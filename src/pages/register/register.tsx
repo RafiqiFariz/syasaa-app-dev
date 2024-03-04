@@ -7,8 +7,8 @@ export const RegisterPage = ()=>{
     const [form, setFrom] = useState({
         username: '',
         password: '',
-        confirmPassword: ''
-    
+        confirmPassword: '',
+        role_id: '0'
     })
     const handleChange = (event: any) => {
         const {name, value} = event.target
@@ -18,10 +18,31 @@ export const RegisterPage = ()=>{
             [name]: value
         })
     }
-    const onFinish = (event: any) => {
+    const onFinish = async (event: any)  => {
         event.preventDefault()
         console.log('Received values of form: ', form);
-        // setFrom(values)
+        try {
+            const response = await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+                method: 'GET',
+            })
+            const data = response.status
+            console.log(data,'asdasd')
+            if (data === 204) {
+                const response = await fetch('http://localhost:8000/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        
+                    },
+                    body: JSON.stringify(form)
+                })
+                const data = await response.json()
+                console.log(data, 'Data')
+            }
+        } catch (error) {
+            console.log(error,'Error')
+        }
       };
     return(
       <div className="container my-auto mt-5">
@@ -53,12 +74,21 @@ export const RegisterPage = ()=>{
                   </span>
                   <input name='confirmPassword' value={form.confirmPassword} onChange={handleChange} type="password" className="form-control" placeholder="Confirm Password" aria-label="Confirm Password" aria-describedby="basic-addon3"/>
               </div>
+              <div className="input-group input-group-static mb-4">
+                <label htmlFor="exampleFormControlSelect1" className="ms-0">Example select</label>
+                <select name='role_id' value={form.role_id} className="form-control" id="exampleFormControlSelect1" onChange={handleChange}>
+                  <option value={1}>Admin</option>
+                  <option value={2}>Staff</option>
+                  <option value={3}>Lecture</option>
+                  <option value={4}>Mahasiswa</option>
+                </select>
+              </div>
                 <div className="text-center">
                   <button type="submit" className="btn bg-primary w-100 my-4 mb-2 text-white">Sign up</button>
                 </div>
                 <p className="mt-4 text-sm text-center">
                    have an account?
-                  <IonItem className="text-primary text-gradient font-weight-bold" routerLink="/login">Sign in</IonItem>
+                  <IonItem className="text-primary  font-weight-bold" routerLink="/login">Sign in</IonItem>
                 </p>
               </form>
             </div>

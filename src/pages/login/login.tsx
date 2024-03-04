@@ -1,6 +1,3 @@
-import { Button, Card, Checkbox, Form, Input } from "antd"
-import styles from './login.module.css'
-import { LockOutlined, UserOutlined } from "@ant-design/icons"
 import { IonItem } from "@ionic/react"
 import { useState } from "react"
 export const LoginPage = ()=>{
@@ -55,7 +52,7 @@ export const LoginPage = ()=>{
                   </div>
                   <p className="mt-4 text-sm text-center">
                     Don't have an account?
-                    <IonItem className="text-primary text-gradient font-weight-bold" routerLink="/register">Sign up</IonItem>
+                    <IonItem className="text-primary  font-weight-bold" routerLink="/register">Sign up</IonItem>
                   </p>
                 </form>
               </div>
