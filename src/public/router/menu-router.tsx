@@ -1,5 +1,5 @@
 import { IonApp, IonRouterOutlet } from "@ionic/react";
-import { LoginPage } from "../../pages/login";
+import { LoginPage } from "../../pages/login/Login";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router";
 import { RegisterPage } from "../../pages/register/register";

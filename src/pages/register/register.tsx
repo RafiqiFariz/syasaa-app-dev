@@ -2,12 +2,15 @@ import { Button, Card, Form, Input } from 'antd';
 import styles from './register.module.css';
 import { IonItem } from '@ionic/react';
 import { useState } from 'react';
+import Cookies from 'js-cookie';
 
 export const RegisterPage = ()=>{
     const [form, setFrom] = useState({
-        username: '',
+        name: '',
+        email: '',
         password: '',
-        confirmPassword: '',
+        password_confirmation: '',
+        phone: '',
         role_id: '0'
     })
     const handleChange = (event: any) => {
@@ -20,25 +23,28 @@ export const RegisterPage = ()=>{
     }
     const onFinish = async (event: any)  => {
         event.preventDefault()
-        console.log('Received values of form: ', form);
+        console.log('Received values of form: ', JSON.stringify(form));
         try {
             const response = await fetch('http://localhost:8000/sanctum/csrf-cookie', {
                 method: 'GET',
+                credentials: 'include',
             })
             const data = response.status
-            console.log(data,'asdasd')
+            console.log(Cookies.get('XSRF-TOKEN'))
+            console.log(form, 'asdasd')
             if (data === 204) {
-                const response = await fetch('http://localhost:8000/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        
-                    },
-                    body: JSON.stringify(form)
-                })
-                const data = await response.json()
-                console.log(data, 'Data')
+              const response = await fetch('http://localhost:8000/register', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                  'Accept': 'application/json',
+                  'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN') || '',
+                  'Content-Type': 'application/json', // Add this line
+                },
+                body: JSON.stringify(form), // Convert form to JSON
+              })
+              const data = await response.json()
+              console.log(data, 'Data')
             }
         } catch (error) {
             console.log(error,'Error')
@@ -57,10 +63,16 @@ export const RegisterPage = ()=>{
             <div className="card-body">
               <form onSubmit={onFinish}>
               <div className="input-group input-group-dynamic mb-4">
+                  <span className="input-group-text" id="basic-addon0">
+                      <i className="bi bi-person-fill"></i>
+                  </span>
+                  <input name='name' value={form.name} onChange={handleChange} type="text" className="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon0"/>
+              </div>
+              <div className="input-group input-group-dynamic mb-4">
                   <span className="input-group-text" id="basic-addon1">
                       <i className="bi bi-person-fill"></i>
                   </span>
-                  <input name='username' value={form.username} onChange={handleChange} type="email" className="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"/>
+                  <input name='email' value={form.email} onChange={handleChange} type="email" className="form-control" placeholder="email" aria-label="email" aria-describedby="basic-addon1"/>
               </div>
               <div className="input-group input-group-dynamic mb-4">
                   <span className="input-group-text" id="basic-addon2">
@@ -72,7 +84,7 @@ export const RegisterPage = ()=>{
                   <span className="input-group-text" id="basic-addon3">
                     <i className="bi bi-key-fill"></i>
                   </span>
-                  <input name='confirmPassword' value={form.confirmPassword} onChange={handleChange} type="password" className="form-control" placeholder="Confirm Password" aria-label="Confirm Password" aria-describedby="basic-addon3"/>
+                  <input name='password_confirmation' value={form.password_confirmation} onChange={handleChange} type="password" className="form-control" placeholder="Confirm Password" aria-label="Confirm Password" aria-describedby="basic-addon3"/>
               </div>
               <div className="input-group input-group-static mb-4">
                 <label htmlFor="exampleFormControlSelect1" className="ms-0">Example select</label>

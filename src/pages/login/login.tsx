@@ -1,8 +1,9 @@
 import { IonItem } from "@ionic/react"
+import Cookies from "js-cookie"
 import { useState } from "react"
 export const LoginPage = ()=>{
     const [form, setFrom] = useState({
-        username: '',
+        email: '',
         password: '',
 
     
@@ -15,10 +16,34 @@ export const LoginPage = ()=>{
             [name]: value
         })
     }
-    const onFinish = (event: any) => {
-        event.preventDefault()
-        console.log('Received values of form: ', form);
-      };
+    const onFinish = async (event: any)  => {
+      event.preventDefault()
+      console.log('Received values of form: ', JSON.stringify(form));
+      try {
+          const response = await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+              method: 'GET',
+              credentials: 'include',
+          })
+          const data = response.status
+          console.log(form, 'asdasd')
+          if (data === 204) {
+            const response = await fetch('http://localhost:8000/login', {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Accept': 'application/json',
+                'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN') || '',
+                'Content-Type': 'application/json', // Add this line
+              },
+              body: JSON.stringify(form), // Convert form to JSON
+            })
+            const data = await response.json()
+            console.log(data, 'Data')
+          }
+      } catch (error) {
+          console.log(error,'Error')
+      }
+    };
     return (
     <div className="container my-auto mt-5">
         <div className="row">
@@ -35,7 +60,7 @@ export const LoginPage = ()=>{
                     <span className="input-group-text" id="basic-addon1">
                         <i className="bi bi-person-fill"></i>
                     </span>
-                    <input name="username" value={form.username} onChange={handleChange} type="email" className="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"/>
+                    <input name="email" value={form.email} onChange={handleChange} type="email" className="form-control" placeholder="email" aria-label="email" aria-describedby="basic-addon1"/>
                 </div>
                 <div className="input-group input-group-dynamic mb-4">
                     <span className="input-group-text" id="basic-addon2">
