@@ -1,8 +1,9 @@
 import { Button, Card, Form, Input } from 'antd';
 import styles from './register.module.css';
-import { IonItem } from '@ionic/react';
+import { IonItem } from '@ionic/react'; 
 import { useState } from 'react';
 import Cookies from 'js-cookie';
+import { Redirect, useHistory } from 'react-router';
 
 export const RegisterPage = ()=>{
     const [form, setFrom] = useState({
@@ -13,6 +14,7 @@ export const RegisterPage = ()=>{
         phone: '',
         role_id: '0'
     })
+    const history = useHistory();
     const handleChange = (event: any) => {
         const {name, value} = event.target
         console.log(event.target.name)
@@ -44,7 +46,11 @@ export const RegisterPage = ()=>{
                 body: JSON.stringify(form), // Convert form to JSON
               })
               const data = await response.json()
-              console.log(data, 'Data')
+              console.log(data,'data')
+              if (data) {
+                history.push('/dashboard');
+                console.log(data,'data')
+              }
             }
         } catch (error) {
             console.log(error,'Error')

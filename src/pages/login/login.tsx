@@ -1,13 +1,15 @@
 import { IonItem } from "@ionic/react"
 import Cookies from "js-cookie"
 import { useState } from "react"
+import { useHistory} from 'react-router-dom';
+import { Redirect } from "react-router"
 export const LoginPage = ()=>{
+  const history = useHistory();
     const [form, setFrom] = useState({
         email: '',
         password: '',
-
-    
     })
+    const [success, setSuccess] = useState(false)
     const handleChange = (event: any) => {
         const {name, value} = event.target
         console.log(event.target.name)
@@ -25,7 +27,6 @@ export const LoginPage = ()=>{
               credentials: 'include',
           })
           const data = response.status
-          console.log(form, 'asdasd')
           if (data === 204) {
             const response = await fetch('http://localhost:8000/login', {
               method: 'POST',
@@ -37,8 +38,11 @@ export const LoginPage = ()=>{
               },
               body: JSON.stringify(form), // Convert form to JSON
             })
-            const data = await response.json()
-            console.log(data, 'Data')
+            const data = await response.json();
+            if (data) {
+              history.push('/dashboard');
+              console.log(data, 'Data');
+            }
           }
       } catch (error) {
           console.log(error,'Error')
@@ -73,7 +77,8 @@ export const LoginPage = ()=>{
                     <label className="form-check-label mb-0 ms-3" >Remember me</label>
                   </div>
                   <div className="text-center">
-                    <button type="submit" className="btn bg-primary w-100 my-4 mb-2 text-white">Sign in</button>
+                    <button type="submit" className="btn bg-primary w-100 my-4 mb-2 text-white"
+                    >Sign in</button>
                   </div>
                   <p className="mt-4 text-sm text-center">
                     Don't have an account?
