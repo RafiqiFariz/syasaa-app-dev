@@ -1,18 +1,16 @@
 import Cookies from "js-cookie";
 import { UserLayout } from "../../../public/Layout/Layout";
-import { useHistory, useParams } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useHistory } from "react-router";
 
-export const EditUserPage = () => {
-  const { id } = useParams<{ id: string }>();
-
+export const AddUserPage = () => {
   const [form, setFrom] = useState({
     name: "",
     email: "",
     password: "",
     password_confirmation: "",
     phone: "",
-    roleId: "0",
+    role_id: "0",
   });
 
   const history = useHistory();
@@ -20,7 +18,7 @@ export const EditUserPage = () => {
   // Handle form change
   const handleChange = (event: any) => {
     const { name, value } = event.target;
-    console.log(event.target.name);
+
     setFrom({
       ...form,
       [name]: value,
@@ -30,6 +28,7 @@ export const EditUserPage = () => {
   // Handle form submit
   const onFinish = async (event: any) => {
     event.preventDefault();
+
     try {
       const response = await fetch(
         "http://localhost:8000/sanctum/csrf-cookie",
@@ -42,22 +41,18 @@ export const EditUserPage = () => {
       const data = response.status;
 
       if (data === 204) {
-        const response = await fetch(
-          `http://localhost:8000/api/v1/users/${id}`,
-          {
-            method: "PUT",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(form), // Convert form to JSON
-          }
-        );
+        const response = await fetch("http://localhost:8000/api/v1/users", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+            "Content-Type": "application/json", // Add this line
+          },
+          body: JSON.stringify(form), // Convert form to JSON
+        });
 
         if (response.ok) {
-          // Redirect to dashboard
           history.push("/dashboard");
         }
       }
@@ -65,33 +60,6 @@ export const EditUserPage = () => {
       console.log(error, "Error");
     }
   };
-
-  // Get data by id
-  const getDataById = async () => {
-    try {
-      const response = await fetch(`http://localhost:8000/api/v1/users/${id}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-          "Content-Type": "application/json", // Add this line
-        },
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setFrom(data.data);
-      }
-    } catch (error) {
-      console.log(error, "error");
-    }
-  };
-
-  useEffect(() => {
-    getDataById();
-  }, [id]);
 
   return (
     <UserLayout>
@@ -102,7 +70,7 @@ export const EditUserPage = () => {
               <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                   <h6 className="text-white text-capitalize ps-3">
-                    Edit User Form
+                    Add User Form
                   </h6>
                 </div>
                 <div className="card-body px-5 pb-2">
@@ -176,7 +144,7 @@ export const EditUserPage = () => {
                       </label>
                       <select
                         name="role_id"
-                        value={form.roleId}
+                        value={form.role_id}
                         className="form-control"
                         id="exampleFormControlSelect1"
                         onChange={handleChange}
@@ -192,7 +160,7 @@ export const EditUserPage = () => {
                         type="submit"
                         className="btn bg-primary w-100 my-4 mb-2 text-white"
                       >
-                        Update User
+                        Create User
                       </button>
                     </div>
                   </form>
