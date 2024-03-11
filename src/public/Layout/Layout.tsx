@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SideBar } from "../../components/sidebar";
 import { useHistory } from "react-router";
 import Cookies from "js-cookie";
-import _, { capitalize } from "lodash";
+import _, { capitalize, set } from "lodash";
+import { AuthContext } from "../../context/Auth";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,8 @@ interface LayoutProps {
 
 export const UserLayout = ({ children }: LayoutProps) => {
   const history = useHistory();
+
+  const { isLogin, setIsLogin } = useContext(AuthContext);
 
   const [nav, setNav] = useState(false);
 
@@ -63,12 +66,14 @@ export const UserLayout = ({ children }: LayoutProps) => {
         },
       });
 
-      const data = await response.json();
-
-      if (data.status === 200) {
+      if (response.ok) {
         localStorage.removeItem("user");
 
         history.push("/login");
+        setIsLogin({
+          isLogin: false,
+          isPending: true,
+        });
       }
     } catch (e) {
       console.log(e);

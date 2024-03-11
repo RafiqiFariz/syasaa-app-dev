@@ -1,9 +1,12 @@
 import { IonItem } from "@ionic/react";
 import Cookies from "js-cookie";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { AuthContext } from "../../context/Auth";
 export const LoginPage = () => {
   const history = useHistory();
+
+  const { isLogin, setIsLogin } = useContext(AuthContext);
 
   const [form, setFrom] = useState({
     email: "",
@@ -104,6 +107,10 @@ export const LoginPage = () => {
 
             // Redirect to dashboard
             history.push("/dashboard");
+            setIsLogin({
+              isLogin: true,
+              isPending: true,
+            });
           } else {
             console.log("Login failed");
           }

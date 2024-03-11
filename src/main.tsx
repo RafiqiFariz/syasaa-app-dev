@@ -9,11 +9,14 @@ import "material-dashboard/assets/css/material-dashboard.css";
 import "material-dashboard/assets/js/material-dashboard.min.js";
 import "material-dashboard/assets/js/core/bootstrap.min.js";
 import "material-dashboard/assets/js/core/popper.min.js";
+import { AuthContextProvider } from "./context/Auth";
 
 const container = document.getElementById("root");
 const root = createRoot(container!);
 root.render(
   <React.StrictMode>
-    <Router />
+    <AuthContextProvider>
+      <Router />
+    </AuthContextProvider>
   </React.StrictMode>
 );

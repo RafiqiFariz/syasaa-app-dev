@@ -85,7 +85,7 @@ export const RolePage = () => {
               }}
             >
               <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+                <div className="bg-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                   <h6 className="text-white text-capitalize ps-3 d-flex align-items-center">
                     Manage Users Roles
                   </h6>
