@@ -39,6 +39,7 @@ export const Router: React.FC = () => {
             isLogin: false,
             isPending: false,
           });
+          console.log(data, "data123");
         } else {
           setIsLogin({
             isLogin: true,
@@ -66,7 +67,6 @@ export const Router: React.FC = () => {
       </div>
     );
   }
-
   return (
     <IonApp>
       <IonReactRouter>
@@ -86,54 +86,63 @@ export const Router: React.FC = () => {
             }
           />
           <Route
+            exact
             path="/users"
             render={() =>
               isLogin.isLogin ? <UserPage /> : <Redirect to="/login" />
             }
           />
           <Route
+            exact
             path="/users/add"
             render={() =>
               isLogin.isLogin ? <AddUserPage /> : <Redirect to="/login" />
             }
           />
           <Route
+            exact
             path="/users/edit/:id"
             render={() =>
               isLogin.isLogin ? <EditUserPage /> : <Redirect to="/login" />
             }
           />
           <Route
+            exact
             path="/roles"
             render={() =>
               isLogin.isLogin ? <RolePage /> : <Redirect to="/login" />
             }
           />
           <Route
+            exact
             path="/roles/edit/:id"
             render={() =>
               isLogin.isLogin ? <EditRolePage /> : <Redirect to="/login" />
             }
           />
           <Route
+            exact
             path="/roles/add"
             render={() =>
               isLogin.isLogin ? <AddRolePage /> : <Redirect to="/login" />
             }
           />
           <Route
+            exact
             path="/permissions"
             render={() =>
               isLogin.isLogin ? <PermissionPage /> : <Redirect to="/login" />
             }
           />
           <Route
+            exact
             path="/permissions/add"
             render={() =>
               isLogin.isLogin ? <AddPermissionPage /> : <Redirect to="/login" />
             }
           />
           <Route
+            exact
             path="/permissions/edit/:id"
             render={() =>
               isLogin.isLogin ? (

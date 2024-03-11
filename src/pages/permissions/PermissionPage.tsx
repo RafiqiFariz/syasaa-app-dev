@@ -120,10 +120,10 @@ export const PermissionPage = () => {
                   <table className="table align-items-center mb-0">
                     <thead>
                       <tr>
-                        {columns.map((item) => {
+                        {columns.map((item, index) => {
                           return (
                             <th
-                              key={item.key}
+                              key={index}
                               className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                             >
                               <div className="d-flex justify-content-center">

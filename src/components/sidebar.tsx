@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
 
 export const SideBar = ({ user }: { user: any }) => {
   const [list, setList] = useState<any>([]);
@@ -87,6 +87,7 @@ export const SideBar = ({ user }: { user: any }) => {
       getList();
     }
   }, [user]);
+  const history = useHistory();
   return (
     <aside
       className="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-gradient-dark ps bg-white"
@@ -109,7 +110,9 @@ export const SideBar = ({ user }: { user: any }) => {
                       ? "active bg-primary bg-opacity-25"
                       : ""
                   }`}
-                  href={`${item.link}`}
+                  onClick={() => {
+                    history.push(item.link);
+                  }}
                 >
                   <div className="">
                     {/* <i className="material-icons opacity-10">dashboard</i> */}

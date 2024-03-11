@@ -60,7 +60,7 @@ export const AddUserPage = () => {
       console.log(error, "Error");
     }
   };
-
+  console.log("userpahge");
   return (
     <UserLayout>
       <div className="container-fluid py-4">

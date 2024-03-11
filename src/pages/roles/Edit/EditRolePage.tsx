@@ -209,7 +209,13 @@ export const EditRolePage = () => {
                         })}
                       </select>
                     </div>
-                    <div className="input-group input-group-dynamic mt-3 mb-4 w-100">
+                    <div
+                      className="input-group input-group-dynamic mt-3 mb-4 w-100"
+                      style={{
+                        overflowY: "auto",
+                        maxHeight: "200px",
+                      }}
+                    >
                       <div className="d-flex flex-wrap w-100 gap-2">
                         {form.permissions.map(
                           (permission: any, index: number) => {

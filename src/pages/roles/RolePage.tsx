@@ -63,7 +63,7 @@ export const RolePage = () => {
         },
       });
       const data = await response.json();
-      if (data) {
+      if (response.ok) {
         getUserData();
       }
     } catch (error) {
