@@ -98,9 +98,6 @@ export const EditUserPage = () => {
                 <div className="card-body px-5 pb-2">
                   <form onSubmit={onFinish}>
                     <div className="input-group input-group-dynamic mb-4">
-                      <span className="input-group-text" id="basic-addon0">
-                        <i className="bi bi-person-fill"></i>
-                      </span>
                       <input
                         name="name"
                         value={form.name}
@@ -113,9 +110,6 @@ export const EditUserPage = () => {
                       />
                     </div>
                     <div className="input-group input-group-dynamic mb-4">
-                      <span className="input-group-text" id="basic-addon1">
-                        <i className="bi bi-person-fill"></i>
-                      </span>
                       <input
                         name="email"
                         value={form.email}
@@ -128,9 +122,6 @@ export const EditUserPage = () => {
                       />
                     </div>
                     <div className="input-group input-group-dynamic mb-4">
-                      <span className="input-group-text" id="basic-addon2">
-                        <i className="bi bi-person-lock"></i>
-                      </span>
                       <input
                         name="password"
                         value={form.password}
@@ -143,9 +134,6 @@ export const EditUserPage = () => {
                       />
                     </div>
                     <div className="input-group input-group-dynamic mb-4">
-                      <span className="input-group-text" id="basic-addon3">
-                        <i className="bi bi-key-fill"></i>
-                      </span>
                       <input
                         name="password_confirmation"
                         value={form.password_confirmation}

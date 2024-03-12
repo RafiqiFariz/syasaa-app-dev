@@ -71,6 +71,11 @@ export const Router: React.FC = () => {
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet>
+          <Redirect
+            exact
+            path="/"
+            to={!isLogin.isLogin ? "/login" : "/dashboard"}
+          />
           <Route
             exact
             path="/login"

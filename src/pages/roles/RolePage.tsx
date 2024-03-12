@@ -157,13 +157,13 @@ export const RolePage = () => {
                                       history.push(`/roles/edit/${item.id}`);
                                     }}
                                   >
-                                    Change Role
+                                    Edit
                                   </button>
                                   <button
                                     className="btn btn-danger btn-sm mx-1"
                                     onClick={() => deleteRole(item.id)}
                                   >
-                                    Delete Role
+                                    Delete
                                   </button>
                                 </div>
                               </td>

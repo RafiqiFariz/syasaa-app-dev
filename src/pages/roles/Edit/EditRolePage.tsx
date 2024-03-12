@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 
 export const EditRolePage = () => {
   const { id } = useParams<{ id: string }>();
+
   const [form, setForm] = useState({
     name: "",
     permissions: [
@@ -14,11 +15,14 @@ export const EditRolePage = () => {
       },
     ],
   });
+
   const [options, setOptions] = useState<Array<any>>([]);
+
   const history = useHistory();
+
   const handleChange = (event: any) => {
     const { name, value } = event.target;
-    console.log(event.target.name, "asdas");
+
     setForm((prev) => {
       return {
         ...prev,
@@ -26,6 +30,7 @@ export const EditRolePage = () => {
       };
     });
   };
+
   const getRoles = async () => {
     try {
       const response = await fetch(
@@ -40,29 +45,30 @@ export const EditRolePage = () => {
           },
         }
       );
+
       const data = await response.json();
-      if (data) {
-        console.log(data, "data");
+
+      if (response.ok) {
         setForm({
           name: data.data.name,
           permissions: data.data.permissions,
         });
       }
-      console.log(data, "dataRoles");
     } catch (error) {
       console.log(error, "error");
     }
   };
+
   const onFinish = async (event: any) => {
     event.preventDefault();
-    console.log("Received values of form: ", JSON.stringify(form));
+
     try {
       const payload = {
         name: form.name,
         permissions: form.permissions.map((permission: any) => permission.id),
         _method: "PUT",
       };
-      console.log(payload, "payload");
+
       const response = await fetch(`http://localhost:8000/api/v1/roles/${id}`, {
         method: "PUT",
         credentials: "include",
@@ -73,8 +79,8 @@ export const EditRolePage = () => {
         },
         body: JSON.stringify(payload), // Convert form to JSON
       });
-      const data = await response.json();
-      if (data) {
+
+      if (response.ok) {
         history.push("/roles");
       }
     } catch (error) {
@@ -86,6 +92,7 @@ export const EditRolePage = () => {
       setForm((prev: any) => {
         return {
           ...prev,
+
           permissions: [
             {
               id: 0,
@@ -94,8 +101,10 @@ export const EditRolePage = () => {
           ],
         };
       });
+
       return;
     }
+
     setForm((prev: any) => {
       return {
         ...prev,
@@ -103,6 +112,7 @@ export const EditRolePage = () => {
       };
     });
   };
+
   const handleSelect = (event: any) => {
     const { value } = event.target;
 
@@ -134,6 +144,7 @@ export const EditRolePage = () => {
       };
     });
   };
+
   const getPermissions = async () => {
     try {
       const response = await fetch("http://localhost:8000/api/v1/permissions", {
@@ -146,12 +157,9 @@ export const EditRolePage = () => {
         },
       });
       const data = await response.json();
-      console.log(data, "data----");
       if (response.ok) {
-        console.log(data, "data----");
         setOptions(data.data);
       }
-      console.log(data, "dataRoles");
     } catch (error) {
       console.log(error, "error");
     }
@@ -177,9 +185,6 @@ export const EditRolePage = () => {
                 <div className="card-body px-5 pb-2">
                   <form onSubmit={onFinish}>
                     <div className="input-group input-group-dynamic mb-4">
-                      <span className="input-group-text" id="basic-addon0">
-                        <i className="bi bi-person-fill"></i>
-                      </span>
                       <input
                         name="name"
                         value={form.name}
@@ -202,7 +207,13 @@ export const EditRolePage = () => {
                       >
                         {options.map((option) => {
                           return (
-                            <option key={option.id} value={option.id}>
+                            <option
+                              key={option.id}
+                              value={option.id}
+                              disabled={form.permissions.some(
+                                (permission) => permission.id === option.id
+                              )}
+                            >
                               {option.name}
                             </option>
                           );

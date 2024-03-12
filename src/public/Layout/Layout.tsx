@@ -70,6 +70,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
         localStorage.removeItem("user");
 
         history.push("/login");
+
         setIsLogin({
           isLogin: false,
           isPending: true,
@@ -158,6 +159,8 @@ export const UserLayout = ({ children }: LayoutProps) => {
                 <li className="nav-item d-flex align-items-center">
                   <button
                     className="nav-link text-body font-weight-bold px-0"
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
                     onClick={HandleSignOut}
                   >
                     <span className="d-sm-inline d-none">Sign Out</span>

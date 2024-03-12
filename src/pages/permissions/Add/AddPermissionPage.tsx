@@ -52,9 +52,6 @@ export const AddPermissionPage = () => {
                 <div className="card-body px-5 pb-2">
                   <form onSubmit={onFinish}>
                     <div className="input-group input-group-dynamic mb-4">
-                      <span className="input-group-text" id="basic-addon0">
-                        <i className="bi bi-person-fill"></i>
-                      </span>
                       <input
                         name="name"
                         value={form.name}
