@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
+import {Link} from "react-router-dom";
 
-export const SideBar = ({ user }: { user: any }) => {
+export const Sidebar = ({ user }: { user: any }) => {
   const [list, setList] = useState<any>([]);
   const getList = () => {
     let list = [];
@@ -87,14 +88,17 @@ export const SideBar = ({ user }: { user: any }) => {
       getList();
     }
   }, [user]);
+
   const history = useHistory();
+  const appName = import.meta.env.VITE_APP_NAME;
+
   return (
     <aside
       className="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-gradient-dark ps bg-white"
       id="sidenav-main"
     >
       <div className="sidenav-header d-flex justify-content-center align-items-center">
-        <span className="ms-1 font-weight-bold text-white">Syasa Absensi</span>
+        <span className="ms-1 font-weight-bold text-white">{appName}</span>
       </div>
       <div
         className="collapse navbar-collapse h-100"
@@ -104,21 +108,15 @@ export const SideBar = ({ user }: { user: any }) => {
           {list.map((item: any, index: number) => {
             return (
               <li key={index} className="nav-item">
-                <a
+                <Link to={item.link}
                   className={`nav-link text-white ${
                     window.location.pathname === item.link
                       ? "active bg-primary bg-opacity-25"
                       : ""
                   }`}
-                  onClick={() => {
-                    history.push(item.link);
-                  }}
                 >
-                  <div className="">
-                    {/* <i className="material-icons opacity-10">dashboard</i> */}
-                  </div>
                   <span className="nav-link-text ms-1">{item.name}</span>
-                </a>
+                </Link>
               </li>
             );
           })}

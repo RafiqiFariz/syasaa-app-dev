@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserLayout } from "../../public/Layout/Layout";
+import { UserLayout } from "../../components/Layout/Layout";
 import { useHistory } from "react-router";
 import Cookies from "js-cookie";
 interface userData {
@@ -128,7 +128,7 @@ export const RolePage = () => {
                           {Array(columns.length)
                             .fill(0)
                             .map((_, i) => (
-                              <td key={i} className="text-center">
+                              <td key={i} className="text-center placeholder-glow">
                                 <span className="placeholder col-10"></span>
                               </td>
                             ))}

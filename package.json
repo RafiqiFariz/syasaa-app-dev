@@ -33,7 +33,8 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
     "react-dom": "^18.2.0",
-    "react-router": "^5.3.4"
+    "react-router": "^5.3.4",
+    "smooth-scrollbar-react": "^2.4.1"
   },
   "devDependencies": {
     "@capacitor/cli": "5.7.0",

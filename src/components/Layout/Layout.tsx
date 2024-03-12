@@ -1,9 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { SideBar } from "../../components/sidebar";
+import { Sidebar } from "../Sidebar";
 import { useHistory } from "react-router";
 import Cookies from "js-cookie";
-import _, { capitalize, set } from "lodash";
+import _ from "lodash";
 import { AuthContext } from "../../context/Auth";
+import fetchAPI from "../../fetch";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,7 +19,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
 
   let pathname = window.location.pathname.split("/").join(" / ");
 
-  const [userdata, setUserdata] = useState({
+  const [userData, setUserData] = useState({
     name: "",
     email: "",
     phone: "",
@@ -28,7 +29,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
 
   const getUsers = async () => {
     try {
-      const response = await fetch("http://localhost:8000/user", {
+      const response = await fetchAPI("/user", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -41,7 +42,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
       const data = await response.json();
 
       if (data) {
-        setUserdata({
+        setUserData({
           name: data.name,
           email: data.email,
           phone: data?.phone,
@@ -54,9 +55,9 @@ export const UserLayout = ({ children }: LayoutProps) => {
       console.log(e);
     }
   };
-  const HandleSignOut = async () => {
+  const handleSignOut = async () => {
     try {
-      const response = await fetch("http://localhost:8000/logout", {
+      const response = await fetchAPI("/logout", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -84,17 +85,13 @@ export const UserLayout = ({ children }: LayoutProps) => {
     getUsers();
   }, []);
 
-  const capitalize = (str: string) => {
-    return str.replace(/\b\w/g, (char) => char.toUpperCase());
-  };
-
   return (
     <div
       className={`g-sidenav-show bg-gray-200 ${
         nav ? "g-sidenav-pinned" : ""
       } h-100`}
     >
-      <SideBar user={userdata} />
+      <Sidebar user={userData} />
       <div className="main-content position-relative max-height-vh-100 h-100">
         <nav
           className="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
@@ -105,8 +102,8 @@ export const UserLayout = ({ children }: LayoutProps) => {
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
                 {pathname.split("/").map((item, index) => {
-                  const caps = capitalize(item as string) || item;
-                  console.log(caps, item, "---");
+                  const submenu = _.startCase(_.camelCase(item)) || item;
+                  console.log(submenu, item, "---");
                   if (index === 0) {
                     return (
                       <li
@@ -125,12 +122,12 @@ export const UserLayout = ({ children }: LayoutProps) => {
                       className="breadcrumb-item text-sm text-dark active"
                       aria-current="page"
                     >
-                      {caps}
+                      {submenu}
                     </li>
                   );
                 })}
               </ol>
-              <h6 className="font-weight-bolder mb-0">Profile</h6>
+              <h6 className="font-weight-bolder mb-0">{_.startCase(_.camelCase(pathname.split("/").toString()))}</h6>
             </nav>
             <div
               className="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
@@ -161,7 +158,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
                     className="nav-link text-body font-weight-bold px-0"
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModal"
-                    onClick={HandleSignOut}
+                    onClick={handleSignOut}
                   >
                     <span className="d-sm-inline d-none">Sign Out</span>
                   </button>

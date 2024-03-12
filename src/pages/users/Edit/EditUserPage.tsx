@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { UserLayout } from "../../../public/Layout/Layout";
+import { UserLayout } from "../../../components/Layout/Layout";
 import { useHistory, useParams } from "react-router";
 import { useEffect, useState } from "react";
 

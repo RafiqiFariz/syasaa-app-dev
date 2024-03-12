@@ -1,8 +1,9 @@
 import { IonItem } from "@ionic/react";
 import Cookies from "js-cookie";
 import { useContext, useState } from "react";
-import { useHistory } from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import { AuthContext } from "../../context/Auth";
+import fetchAPI from "../../fetch";
 export const LoginPage = () => {
   const history = useHistory();
 
@@ -11,11 +12,13 @@ export const LoginPage = () => {
   const [form, setFrom] = useState({
     email: "",
     password: "",
+    remember: 0,
   });
 
   const [errors, setErrors] = useState({
     email: "",
     password: "",
+    remember: 0,
   });
 
   // Handle form change
@@ -82,8 +85,8 @@ export const LoginPage = () => {
 
     if (validateForm()) {
       try {
-        const response = await fetch(
-          "http://localhost:8000/sanctum/csrf-cookie",
+        const response = await fetchAPI(
+          "/sanctum/csrf-cookie",
           {
             method: "GET",
             credentials: "include",
@@ -91,7 +94,7 @@ export const LoginPage = () => {
         );
 
         if (response.status === 204) {
-          const loginResponse = await fetch("http://localhost:8000/login", {
+          const loginResponse = await fetchAPI("/login", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -120,7 +123,11 @@ export const LoginPage = () => {
       }
     }
   };
+
   console.log(errors, "errors");
+
+  const appName = import.meta.env.VITE_APP_NAME;
+
   return (
     <div className="container my-auto mt-5">
       <div className="row">
@@ -129,7 +136,7 @@ export const LoginPage = () => {
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-primary shadow-primary border-radius-lg py-3 pe-1 mt-3">
                 <h4 className="text-white font-weight-bolder text-center mt-2 mb-0">
-                  Absensi Syasa
+                  {appName}
                 </h4>
               </div>
             </div>
@@ -145,7 +152,7 @@ export const LoginPage = () => {
                     onChange={handleChange}
                     type="email"
                     className="form-control"
-                    placeholder="email"
+                    placeholder="Email"
                     aria-label="email"
                     aria-describedby="basic-addon1"
                   />
@@ -163,7 +170,7 @@ export const LoginPage = () => {
                     onChange={handleChange}
                     type="password"
                     className="form-control"
-                    placeholder="password"
+                    placeholder="Password"
                     aria-label="Password"
                     aria-describedby="basic-addon2"
                   />
@@ -171,8 +178,9 @@ export const LoginPage = () => {
                 {errors.password && (
                   <span className="text-danger text-s">{errors.password}</span>
                 )}
-                <div className="form-check form-switch d-flex align-items-center mb-3">
+                <div className="form-check form-switch d-flex align-items-center my-3">
                   <input
+                    name="remember"
                     className="form-check-input"
                     type="checkbox"
                     id="rememberMe"
@@ -191,12 +199,12 @@ export const LoginPage = () => {
                 </div>
                 <p className="mt-4 text-sm text-center">
                   Don't have an account?
-                  <IonItem
-                    className="text-primary  font-weight-bold"
-                    routerLink="/register"
+                  <Link
+                    className="text-primary font-weight-bold ms-2"
+                    to="/register"
                   >
                     Sign up
-                  </IonItem>
+                  </Link>
                 </p>
               </form>
             </div>

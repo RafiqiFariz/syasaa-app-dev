@@ -1,7 +1,8 @@
 import Cookies from "js-cookie";
-import { UserLayout } from "../../../public/Layout/Layout";
+import { UserLayout } from "../../../components/Layout/Layout";
 import { useState } from "react";
 import { useHistory } from "react-router";
+import fetchAPI from "../../../fetch";
 
 export const AddUserPage = () => {
   const [form, setFrom] = useState({
@@ -30,8 +31,8 @@ export const AddUserPage = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/sanctum/csrf-cookie",
+      const response = await fetchAPI(
+        "/sanctum/csrf-cookie",
         {
           method: "GET",
           credentials: "include",
@@ -41,7 +42,7 @@ export const AddUserPage = () => {
       const data = response.status;
 
       if (data === 204) {
-        const response = await fetch("http://localhost:8000/api/v1/users", {
+        const response = await fetchAPI("/api/v1/users", {
           method: "POST",
           credentials: "include",
           headers: {
@@ -60,7 +61,9 @@ export const AddUserPage = () => {
       console.log(error, "Error");
     }
   };
-  console.log("userpahge");
+
+  console.log("userpage");
+
   return (
     <UserLayout>
       <div className="container-fluid py-4">

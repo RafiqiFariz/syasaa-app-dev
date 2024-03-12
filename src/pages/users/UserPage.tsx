@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserLayout } from "../../public/Layout/Layout";
+import { UserLayout } from "../../components/Layout/Layout";
 import { useHistory } from "react-router";
 import Cookies from "js-cookie";
 
@@ -146,12 +146,12 @@ export const UserPage = () => {
               }}
             >
               <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                  <h6 className="text-white text-capitalize ps-3 d-flex align-items-center">
+                <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
+                  <h6 className="text-white text-capitalize ps-3">
                     Users
                   </h6>
                   <button
-                    className="btn btn-info btn-md mx-4"
+                    className="btn btn-info btn-md mx-4 mb-0"
                     onClick={() => {
                       history.push(`/users/add`);
                     }}
@@ -187,7 +187,7 @@ export const UserPage = () => {
                           {Array(columns.length)
                             .fill(0)
                             .map((_, i) => (
-                              <td key={i} className="text-center">
+                              <td key={i} className="text-center placeholder-glow">
                                 <span className="placeholder col-10"></span>
                               </td>
                             ))}

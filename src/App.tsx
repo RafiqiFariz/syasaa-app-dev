@@ -1,0 +1,238 @@
+import {Redirect, Route} from 'react-router-dom';
+import {
+  IonApp,
+  IonIcon,
+  IonLabel,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+  setupIonicReact
+} from '@ionic/react';
+import {IonReactRouter} from '@ionic/react-router';
+import {ellipse, square, triangle} from 'ionicons/icons';
+import Tab1 from './pages/Tab1';
+import Tab2 from './pages/Tab2';
+import Tab3 from './pages/Tab3';
+
+/* Core CSS required for Ionic components to work properly */
+import '@ionic/react/css/core.css';
+
+/* Basic CSS for apps built with Ionic */
+import '@ionic/react/css/normalize.css';
+import '@ionic/react/css/structure.css';
+import '@ionic/react/css/typography.css';
+
+/* Optional CSS utils that can be commented out */
+import '@ionic/react/css/padding.css';
+import '@ionic/react/css/float-elements.css';
+import '@ionic/react/css/text-alignment.css';
+import '@ionic/react/css/text-transformation.css';
+import '@ionic/react/css/flex-utils.css';
+import '@ionic/react/css/display.css';
+
+/* Theme variables */
+import './theme/variables.css';
+import {useContext, useEffect, useState} from "react";
+import {LoginPage} from "./pages/login/Login";
+import {DashboardPage} from "./pages/dashboard/DashboardPage";
+import {UserPage} from "./pages/users/UserPage";
+import {AddUserPage} from "./pages/users/Add/AddUserPage";
+import {EditUserPage} from "./pages/users/Edit/EditUserPage";
+import {RolePage} from "./pages/roles/RolePage";
+import {EditRolePage} from "./pages/roles/Edit/EditRolePage";
+import {AddRolePage} from "./pages/roles/Add/AddRolePage";
+import {PermissionPage} from "./pages/permissions/PermissionPage";
+import {AddPermissionPage} from "./pages/permissions/Add/AddPermissionPage";
+import {EditPermissionPage} from "./pages/permissions/Edit/EditPermissionPage";
+import {AuthContext} from "./context/Auth";
+import Cookies from "js-cookie";
+import fetchAPI from "./fetch";
+
+setupIonicReact();
+
+const App: React.FC = () => {
+  const {isLogin, setIsLogin} = useContext(AuthContext);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const getAuth = async () => {
+      try {
+        const response = await fetchAPI("/user", {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+          },
+        });
+
+        const data = await response.json();
+
+        if (data.message === "Unauthenticated.") {
+          setIsLogin({
+            isLogin: false,
+            isPending: false,
+          });
+          console.log(data, "data123");
+        } else {
+          setIsLogin({
+            isLogin: true,
+            isPending: false,
+          });
+          console.log(data, "data");
+        }
+      } catch (error) {
+        setIsLogin({
+          isLogin: false,
+          isPending: false,
+        });
+      }
+    };
+
+    getAuth();
+  }, [isLogin.isLogin]);
+
+  console.log(isLogin, "isLogin");
+
+  if (isLogin.isPending) {
+    return (
+      <div className="d-flex absolute justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="sr-only"></span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <IonApp>
+      <IonReactRouter>
+        {!isMobile ? (
+          <IonRouterOutlet>
+            <Redirect
+              exact
+              path="/"
+              to={!isLogin.isLogin ? "/login" : "/dashboard"}
+            />
+            <Route
+              exact
+              path="/login"
+              render={() =>
+                !isLogin.isLogin ? <LoginPage/> : <Redirect to={"/dashboard"}/>
+              }
+            />
+            <Route
+              exact
+              path="/dashboard"
+              render={() =>
+                isLogin.isLogin ? <DashboardPage/> : <Redirect to={"/login"}/>
+              }
+            />
+            <Route
+              exact
+              path="/users"
+              render={() =>
+                isLogin.isLogin ? <UserPage/> : <Redirect to="/login"/>
+              }
+            />
+            <Route
+              exact
+              path="/users/add"
+              render={() =>
+                isLogin.isLogin ? <AddUserPage/> : <Redirect to="/login"/>
+              }
+            />
+            <Route
+              exact
+              path="/users/edit/:id"
+              render={() =>
+                isLogin.isLogin ? <EditUserPage/> : <Redirect to="/login"/>
+              }
+            />
+            <Route
+              exact
+              path="/roles"
+              render={() =>
+                isLogin.isLogin ? <RolePage/> : <Redirect to="/login"/>
+              }
+            />
+            <Route
+              exact
+              path="/roles/edit/:id"
+              render={() =>
+                isLogin.isLogin ? <EditRolePage/> : <Redirect to="/login"/>
+              }
+            />
+            <Route
+              exact
+              path="/roles/add"
+              render={() =>
+                isLogin.isLogin ? <AddRolePage/> : <Redirect to="/login"/>
+              }
+            />
+            <Route
+              exact
+              path="/permissions"
+              render={() =>
+                isLogin.isLogin ? <PermissionPage/> : <Redirect to="/login"/>
+              }
+            />
+            <Route
+              exact
+              path="/permissions/add"
+              render={() =>
+                isLogin.isLogin ? <AddPermissionPage/> : <Redirect to="/login"/>
+              }
+            />
+            <Route
+              exact
+              path="/permissions/edit/:id"
+              render={() =>
+                isLogin.isLogin ? (
+                  <EditPermissionPage/>
+                ) : (
+                  <Redirect to="/login"/>
+                )
+              }
+            />
+          </IonRouterOutlet>
+        ) : (
+          <IonTabs>
+            <IonRouterOutlet>
+              <Route exact path="/tab1">
+                <Tab1/>
+              </Route>
+              <Route exact path="/tab2">
+                <Tab2/>
+              </Route>
+              <Route path="/tab3">
+                <Tab3/>
+              </Route>
+              <Route exact path="/">
+                <Redirect to="/tab1"/>
+              </Route>
+            </IonRouterOutlet>
+            <IonTabBar slot="bottom">
+              <IonTabButton tab="tab1" href="/tab1">
+                <IonIcon aria-hidden="true" icon={triangle}/>
+                <IonLabel>Home</IonLabel>
+              </IonTabButton>
+              <IonTabButton tab="tab2" href="/tab2">
+                <IonIcon aria-hidden="true" icon={ellipse}/>
+                <IonLabel>My Absence</IonLabel>
+              </IonTabButton>
+              <IonTabButton tab="tab3" href="/tab3">
+                <IonIcon aria-hidden="true" icon={square}/>
+                <IonLabel>Profile</IonLabel>
+              </IonTabButton>
+            </IonTabBar>
+          </IonTabs>
+        )}
+      </IonReactRouter>
+    </IonApp>
+  )
+};
+
+export default App;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserLayout } from "../../public/Layout/Layout";
+import { UserLayout } from "../../components/Layout/Layout";
 import { useHistory } from "react-router";
 import Cookies from "js-cookie";
 
@@ -140,7 +140,7 @@ export const PermissionPage = () => {
                           {Array(columns.length)
                             .fill(0)
                             .map((_, i) => (
-                              <td key={i} className="text-center">
+                              <td key={i} className="text-center placeholder-glow">
                                 <span className="placeholder col-10"></span>
                               </td>
                             ))}
@@ -194,7 +194,7 @@ export const PermissionPage = () => {
                 </div>
               </div>
               <div className="text-center mt-4 mx-5">
-                <nav aria-label="Page navigation example">
+                <nav>
                   <ul className="pagination pagination-md gap-1">
                     {Array.from({ length: 20 }, (_, index) => index + 1).map(
                       (page) => (
@@ -211,7 +211,6 @@ export const PermissionPage = () => {
                                 ? "text-white"
                                 : "text-primary"
                             }`}
-                            text-white
                             onClick={() => handleChangePage(page)}
                           >
                             {page}
