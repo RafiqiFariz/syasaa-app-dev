@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
 import { useHistory } from "react-router";
+import Swal from "sweetalert2";
+import Pagination from "react-js-pagination";
+import { DefaultPaginatedResponse } from "../../types";
 import Cookies from "js-cookie";
-interface userData {
+import fetchAPI from "../../fetch";
+
+interface ItemData {
   id: number;
   name: string;
-  email: string;
-  phone: string | null;
-  roleId: number;
 }
 
 export const RolePage = () => {
@@ -15,9 +17,14 @@ export const RolePage = () => {
 
   const columns = [
     {
+      name: "ID",
+      selector: "id",
+      key: 1,
+    },
+    {
       name: "Name",
       selector: "name",
-      key: 1,
+      key: 2,
     },
     {
       name: "Action",
@@ -25,13 +32,13 @@ export const RolePage = () => {
     },
   ];
 
-  const [userData, setUserData] = useState<Array<userData>>([]);
-
+  const [roles, setRoles] = useState<DefaultPaginatedResponse<ItemData>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const getUserData = async () => {
+  const getRolesData = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/roles", {
+      const response = await fetchAPI("/api/v1/roles", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -40,10 +47,11 @@ export const RolePage = () => {
           "X-XSRF-TOKEN": localStorage.getItem("XSRF-TOKEN") || "",
         },
       });
+
       const data = await response.json();
-      console.log(data, "data");
+
       if (data) {
-        setUserData(data.data);
+        setRoles(data);
         setIsLoading(false);
       }
     } catch (error) {
@@ -51,130 +59,152 @@ export const RolePage = () => {
       setIsLoading(false);
     }
   };
+
   const deleteRole = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/roles/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        heightAuto: false,
       });
-      const data = await response.json();
+
+      if (!result.isConfirmed) return;
+
+      const response = await fetchAPI(`/api/v1/roles/${id}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN') || '',
+        },
+        body: JSON.stringify({_method: 'DELETE'})
+      });
+
       if (response.ok) {
-        getUserData();
+        await getRolesData();
       }
     } catch (error) {
       console.log(error, "error");
     }
   };
+
+  const handleChangePage = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
   useEffect(() => {
-    getUserData();
-  }, []);
+    getRolesData();
+  }, [currentPage]);
+
   return (
     <UserLayout>
-      <div className="container-fluid py-4">
-        <div className="row">
-          <div className="col-12">
-            <div
-              className="card"
-              style={{
-                height: "85vh",
-              }}
-            >
-              <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div className="bg-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                  <h6 className="text-white text-capitalize ps-3 d-flex align-items-center">
-                    Manage Users Roles
-                  </h6>
-                  <button
-                    className="btn btn-info btn-md mx-4"
-                    onClick={() => {
-                      history.push(`/roles/add`);
-                    }}
-                  >
-                    Add Role
-                  </button>
-                </div>
-              </div>
+      <div className="row">
+        <div className="col-12">
+          <div
+            className="card"
+            style={{
+              height: roles.data?.length > 0 ? "100%" : "85vh",
+            }}
+          >
+            <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div
-                className="card-body px-0 pb-2"
-                style={{
-                  overflowY: "auto",
-                  maxHeight: "max-content",
-                }}
-              >
-                <div className="table-responsive p-0">
-                  <table className="table align-items-center mb-0">
-                    <thead>
-                      <tr>
-                        {columns.map((column, index) => (
-                          <th
-                            key={index}
-                            className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                          >
-                            <div className="d-flex justify-content-center">
-                              {column.name}
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {isLoading ? (
-                        <tr>
-                          {Array(columns.length)
-                            .fill(0)
-                            .map((_, i) => (
-                              <td key={i} className="text-center placeholder-glow">
-                                <span className="placeholder col-10"></span>
-                              </td>
-                            ))}
-                        </tr>
-                      ) : (
-                        userData.map((item, index) => {
-                          return (
-                            <tr key={index}>
-                              <td>
-                                <div className="d-flex px-2 py-1 justify-content-center">
-                                  <div>
-                                    {/* <img src="../assets/img/team-2.jpg" className="avatar avatar-sm me-3 border-radius-lg" alt="user1"> */}
-                                  </div>
-                                  <div className="d-flex flex-column justify-content-center">
-                                    <h6 className="mb-0 text-sm">
-                                      {item.name}
-                                    </h6>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="align-middle">
-                                <div className="d-flex justify-content-center">
-                                  <button
-                                    className="btn btn-primary btn-sm mx-1"
-                                    onClick={() => {
-                                      history.push(`/roles/edit/${item.id}`);
-                                    }}
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    className="btn btn-danger btn-sm mx-1"
-                                    onClick={() => deleteRole(item.id)}
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
+                <h6 className="text-white text-capitalize ps-3 mb-0">
+                  Roles
+                </h6>
+                <button
+                  className="btn btn-info btn-md mx-4 mb-0"
+                  onClick={() => {
+                    history.push(`/roles/add`);
+                  }}
+                >
+                  Add Role
+                </button>
               </div>
+            </div>
+            <div className="card-body px-0 pb-2">
+              <div className="table-responsive">
+                <table className="table align-items-center mb-0">
+                  <thead>
+                  <tr>
+                    {columns.map((column, index) => (
+                      <th
+                        key={index}
+                        className="text-uppercase text-secondary text-xxs font-weight-bolder"
+                      >
+                        {column.name}
+                      </th>
+                    ))}
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {isLoading ? (
+                    <tr>
+                      {Array(columns.length)
+                        .fill(0)
+                        .map((_, i) => (
+                          <td key={i} className="text-center placeholder-glow">
+                            <span className="placeholder col-10"></span>
+                          </td>
+                        ))}
+                    </tr>
+                  ) : (
+                    roles.data?.map((item, index) => {
+                      return (
+                        <tr key={index}>
+                          <td className="text-sm font-weight-normal px-4 py-3">
+                            {item.id}
+                          </td>
+                          <td className="text-sm font-weight-normal px-4 py-3">
+                            <h6 className="mb-0 text-sm">
+                              {item.name}
+                            </h6>
+                          </td>
+                          <td className="align-middle">
+                            <div className="d-flex gap-2">
+                              <button
+                                className="btn btn-primary btn-sm mb-0"
+                                onClick={() => {
+                                  history.push(`/roles/edit/${item.id}`);
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="btn btn-danger btn-sm mb-0"
+                                onClick={() => deleteRole(item.id)}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="text-center pt-4 px-4">
+              <Pagination
+                activePage={roles?.meta?.current_page}
+                itemsCountPerPage={roles?.meta?.per_page}
+                totalItemsCount={roles?.meta?.total ?? 0}
+                onChange={handleChangePage}
+                itemClass="page-item"
+                linkClass="page-link"
+                firstPageText="First"
+                lastPageText="Last"
+                prevPageText={<>&laquo;</>}
+                nextPageText={<>&raquo;</>}
+              />
             </div>
           </div>
         </div>

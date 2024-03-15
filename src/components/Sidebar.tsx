@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router";
-import {Link} from "react-router-dom";
+import { useLocation } from "react-router";
+import { Link } from "react-router-dom";
 
-export const Sidebar = ({ user }: { user: any }) => {
+export const Sidebar = ({user}: { user: any }) => {
   const [list, setList] = useState<any>([]);
+  const location = useLocation();
+
   const getList = () => {
     let list = [];
     if (user.role_id === 1) {
@@ -29,7 +31,7 @@ export const Sidebar = ({ user }: { user: any }) => {
           link: "/classes",
         },
         {
-          name: "Course",
+          name: "Courses",
           link: "/course",
         },
         {
@@ -45,8 +47,8 @@ export const Sidebar = ({ user }: { user: any }) => {
           link: "/locations",
         },
         {
-          name: "Attendance",
-          link: "/attendance",
+          name: "Attendances",
+          link: "/attendances",
         },
         {
           name: "Profile",
@@ -83,13 +85,13 @@ export const Sidebar = ({ user }: { user: any }) => {
       console.log("guest");
     }
   };
+
   useEffect(() => {
     if (user) {
       getList();
     }
   }, [user]);
 
-  const history = useHistory();
   const appName = import.meta.env.VITE_APP_NAME;
 
   return (
@@ -109,11 +111,11 @@ export const Sidebar = ({ user }: { user: any }) => {
             return (
               <li key={index} className="nav-item">
                 <Link to={item.link}
-                  className={`nav-link text-white ${
-                    window.location.pathname === item.link
-                      ? "active bg-primary bg-opacity-25"
-                      : ""
-                  }`}
+                      className={`nav-link text-white ${
+                        location.pathname.includes(item.link)
+                          ? "active bg-primary bg-opacity-25"
+                          : ""
+                      }`}
                 >
                   <span className="nav-link-text ms-1">{item.name}</span>
                 </Link>

@@ -2,21 +2,33 @@ import { useEffect, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
 import { useHistory } from "react-router";
 import Cookies from "js-cookie";
+import fetchAPI from "../../fetch";
+import Pagination from "react-js-pagination";
+import { DefaultPaginatedResponse } from "../../types";
+
+type ItemData = {
+  id: number;
+  name: string;
+  updated_at: string;
+  created_at: string;
+}
 
 export const PermissionPage = () => {
   const history = useHistory();
-
-  const [permissions, setPermissions] = useState<Array<any>>([]);
-
+  const [permissions, setPermissions] = useState<DefaultPaginatedResponse<ItemData>>({});
   const [currentPage, setCurrentPage] = useState(1);
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const columns = [
     {
+      name: "ID",
+      selector: "id",
+      key: 1,
+    },
+    {
       name: "Name",
       selector: "name",
-      key: 1,
+      key: 2,
     },
     {
       name: "Action",
@@ -26,8 +38,8 @@ export const PermissionPage = () => {
 
   const getPermissionsData = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/v1/permissions?page=${currentPage}`,
+      const response = await fetchAPI(
+        `/api/v1/permissions?page=${currentPage}`,
         {
           method: "GET",
           credentials: "include",
@@ -41,25 +53,23 @@ export const PermissionPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setPermissions(data.data);
-
+        setPermissions(data);
         setIsLoading(false);
       }
     } catch (error) {
       setIsLoading(false);
-
       console.log(error, "error");
     }
   };
-  const handleChangePage = (newPage: number) => {
-    setIsLoading(true);
 
+  const handleChangePage = (newPage: number) => {
     setCurrentPage(newPage);
   };
+
   const deletePermission = async (id: number) => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/v1/permissions/${id}`,
+      const response = await fetchAPI(
+        `/api/v1/permissions/${id}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -72,7 +82,7 @@ export const PermissionPage = () => {
       );
 
       if (response.ok) {
-        getPermissionsData();
+        await getPermissionsData();
       }
     } catch (error) {
       console.log(error, "error");
@@ -85,142 +95,117 @@ export const PermissionPage = () => {
 
   return (
     <UserLayout>
-      <div className="container-fluid py-4">
-        <div className="row">
-          <div className="col-12">
-            <div
-              className="card"
-              style={{
-                height: "85vh",
-              }}
-            >
-              <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                  <h6 className="text-white text-capitalize ps-3 d-flex align-items-center">
-                    Permissions
-                  </h6>
-                  <button
-                    className="btn btn-info btn-md mx-4"
-                    onClick={() => {
-                      history.push(`/permissions/add`);
-                    }}
-                  >
-                    Add Permissions
-                  </button>
-                </div>
-              </div>
+      <div className="row">
+        <div className="col-12">
+          <div
+            className="card"
+            style={{
+              height: permissions?.data?.length > 0 ? "100%" : "85vh",
+            }}
+          >
+            <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div
-                className="card-body px-0 pb-2"
-                style={{
-                  overflowY: "auto",
-                  maxHeight: "max-content",
-                }}
-              >
-                <div className="table-responsive p-0">
-                  <table className="table align-items-center mb-0">
-                    <thead>
-                      <tr>
-                        {columns.map((item, index) => {
-                          return (
-                            <th
-                              key={index}
-                              className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                            >
-                              <div className="d-flex justify-content-center">
-                                {item.name}
-                              </div>
-                            </th>
-                          );
-                        })}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {isLoading ? (
-                        <tr>
-                          {Array(columns.length)
-                            .fill(0)
-                            .map((_, i) => (
-                              <td key={i} className="text-center placeholder-glow">
-                                <span className="placeholder col-10"></span>
-                              </td>
-                            ))}
-                        </tr>
-                      ) : permissions.length === 0 ? (
-                        <tr>
-                          <td colSpan={columns.length} className="text-center">
-                            No data available
+                className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
+                <h6 className="text-white text-capitalize ps-3 mb-0">
+                  Permissions
+                </h6>
+                <button
+                  className="btn btn-info btn-md mx-4 mb-0"
+                  onClick={() => {
+                    history.push(`/permissions/add`);
+                  }}
+                >
+                  Add Permission
+                </button>
+              </div>
+            </div>
+            <div className="card-body px-0 pb-2">
+              <div className="table-responsive">
+                <table className="table align-items-center mb-0">
+                  <thead>
+                  <tr>
+                    {columns.map((item, index) => {
+                      return (
+                        <th
+                          key={index}
+                          className="text-uppercase text-secondary text-xxs font-weight-bolder"
+                        >
+                          <div>
+                            {item.name}
+                          </div>
+                        </th>
+                      );
+                    })}
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {isLoading ? (
+                    <tr>
+                      {Array(columns.length)
+                        .fill(0)
+                        .map((_, i) => (
+                          <td key={i} className="text-center placeholder-glow">
+                            <span className="placeholder col-10"></span>
+                          </td>
+                        ))}
+                    </tr>
+                  ) : permissions.data?.length === 0 ? (
+                    <tr>
+                      <td colSpan={columns.length} className="text-center">
+                        No data available
+                      </td>
+                    </tr>
+                  ) : (
+                    permissions.data?.map((item: ItemData, index) => {
+                      return (
+                        <tr key={index}>
+                          <td className="text-sm font-weight-normal px-4 py-3">
+                            {item.id}
+                          </td>
+                          <td className="text-sm font-weight-normal px-4 py-3">
+                            {item.name}
+                          </td>
+                          <td className="align-middle">
+                            <div className="d-flex gap-2">
+                              <button
+                                className="btn btn-primary btn-sm mb-0"
+                                onClick={() => {
+                                  history.push(
+                                    `/permissions/edit/${item.id}`
+                                  );
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="btn btn-danger btn-sm mb-0"
+                                onClick={() => deletePermission(item.id)}
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </td>
                         </tr>
-                      ) : (
-                        permissions.map((item, index) => {
-                          return (
-                            <tr key={index}>
-                              <td>
-                                <div className="d-flex px-2 py-1 justify-content-center">
-                                  <div></div>
-                                  <div className="d-flex flex-column justify-content-center">
-                                    <h6 className="mb-0 text-sm">
-                                      {item.name}
-                                    </h6>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="align-middle">
-                                <div className="d-flex justify-content-center">
-                                  <button
-                                    className="btn btn-primary btn-sm mx-1"
-                                    onClick={() => {
-                                      history.push(
-                                        `/permissions/edit/${item.id}`
-                                      );
-                                    }}
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() => deletePermission(item.id)}
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                      );
+                    })
+                  )}
+                  </tbody>
+                </table>
               </div>
-              <div className="text-center mt-4 mx-5">
-                <nav>
-                  <ul className="pagination pagination-md gap-1">
-                    {Array.from({ length: 20 }, (_, index) => index + 1).map(
-                      (page) => (
-                        <li
-                          key={page}
-                          className={`page-item ${
-                            page === currentPage ? "active" : ""
-                          }`}
-                          aria-current="page"
-                        >
-                          <button
-                            className={`page-link ${
-                              page === currentPage
-                                ? "text-white"
-                                : "text-primary"
-                            }`}
-                            onClick={() => handleChangePage(page)}
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </nav>
-              </div>
+            </div>
+            <div className="text-center pt-4 px-4">
+              <Pagination
+                activePage={permissions?.meta?.current_page}
+                itemsCountPerPage={permissions?.meta?.per_page}
+                totalItemsCount={permissions?.meta?.total ?? 0}
+                onChange={handleChangePage}
+                itemClass="page-item"
+                linkClass="page-link"
+                firstPageText="First"
+                lastPageText="Last"
+                prevPageText={<>&laquo;</>}
+                nextPageText={<>&raquo;</>}
+              />
             </div>
           </div>
         </div>

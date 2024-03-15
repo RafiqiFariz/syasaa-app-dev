@@ -1,22 +1,21 @@
 import { useEffect, useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
-import Cookies from "js-cookie";
 import { useHistory } from "react-router";
+import Cookies from "js-cookie";
+import fetchAPI from "../../../fetch";
+import { ErrorMessage } from "../../../components/ErrorMessage";
 
 export const AddRolePage = () => {
+  const history = useHistory();
   const [form, setForm] = useState({
     name: "",
-    permissions: [
-      {
-        id: 0,
-        name: "",
-      },
-    ],
+    permissions: [{id: 0, name: ""}],
   });
-  const history = useHistory();
   const [options, setOptions] = useState<Array<any>>([]);
+  const [errors, setErrors] = useState({});
+
   const handleChange = (event: any) => {
-    const { name, value } = event.target;
+    const {name, value} = event.target;
     console.log(event.target.name);
     setForm((prev) => {
       return {
@@ -25,8 +24,9 @@ export const AddRolePage = () => {
       };
     });
   };
+
   const handleSelect = (event: any) => {
-    const { value } = event.target;
+    const {value} = event.target;
 
     // Mengabaikan jika nilai yang dipilih adalah 0 atau sudah ada di dalam array permissions
     if (
@@ -56,7 +56,8 @@ export const AddRolePage = () => {
       };
     });
   };
-  const DeleteSelectedHandler = (index: number) => {
+
+  const deleteSelectedHandler = (index: number) => {
     if (form.permissions.length === 1) {
       setForm((prev: any) => {
         return {
@@ -78,10 +79,12 @@ export const AddRolePage = () => {
       };
     });
   };
+
   console.log(form, "form");
+
   const getPermissions = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/permissions", {
+      const response = await fetchAPI("/api/v1/permissions", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -90,147 +93,142 @@ export const AddRolePage = () => {
           "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
         },
       });
+
       const data = await response.json();
+
       if (data) {
-        console.log(data, "dataResponse");
         setOptions(data.data);
       }
-      console.log(data, "dataRoles");
+      console.log(data, "data roles");
     } catch (error) {
       console.log(error, "error");
     }
   };
+
   const onFinish = async (event: any) => {
     event.preventDefault();
     try {
-      const response = await fetch(
-        "http://localhost:8000/sanctum/csrf-cookie",
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      const data = response.status;
-      if (data === 204) {
-        const body = {
-          name: form.name,
-          permissions: form.permissions.map((permission: any) =>
-            parseInt(permission.id)
-          ),
-        };
-        console.log(body, "body");
-        const response = await fetch("http://localhost:8000/api/v1/roles", {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-            "Content-Type": "application/json", // Add this line
-          },
-          body: JSON.stringify(body), // Convert form to JSON
-        });
-        const data = await response.json();
-        console.log(data, "data123");
-        if (data) {
-          history.push("/dashboard");
-          console.log(data, "data");
-        }
+      const body = {
+        name: form.name,
+        permissions: form.permissions.map((permission: any) =>
+          parseInt(permission.id)
+        ),
+      };
+
+      console.log(body, "body");
+
+      const response = await fetchAPI("/api/v1/roles", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+      console.log(data, "data role");
+
+      if (!response.ok) {
+        setErrors(data.errors);
+      } else {
+        history.push("/roles");
       }
     } catch (error) {
       console.log(error, "Error");
     }
   };
+
   useEffect(() => {
     getPermissions();
   }, []);
+
   return (
     <UserLayout>
-      <div className="container-fluid py-4">
-        <div className="row">
-          <div className="col-12 d-flex justify-content-center">
-            <div className="card my-4 w-50">
-              <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                  <h6 className="text-white text-capitalize ps-3">
-                    Create Role Form
-                  </h6>
-                </div>
-                <div className="card-body px-5 pb-2">
-                  <form onSubmit={onFinish}>
-                    <div className="input-group input-group-dynamic mb-4">
-                      <input
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        type="text"
-                        className="form-control"
-                        placeholder="Role Name"
-                        aria-label="Role Name"
-                        aria-describedby="basic-addon0"
-                      />
-                    </div>
-                    <div className="input-group input-group-static">
-                      <label className="ms-0">Permissions</label>
-                      <select
-                        className="form-control"
-                        id="exampleFormControlSelect2"
-                        title="Select Options"
-                        multiple
-                        onChange={handleSelect}
-                      >
-                        {options.map((option) => {
-                          return (
-                            <option key={option.id} value={option.id}>
-                              {option.name}
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </div>
-                    <div className="input-group input-group-dynamic mt-3 mb-4 w-100">
-                      <div className="d-flex flex-wrap w-100 gap-2">
-                        {form.permissions.map(
-                          (permission: any, index: number) => {
-                            if (permission.id === 0) {
-                              return (
-                                <span
-                                  key={index}
-                                  className="badge bg-primary me-2 d-flex align-items-center"
-                                >
-                                  No Permission
-                                </span>
-                              );
-                            }
+      <div className="row">
+        <div className="col-12 col-lg-8 m-auto">
+          <div className="card my-4">
+            <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div
+                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+                <h6 className="text-white text-capitalize ps-3">
+                  Add Role
+                </h6>
+              </div>
+              <div className="card-body">
+                <form onSubmit={onFinish}>
+                  <div className="input-group input-group-dynamic mb-4 has-validation">
+                    <input
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      type="text"
+                      className={`form-control ${errors['name'] ? "is-invalid" : ""}`}
+                      placeholder="Role Name"
+                      aria-label="Role Name"
+                      aria-describedby="role name"
+                    />
+                    <ErrorMessage field="name" errors={errors}/>
+                  </div>
+                  <div className="input-group input-group-static has-validation">
+                    <label className="ms-0">Permissions</label>
+                    <select
+                      id="permissions"
+                      title="Select Permissions"
+                      className={`form-control ${errors['permissions'] ? "is-invalid" : ""}`}
+                      multiple
+                      onChange={handleSelect}
+                    >
+                      {options.map((option) => {
+                        return (
+                          <option key={option.id} value={option.id}>
+                            {option.name}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <ErrorMessage field="permissions" errors={errors}/>
+                  </div>
+                  <div className="input-group input-group-dynamic mt-3 mb-4 w-100">
+                    <div className="d-flex flex-wrap w-100 gap-2">
+                      {form.permissions.map(
+                        (permission: any, index: number) => {
+                          if (permission.id === 0) {
                             return (
                               <span
                                 key={index}
                                 className="badge bg-primary me-2 d-flex align-items-center"
                               >
-                                {permission.name}
-                                <button
-                                  type="button"
-                                  className="btn-close mx-2"
-                                  aria-label="Close"
-                                  onClick={() =>
-                                    DeleteSelectedHandler(permission.id)
-                                  }
-                                ></button>
-                              </span>
+                                  No Permission
+                                </span>
                             );
                           }
-                        )}
-                      </div>
+                          return (
+                            <span
+                              key={index}
+                              className="badge bg-primary me-2 d-flex align-items-center"
+                            >
+                                {permission.name}
+                              <button
+                                type="button"
+                                className="btn-close mx-2"
+                                aria-label="Close"
+                                onClick={() =>
+                                  deleteSelectedHandler(permission.id)
+                                }
+                              ></button>
+                              </span>
+                          );
+                        }
+                      )}
                     </div>
-                    <div className="text-center">
-                      <button
-                        type="submit"
-                        className="btn bg-primary w-100 my-4 mb-2 text-white"
-                      >
-                        Create Role
-                      </button>
-                    </div>
-                  </form>
-                </div>
+                  </div>
+                  <div className="button-row d-flex mt-4">
+                    <button className="btn bg-gradient-dark ms-auto mb-0" type="submit" title="Send">Submit</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

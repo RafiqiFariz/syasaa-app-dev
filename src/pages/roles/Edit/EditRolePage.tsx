@@ -2,9 +2,10 @@ import { useHistory, useParams } from "react-router";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import fetchAPI from "../../../fetch";
 
 export const EditRolePage = () => {
-  const { id } = useParams<{ id: string }>();
+  const {id} = useParams<{ id: string }>();
 
   const [form, setForm] = useState({
     name: "",
@@ -21,7 +22,7 @@ export const EditRolePage = () => {
   const history = useHistory();
 
   const handleChange = (event: any) => {
-    const { name, value } = event.target;
+    const {name, value} = event.target;
 
     setForm((prev) => {
       return {
@@ -33,8 +34,8 @@ export const EditRolePage = () => {
 
   const getRoles = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/api/v1/roles/${id}?includePermissions=${id}`,
+      const response = await fetchAPI(
+        `/api/v1/roles/${id}?includePermissions=${id}`,
         {
           method: "GET",
           credentials: "include",
@@ -69,7 +70,7 @@ export const EditRolePage = () => {
         _method: "PUT",
       };
 
-      const response = await fetch(`http://localhost:8000/api/v1/roles/${id}`, {
+      const response = await fetchAPI(`/api/v1/roles/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -114,7 +115,7 @@ export const EditRolePage = () => {
   };
 
   const handleSelect = (event: any) => {
-    const { value } = event.target;
+    const {value} = event.target;
 
     // Mengabaikan jika nilai yang dipilih adalah 0 atau sudah ada di dalam array permissions
     if (
@@ -147,7 +148,7 @@ export const EditRolePage = () => {
 
   const getPermissions = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/permissions", {
+      const response = await fetchAPI("/api/v1/permissions", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -164,6 +165,7 @@ export const EditRolePage = () => {
       console.log(error, "error");
     }
   };
+
   useEffect(() => {
     getRoles();
     getPermissions();
@@ -172,104 +174,103 @@ export const EditRolePage = () => {
   console.log(form, "form");
   return (
     <UserLayout>
-      <div className="container-fluid py-4">
-        <div className="row">
-          <div className="col-12 d-flex justify-content-center">
-            <div className="card my-4 w-75">
-              <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                  <h6 className="text-white text-capitalize ps-3">
-                    Edit Role Form
-                  </h6>
-                </div>
-                <div className="card-body px-5 pb-2">
-                  <form onSubmit={onFinish}>
-                    <div className="input-group input-group-dynamic mb-4">
-                      <input
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        type="text"
-                        className="form-control"
-                        placeholder="Role Name"
-                        aria-label="Role Name"
-                        aria-describedby="basic-addon0"
-                      />
-                    </div>
-                    <div className="input-group input-group-static">
-                      <label className="ms-0">Permissions</label>
-                      <select
-                        className="form-control"
-                        id="exampleFormControlSelect2"
-                        title="Select Options"
-                        multiple
-                        onChange={handleSelect}
-                      >
-                        {options.map((option) => {
-                          return (
-                            <option
-                              key={option.id}
-                              value={option.id}
-                              disabled={form.permissions.some(
-                                (permission) => permission.id === option.id
-                              )}
-                            >
-                              {option.name}
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </div>
-                    <div
-                      className="input-group input-group-dynamic mt-3 mb-4 w-100"
-                      style={{
-                        overflowY: "auto",
-                        maxHeight: "200px",
-                      }}
+      <div className="row">
+        <div className="col-12 d-flex justify-content-center">
+          <div className="card my-4 w-75">
+            <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div
+                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+                <h6 className="text-white text-capitalize ps-3">
+                  Edit Role Form
+                </h6>
+              </div>
+              <div className="card-body px-5 pb-2">
+                <form onSubmit={onFinish}>
+                  <div className="input-group input-group-dynamic mb-4">
+                    <input
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      type="text"
+                      className="form-control"
+                      placeholder="Role Name"
+                      aria-label="Role Name"
+                      aria-describedby="basic-addon0"
+                    />
+                  </div>
+                  <div className="input-group input-group-static">
+                    <label className="ms-0">Permissions</label>
+                    <select
+                      className="form-control"
+                      id="exampleFormControlSelect2"
+                      title="Select Options"
+                      multiple
+                      onChange={handleSelect}
                     >
-                      <div className="d-flex flex-wrap w-100 gap-2">
-                        {form.permissions.map(
-                          (permission: any, index: number) => {
-                            if (permission.id === 0) {
-                              return (
-                                <span
-                                  key={index}
-                                  className="badge bg-primary me-2 d-flex align-items-center"
-                                >
-                                  No Permission
-                                </span>
-                              );
-                            }
+                      {options.map((option) => {
+                        return (
+                          <option
+                            key={option.id}
+                            value={option.id}
+                            disabled={form.permissions.some(
+                              (permission) => permission.id === option.id
+                            )}
+                          >
+                            {option.name}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                  <div
+                    className="input-group input-group-dynamic mt-3 mb-4 w-100"
+                    style={{
+                      overflowY: "auto",
+                      maxHeight: "200px",
+                    }}
+                  >
+                    <div className="d-flex flex-wrap w-100 gap-2">
+                      {form.permissions.map(
+                        (permission: any, index: number) => {
+                          if (permission.id === 0) {
                             return (
                               <span
                                 key={index}
                                 className="badge bg-primary me-2 d-flex align-items-center"
                               >
-                                {permission.name}
-                                <button
-                                  type="button"
-                                  className="btn-close mx-2"
-                                  aria-label="Close"
-                                  onClick={() =>
-                                    DeleteSelectedHandler(permission.id)
-                                  }
-                                ></button>
-                              </span>
+                                  No Permission
+                                </span>
                             );
                           }
-                        )}
-                      </div>
+                          return (
+                            <span
+                              key={index}
+                              className="badge bg-primary me-2 d-flex align-items-center"
+                            >
+                                {permission.name}
+                              <button
+                                type="button"
+                                className="btn-close mx-2"
+                                aria-label="Close"
+                                onClick={() =>
+                                  DeleteSelectedHandler(permission.id)
+                                }
+                              ></button>
+                              </span>
+                          );
+                        }
+                      )}
                     </div>
-                    <div className="text-center">
-                      <button
-                        type="submit"
-                        className="btn bg-primary w-100 my-4 mb-2 text-white"
-                      >
-                        Update Role
-                      </button>
-                    </div>
-                  </form>
-                </div>
+                  </div>
+                  <div className="text-center">
+                    <button
+                      type="submit"
+                      className="btn bg-primary w-100 my-4 mb-2 text-white"
+                    >
+                      Update Role
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

@@ -1,24 +1,27 @@
 import { useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
-import Cookies from "js-cookie";
 import { useHistory } from "react-router";
+import { ErrorMessage } from "../../../components/ErrorMessage";
+import Cookies from "js-cookie";
+import fetchAPI from "../../../fetch";
 
 export const AddPermissionPage = () => {
   const history = useHistory();
-  const [form, setForm] = useState({
-    name: "",
-  });
+  const [form, setForm] = useState({name: "",});
+  const [errors, setErrors] = useState({});
+
   const handleChange = (event: any) => {
-    const { name, value } = event.target;
+    const {name, value} = event.target;
     setForm({
       ...form,
       [name]: value,
     });
   };
+
   const onFinish = async (event: any) => {
     try {
       event.preventDefault();
-      const response = await fetch("http://localhost:8000/api/v1/permissions", {
+      const response = await fetchAPI("/api/v1/permissions", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -28,51 +31,50 @@ export const AddPermissionPage = () => {
         },
         body: JSON.stringify(form),
       });
+
       const data = await response.json();
-      if (data) {
+
+      if (!response.ok) {
+        setErrors(data.errors);
+      } else {
         history.push("/permissions");
       }
-      console.log(data, "data");
     } catch (error) {
-      console.log(error, "Error");
+      console.error(error, "Error");
     }
   };
+
   return (
     <UserLayout>
-      <div className="container-fluid py-4">
-        <div className="row">
-          <div className="col-12 d-flex justify-content-center">
-            <div className="card my-4 w-50">
-              <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                  <h6 className="text-white text-capitalize ps-3">
-                    Create Permissions Form
-                  </h6>
-                </div>
-                <div className="card-body px-5 pb-2">
-                  <form onSubmit={onFinish}>
-                    <div className="input-group input-group-dynamic mb-4">
-                      <input
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        type="text"
-                        className="form-control"
-                        placeholder="Permissions Name"
-                        aria-label="Permissions Name"
-                        aria-describedby="basic-addon0"
-                      />
-                    </div>
-                    <div className="text-center">
-                      <button
-                        type="submit"
-                        className="btn bg-primary w-100 my-4 mb-2 text-white"
-                      >
-                        Create Role
-                      </button>
-                    </div>
-                  </form>
-                </div>
+      <div className="row">
+        <div className="col-12 col-lg-6 m-auto">
+          <div className="card my-4">
+            <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div
+                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+                <h6 className="text-white text-capitalize ps-3">
+                  Create Permission
+                </h6>
+              </div>
+              <div className="card-body">
+                <form onSubmit={onFinish}>
+                  <div className="input-group input-group-dynamic mb-4 has-validation">
+                    <input
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      type="text"
+                      className={`form-control ${errors['name'] ? "is-invalid" : ""}`}
+                      placeholder="Permission Name"
+                      aria-label="Permissions Name"
+                      aria-describedby="basic-addon0"
+                    />
+                    <ErrorMessage field="name" errors={errors}/>
+                  </div>
+                  <div className="button-row d-flex mt-4">
+                    <button className="btn bg-gradient-dark ms-auto mb-0" type="submit" title="Send">Submit</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
