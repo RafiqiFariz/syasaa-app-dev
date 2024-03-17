@@ -35,16 +35,16 @@ export const Sidebar = ({user}: { user: any }) => {
           link: "/course",
         },
         {
+          name: "Courses Classes",
+          link: "/course-classes",
+        },
+        {
           name: "Roles",
           link: "/roles",
         },
         {
           name: "Permissions",
           link: "/permissions",
-        },
-        {
-          name: "Locations",
-          link: "/locations",
         },
         {
           name: "Attendances",
