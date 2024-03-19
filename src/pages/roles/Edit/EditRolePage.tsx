@@ -3,9 +3,10 @@ import { UserLayout } from "../../../components/Layout/Layout";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
+import Swal from "sweetalert2";
 
 export const EditRolePage = () => {
-  const {id} = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
 
   const [form, setForm] = useState({
     name: "",
@@ -22,7 +23,7 @@ export const EditRolePage = () => {
   const history = useHistory();
 
   const handleChange = (event: any) => {
-    const {name, value} = event.target;
+    const { name, value } = event.target;
 
     setForm((prev) => {
       return {
@@ -70,6 +71,23 @@ export const EditRolePage = () => {
         _method: "PUT",
       };
 
+      const result = await Swal.fire({
+        title: "Update Confirmation!",
+        text: "Are you sure you want to Update this role?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#1D24CA",
+        cancelButtonColor: "#F44335",
+        confirmButtonText: "Yes, Update it!",
+        customClass: {
+          confirmButton: "btn btn-primary btn-sm ",
+          cancelButton: "btn btn-danger btn-sm ",
+        },
+        heightAuto: false,
+      });
+
+      if (!result.isConfirmed) return;
+
       const response = await fetchAPI(`/api/v1/roles/${id}`, {
         method: "PUT",
         credentials: "include",
@@ -115,7 +133,7 @@ export const EditRolePage = () => {
   };
 
   const handleSelect = (event: any) => {
-    const {value} = event.target;
+    const { value } = event.target;
 
     // Mengabaikan jika nilai yang dipilih adalah 0 atau sudah ada di dalam array permissions
     if (
@@ -178,8 +196,7 @@ export const EditRolePage = () => {
         <div className="col-12 d-flex justify-content-center">
           <div className="card my-4 w-75">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div
-                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">
                   Edit Role Form
                 </h6>
@@ -238,8 +255,8 @@ export const EditRolePage = () => {
                                 key={index}
                                 className="badge bg-primary me-2 d-flex align-items-center"
                               >
-                                  No Permission
-                                </span>
+                                No Permission
+                              </span>
                             );
                           }
                           return (
@@ -247,7 +264,7 @@ export const EditRolePage = () => {
                               key={index}
                               className="badge bg-primary me-2 d-flex align-items-center"
                             >
-                                {permission.name}
+                              {permission.name}
                               <button
                                 type="button"
                                 className="btn-close mx-2"
@@ -256,7 +273,7 @@ export const EditRolePage = () => {
                                   DeleteSelectedHandler(permission.id)
                                 }
                               ></button>
-                              </span>
+                            </span>
                           );
                         }
                       )}

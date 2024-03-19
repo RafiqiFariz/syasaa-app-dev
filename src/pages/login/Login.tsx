@@ -1,7 +1,7 @@
 import { IonItem } from "@ionic/react";
 import Cookies from "js-cookie";
 import { useContext, useState } from "react";
-import {Link, useHistory} from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { AuthContext } from "../../context/Auth";
 import fetchAPI from "../../fetch";
 export const LoginPage = () => {
@@ -82,49 +82,51 @@ export const LoginPage = () => {
   // Handle form submission
   const onFinish = async (event: any) => {
     event.preventDefault();
+    try {
+      const response = await fetchAPI("/sanctum/csrf-cookie", {
+        method: "GET",
+        credentials: "include",
+      });
 
-    if (validateForm()) {
-      try {
-        const response = await fetchAPI(
-          "/sanctum/csrf-cookie",
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+      if (response.status === 204) {
+        const loginResponse = await fetchAPI("/login", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form),
+        });
+        const meessage = await loginResponse.json();
+        if (loginResponse.ok) {
+          localStorage.setItem("user", JSON.stringify(form));
 
-        if (response.status === 204) {
-          const loginResponse = await fetchAPI("/login", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(form),
+          // Redirect to dashboard
+          history.push("/dashboard");
+          setIsLogin({
+            isLogin: true,
+            isPending: true,
           });
+        } else {
+          console.log("Login failed");
 
-          if (loginResponse.status === 200) {
-            localStorage.setItem("user", JSON.stringify(form));
-
-            // Redirect to dashboard
-            history.push("/dashboard");
-            setIsLogin({
-              isLogin: true,
-              isPending: true,
-            });
-          } else {
-            console.log("Login failed");
-          }
+          setErrors({
+            ...errors,
+            email: meessage.errors.email ? meessage.errors.email[0] : "",
+            password: meessage.errors.password
+              ? meessage.errors.password[0]
+              : "",
+          });
         }
-      } catch (error) {
-        console.log(error, "Error");
       }
+    } catch (error) {
+      console.log(error, "Error");
     }
   };
 
-  console.log(errors, "errors");
+  // console.log(errors, "errors");
 
   const appName = import.meta.env.VITE_APP_NAME;
 

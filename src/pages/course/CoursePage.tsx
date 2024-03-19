@@ -1,60 +1,24 @@
-import { useEffect, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import Cookies from "js-cookie";
 import fetchAPI from "../../fetch";
 import Pagination from "react-js-pagination";
 import { DefaultPaginatedResponse } from "../../types";
-import _ from "lodash";
 import Swal from "sweetalert2";
 
 interface ItemData {
   id: number;
   name: string;
-  email: string;
-  phone: string | null;
-  roleId: number;
-  role: {
-    id: number;
-    name: string;
-  };
+  description?: string | null;
 }
 
-export const UserPage = () => {
+export const CoursePage = () => {
   const history = useHistory();
-
-  const userId = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user") || "").id
-    : {};
-
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [users, setUsers] = useState<DefaultPaginatedResponse<ItemData>>({});
+  const [course, setCourse] = useState<DefaultPaginatedResponse<ItemData>>({});
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const getUserData = async () => {
-    try {
-      const response = await fetchAPI("/api/v1/users?includeRole=1", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setUsers(data);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.log(error, "error");
-      setIsLoading(false);
-    }
-  };
-
-  // Table columns
   const columns = [
     {
       name: "ID",
@@ -67,58 +31,31 @@ export const UserPage = () => {
       key: 2,
     },
     {
-      name: "Email",
-      selector: "email",
-      key: 3,
-    },
-    {
-      name: "Phone",
-      selector: "phone",
-      key: 4,
-    },
-    {
-      name: "Role",
-      selector: "role_id",
-      key: 5,
-    },
-    {
       name: "Action",
       selector: "action",
     },
   ];
 
-  // Delete user data
-  const deleteUser = async (id: number) => {
+  const getCourseData = async () => {
     try {
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-        heightAuto: false,
-      });
-
-      if (!result.isConfirmed) return;
-
-      const response = await fetchAPI(`/api/v1/users/${id}`, {
-        method: "POST",
+      const response = await fetchAPI(`/api/v1/courses?page=${currentPage}`, {
+        method: "GET",
         credentials: "include",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
         },
-        body: JSON.stringify({ _method: "DELETE" }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        await getUserData();
+        setCourse(data);
+        console.log(data);
+        setIsLoading(false);
       }
     } catch (error) {
-      console.log(error, "error");
+      setIsLoading(false);
     }
   };
 
@@ -126,9 +63,48 @@ export const UserPage = () => {
     setCurrentPage(newPage);
   };
 
-  // Get user data
+  const deleteCourse = async (id: number) => {
+    try {
+      const result = await Swal.fire({
+        title: "Delete Confirmation!",
+        text: "Are you sure you want to delete this course?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#1D24CA",
+        cancelButtonColor: "#F44335",
+        confirmButtonText: "Yes, Delete it!",
+        customClass: {
+          confirmButton: "btn btn-primary btn-sm ",
+          cancelButton: "btn btn-danger btn-sm ",
+        },
+        heightAuto: false,
+      });
+
+      if (!result.isConfirmed) return;
+      const response = await fetchAPI(`/api/v1/courses/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+        },
+      });
+
+      const data = await response.json();
+
+      console.log(data, "data");
+
+      if (response.ok) {
+        getCourseData();
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
+
   useEffect(() => {
-    getUserData();
+    getCourseData();
   }, [currentPage]);
 
   return (
@@ -138,19 +114,21 @@ export const UserPage = () => {
           <div
             className="card"
             style={{
-              height: users.data?.length > 0 ? "100%" : "85vh",
+              height: course?.data?.length > 0 ? "100%" : "85vh",
             }}
           >
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
-                <h6 className="text-white text-capitalize ps-3 mb-0">Users</h6>
+                <h6 className="text-white text-capitalize ps-3 mb-0">
+                  Courses
+                </h6>
                 <button
                   className="btn btn-info btn-md mx-4 mb-0"
                   onClick={() => {
-                    history.push(`/users/add`);
+                    history.push(`/course/add`);
                   }}
                 >
-                  Add User
+                  Add Course
                 </button>
               </div>
             </div>
@@ -159,14 +137,16 @@ export const UserPage = () => {
                 <table className="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      {columns.map((item, i) => (
-                        <th
-                          key={i}
-                          className="text-uppercase text-secondary text-xs font-weight-bolder text-center"
-                        >
-                          {item.name}
-                        </th>
-                      ))}
+                      {columns.map((item, index) => {
+                        return (
+                          <th
+                            key={index}
+                            className="text-uppercase text-secondary text-xxs font-weight-bolder"
+                          >
+                            <div>{item.name}</div>
+                          </th>
+                        );
+                      })}
                     </tr>
                   </thead>
                   <tbody>
@@ -183,48 +163,43 @@ export const UserPage = () => {
                             </td>
                           ))}
                       </tr>
+                    ) : course.data?.length === 0 ? (
+                      <tr>
+                        <td colSpan={columns.length} className="text-center">
+                          No data available
+                        </td>
+                      </tr>
                     ) : (
-                      users.data?.map((item, index) => (
-                        <tr key={index}>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            <h6 className="mb-0 text-sm">{item.id}</h6>
-                          </td>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            <h6 className="mb-0 text-sm">{item.name}</h6>
-                          </td>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            <p className="text-xs font-weight-bold mb-0">
-                              {item.email}
-                            </p>
-                          </td>
-                          <td className="text-xs font-weight-bold px-4 py-3 text-center">
-                            {item.phone ?? "-"}
-                          </td>
-                          <td className="text-xs font-weight-bold px-4 py-3 text-center">
-                            {_.startCase(_.camelCase(item.role?.name)) ?? "-"}
-                          </td>
-                          <td className="align-middle">
-                            {userId !== item.id && (
-                              <div className="d-flex gap-2 text-center">
+                      course.data?.map((item: ItemData, index) => {
+                        return (
+                          <tr key={index}>
+                            <td className="text-sm font-weight-normal px-4 py-3">
+                              {item.id}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3">
+                              {item.name}
+                            </td>
+                            <td className="align-middle">
+                              <div className="d-flex gap-2">
                                 <button
                                   className="btn btn-primary btn-sm mb-0"
                                   onClick={() => {
-                                    history.push(`/users/edit/${item.id}`);
+                                    history.push(`/course/edit/${item.id}`);
                                   }}
                                 >
                                   Edit
                                 </button>
                                 <button
                                   className="btn btn-danger btn-sm mb-0"
-                                  onClick={() => deleteUser(item.id)}
+                                  onClick={() => deleteCourse(item.id)}
                                 >
                                   Delete
                                 </button>
                               </div>
-                            )}
-                          </td>
-                        </tr>
-                      ))
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -232,9 +207,9 @@ export const UserPage = () => {
             </div>
             <div className="text-center pt-4 px-4">
               <Pagination
-                activePage={users?.meta?.current_page}
-                itemsCountPerPage={users?.meta?.per_page}
-                totalItemsCount={users?.meta?.total ?? 0}
+                activePage={course?.meta?.current_page}
+                itemsCountPerPage={course?.meta?.per_page}
+                totalItemsCount={course?.meta?.total ?? 0}
                 onChange={handleChangePage}
                 itemClass="page-item"
                 linkClass="page-link"

@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import _ from "lodash";
 import { AuthContext } from "../../context/Auth";
 import fetchAPI from "../../fetch";
-import PerfectScrollbar from 'react-perfect-scrollbar';
+import PerfectScrollbar from "react-perfect-scrollbar";
 import Swal from "sweetalert2";
 
 interface LayoutProps {
@@ -61,14 +61,21 @@ export const UserLayout = ({ children }: LayoutProps) => {
   const handleSignOut = async () => {
     try {
       const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
+        title: "Sign Out Confirmation",
+        text: "Are you sure you want to sign out of your account?",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
+        confirmButtonColor: "#1D24CA",
+        cancelButtonColor: "#F44335",
+        confirmButtonText: "Yes, Sign Out!",
+        customClass: {
+          confirmButton: "btn btn-primary btn-sm ",
+          cancelButton: "btn btn-danger btn-sm ",
+        },
+        heightAuto: false,
       });
+      console.log(result, "result");
+      if (!result.isConfirmed) return;
 
       const response = await fetchAPI("/logout", {
         method: "POST",
@@ -108,84 +115,83 @@ export const UserLayout = ({ children }: LayoutProps) => {
       <Sidebar user={userData} />
       <PerfectScrollbar>
         <main className="main-content position-relative max-height-vh-100 h-100">
-        <nav
-          className="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
-          id="navbarBlur"
-          data-scroll="true"
-        >
-          <div className="container-fluid py-1 px-3">
-            <nav aria-label="breadcrumb">
-              <ol className="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-                {pathname.split("/").map((item, index) => {
-                  const submenu = _.startCase(_.camelCase(item)) || item;
-                  // console.log(submenu, item, "---");
-                  if (index === 0) {
+          <nav
+            className="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
+            id="navbarBlur"
+            data-scroll="true"
+          >
+            <div className="container-fluid py-1 px-3">
+              <nav aria-label="breadcrumb">
+                <ol className="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+                  {pathname.split("/").map((item, index) => {
+                    const submenu = _.startCase(_.camelCase(item)) || item;
+                    if (index === 0) {
+                      return (
+                        <li
+                          key={index}
+                          className="breadcrumb-item text-sm text-dark active"
+                          aria-current="page"
+                        >
+                          Page
+                        </li>
+                      );
+                    }
+
                     return (
                       <li
                         key={index}
                         className="breadcrumb-item text-sm text-dark active"
                         aria-current="page"
                       >
-                        Page
+                        {submenu}
                       </li>
                     );
-                  }
-
-                  return (
-                    <li
-                      key={index}
-                      className="breadcrumb-item text-sm text-dark active"
-                      aria-current="page"
-                    >
-                      {submenu}
-                    </li>
-                  );
-                })}
-              </ol>
-              <h6 className="font-weight-bolder mb-0">{_.startCase(_.camelCase(pathname.split("/").toString()))}</h6>
-            </nav>
-            <div
-              className="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
-              id="navbar"
-            >
-              <div className="ms-md-auto pe-md-3 d-flex align-items-center">
-                <div className="input-group input-group-outline">
-                  <label className="form-label">Type here...</label>
-                  <input type="text" className="form-control" />
+                  })}
+                </ol>
+                <h6 className="font-weight-bolder mb-0">
+                  {_.startCase(_.camelCase(pathname.split("/").toString()))}
+                </h6>
+              </nav>
+              <div
+                className="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
+                id="navbar"
+              >
+                <div className="ms-md-auto pe-md-3 d-flex align-items-center">
+                  <div className="input-group input-group-outline">
+                    <label className="form-label">Type here...</label>
+                    <input type="text" className="form-control" />
+                  </div>
                 </div>
+                <ul className="navbar-nav  justify-content-end">
+                  <li className="nav-item d-xl-none ps-3 d-flex align-items-center mx-3">
+                    <a
+                      onClick={() => setNav((prev) => !prev)}
+                      className="nav-link text-body p-0"
+                      id="iconNavbarSidenav"
+                    >
+                      <div className="sidenav-toggler-inner">
+                        <i className="sidenav-toggler-line"></i>
+                        <i className="sidenav-toggler-line"></i>
+                        <i className="sidenav-toggler-line"></i>
+                      </div>
+                    </a>
+                  </li>
+                  <li className="nav-item d-flex align-items-center">
+                    <button
+                      className="nav-link text-body font-weight-bold px-0"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                      onClick={handleSignOut}
+                    >
+                      <span className="d-sm-inline d-none">Sign Out</span>
+                    </button>
+                  </li>
+                </ul>
               </div>
-              <ul className="navbar-nav  justify-content-end">
-                <li className="nav-item d-xl-none ps-3 d-flex align-items-center mx-3">
-                  <a
-                    onClick={() => setNav((prev) => !prev)}
-                    className="nav-link text-body p-0"
-                    id="iconNavbarSidenav"
-                  >
-                    <div className="sidenav-toggler-inner">
-                      <i className="sidenav-toggler-line"></i>
-                      <i className="sidenav-toggler-line"></i>
-                      <i className="sidenav-toggler-line"></i>
-                    </div>
-                  </a>
-                </li>
-                <li className="nav-item d-flex align-items-center">
-                  <button
-                    className="nav-link text-body font-weight-bold px-0"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
-                    onClick={handleSignOut}
-                  >
-                    <span className="d-sm-inline d-none">Sign Out</span>
-                  </button>
-                </li>
-              </ul>
             </div>
-          </div>
-        </nav>
-        <div className="container-fluid py-4">
-          {children}
-        </div>
-      </main>
+          </nav>
+          <div className="container-fluid py-4">{children}</div>
+        </main>
       </PerfectScrollbar>
     </div>
   );

@@ -9,13 +9,13 @@ export const AddRolePage = () => {
   const history = useHistory();
   const [form, setForm] = useState({
     name: "",
-    permissions: [{id: 0, name: ""}],
+    permissions: [{ id: 0, name: "" }],
   });
   const [options, setOptions] = useState<Array<any>>([]);
   const [errors, setErrors] = useState({});
 
   const handleChange = (event: any) => {
-    const {name, value} = event.target;
+    const { name, value } = event.target;
     console.log(event.target.name);
     setForm((prev) => {
       return {
@@ -26,7 +26,7 @@ export const AddRolePage = () => {
   };
 
   const handleSelect = (event: any) => {
-    const {value} = event.target;
+    const { value } = event.target;
 
     // Mengabaikan jika nilai yang dipilih adalah 0 atau sudah ada di dalam array permissions
     if (
@@ -151,11 +151,8 @@ export const AddRolePage = () => {
         <div className="col-12 col-lg-8 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div
-                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                <h6 className="text-white text-capitalize ps-3">
-                  Add Role
-                </h6>
+              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+                <h6 className="text-white text-capitalize ps-3">Add Role</h6>
               </div>
               <div className="card-body">
                 <form onSubmit={onFinish}>
@@ -165,19 +162,23 @@ export const AddRolePage = () => {
                       value={form.name}
                       onChange={handleChange}
                       type="text"
-                      className={`form-control ${errors['name'] ? "is-invalid" : ""}`}
+                      className={`form-control ${
+                        errors["name"] ? "is-invalid" : ""
+                      }`}
                       placeholder="Role Name"
                       aria-label="Role Name"
                       aria-describedby="role name"
                     />
-                    <ErrorMessage field="name" errors={errors}/>
+                    <ErrorMessage field="name" errors={errors} />
                   </div>
                   <div className="input-group input-group-static has-validation">
                     <label className="ms-0">Permissions</label>
                     <select
                       id="permissions"
                       title="Select Permissions"
-                      className={`form-control ${errors['permissions'] ? "is-invalid" : ""}`}
+                      className={`form-control ${
+                        errors["permissions"] ? "is-invalid" : ""
+                      }`}
                       multiple
                       onChange={handleSelect}
                     >
@@ -189,7 +190,7 @@ export const AddRolePage = () => {
                         );
                       })}
                     </select>
-                    <ErrorMessage field="permissions" errors={errors}/>
+                    <ErrorMessage field="permissions" errors={errors} />
                   </div>
                   <div className="input-group input-group-dynamic mt-3 mb-4 w-100">
                     <div className="d-flex flex-wrap w-100 gap-2">
@@ -201,8 +202,8 @@ export const AddRolePage = () => {
                                 key={index}
                                 className="badge bg-primary me-2 d-flex align-items-center"
                               >
-                                  No Permission
-                                </span>
+                                No Permission
+                              </span>
                             );
                           }
                           return (
@@ -210,7 +211,7 @@ export const AddRolePage = () => {
                               key={index}
                               className="badge bg-primary me-2 d-flex align-items-center"
                             >
-                                {permission.name}
+                              {permission.name}
                               <button
                                 type="button"
                                 className="btn-close mx-2"
@@ -219,14 +220,20 @@ export const AddRolePage = () => {
                                   deleteSelectedHandler(permission.id)
                                 }
                               ></button>
-                              </span>
+                            </span>
                           );
                         }
                       )}
                     </div>
                   </div>
                   <div className="button-row d-flex mt-4">
-                    <button className="btn bg-gradient-dark ms-auto mb-0" type="submit" title="Send">Submit</button>
+                    <button
+                      className="btn bg-gradient-dark ms-auto mb-0"
+                      type="submit"
+                      title="Send"
+                    >
+                      Submit
+                    </button>
                   </div>
                 </form>
               </div>

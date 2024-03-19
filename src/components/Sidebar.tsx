@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
 
-export const Sidebar = ({user}: { user: any }) => {
+export const Sidebar = ({ user }: { user: any }) => {
   const [list, setList] = useState<any>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const location = useLocation();
 
   const getList = () => {
     let list = [];
+
     if (user.role_id === 1) {
       list = [
         {
@@ -61,7 +63,6 @@ export const Sidebar = ({user}: { user: any }) => {
     } else if (user.role_id === 3) {
       console.log("lecture");
     } else if (user.role_id === 4) {
-      console.log("student");
       list = [
         {
           name: "Dashboard",
@@ -110,12 +111,13 @@ export const Sidebar = ({user}: { user: any }) => {
           {list.map((item: any, index: number) => {
             return (
               <li key={index} className="nav-item">
-                <Link to={item.link}
-                      className={`nav-link text-white ${
-                        location.pathname.includes(item.link)
-                          ? "active bg-primary bg-opacity-25"
-                          : ""
-                      }`}
+                <Link
+                  to={item.link}
+                  className={`nav-link text-white ${
+                    location.pathname.includes(item.link)
+                      ? "active bg-primary bg-opacity-25"
+                      : ""
+                  }`}
                 >
                   <span className="nav-link-text ms-1">{item.name}</span>
                 </Link>

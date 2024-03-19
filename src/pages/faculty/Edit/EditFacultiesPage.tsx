@@ -1,57 +1,66 @@
 import { useEffect, useState } from "react";
+import { ErrorMessage } from "../../../components/ErrorMessage";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useHistory, useParams } from "react-router";
 import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
 import Swal from "sweetalert2";
 
-export const EditPermissionPage = () => {
+export const EditFacultiesPage = () => {
   const [form, setForm] = useState({
     name: "",
   });
-  const history = useHistory();
+  const [errors, setErrors] = useState({});
+
   const { id } = useParams<{ id: string }>();
 
-  const getPermissionsById = async () => {
-    try {
-      const response = await fetchAPI(`/api/v1/permissions/${id}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-      if (data) {
-        setForm(data.data);
-        console.log(data, "data");
-      }
-    } catch (error) {
-      console.log(error, "error");
-    }
-  };
+  const history = useHistory();
 
   const handleChange = (event: any) => {
     const { name, value } = event.target;
-    console.log(event.target.name);
     setForm({
       ...form,
       [name]: value,
     });
   };
 
-  const onFinish = async (event: any) => {
-    event.preventDefault();
+  const getFacultyData = async () => {
     try {
+      const response = await fetchAPI(`/api/v1/faculties/${id}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setForm(data.data);
+      }
+    } catch (error) {
+      console.error(error, "Error");
+    }
+  };
+
+  useEffect(() => {
+    getFacultyData();
+  }, []);
+
+  console.log(form, "form");
+
+  const onFinish = async (event: any) => {
+    try {
+      event.preventDefault();
+
       const payload = {
         name: form.name,
         _method: "PUT",
       };
-
       const result = await Swal.fire({
         title: "Update Confirmation!",
-        text: "Are you sure you want to Update this permission?",
+        text: "Are you sure you want to Update this faculty?",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#1D24CA",
@@ -66,7 +75,7 @@ export const EditPermissionPage = () => {
 
       if (!result.isConfirmed) return;
 
-      const response = await fetchAPI(`/api/v1/permissions/${id}`, {
+      const response = await fetchAPI(`/api/v1/faculties/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -76,50 +85,52 @@ export const EditPermissionPage = () => {
         },
         body: JSON.stringify(payload),
       });
+
       const data = await response.json();
-      if (data) {
-        history.push("/permissions");
+
+      if (!response.ok) {
+        setErrors(data.errors);
+      } else {
+        history.goBack();
       }
     } catch (error) {
-      console.log(error, "Error");
+      console.error(error, "Error");
     }
   };
-
-  useEffect(() => {
-    getPermissionsById();
-  }, []);
 
   return (
     <UserLayout>
       <div className="row">
-        <div className="col-12 d-flex justify-content-center">
-          <div className="card my-4 w-50">
+        <div className="col-12 col-lg-6 m-auto">
+          <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                <h6 className="text-white text-capitalize ps-3">
-                  Create Permissions Form
-                </h6>
+                <h6 className="text-white text-capitalize ps-3">Add Faculty</h6>
               </div>
-              <div className="card-body px-5 pb-2">
+              <div className="card-body">
                 <form onSubmit={onFinish}>
-                  <div className="input-group input-group-dynamic mb-4">
+                  <div className="input-group input-group-dynamic mb-4 has-validation">
                     <input
                       name="name"
-                      value={form.name}
+                      value={form.name ?? ""}
                       onChange={handleChange}
                       type="text"
-                      className="form-control"
-                      placeholder="Permissions Name"
-                      aria-label="Permissions Name"
+                      className={`form-control ${
+                        errors["name"] ? "is-invalid" : ""
+                      }`}
+                      placeholder="Faculty Name"
+                      aria-label="Faculties Name"
                       aria-describedby="basic-addon0"
                     />
+                    <ErrorMessage field="name" errors={errors} />
                   </div>
-                  <div className="text-center">
+                  <div className="button-row d-flex mt-4">
                     <button
+                      className="btn bg-gradient-dark ms-auto mb-0"
                       type="submit"
-                      className="btn bg-primary w-100 my-4 mb-2 text-white"
+                      title="Send"
                     >
-                      Update Permissions
+                      Submit
                     </button>
                   </div>
                 </form>

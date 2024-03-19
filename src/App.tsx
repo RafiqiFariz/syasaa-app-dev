@@ -1,4 +1,4 @@
-import {Redirect, Route} from 'react-router-dom';
+import { Redirect, Route } from "react-router-dom";
 import {
   IonApp,
   IonIcon,
@@ -7,52 +7,61 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
-  setupIonicReact
-} from '@ionic/react';
-import {IonReactRouter} from '@ionic/react-router';
-import {ellipse, square, triangle} from 'ionicons/icons';
-import Tab1 from './pages/Tab1';
-import Tab2 from './pages/Tab2';
-import Tab3 from './pages/Tab3';
+  setupIonicReact,
+} from "@ionic/react";
+import { IonReactRouter } from "@ionic/react-router";
+import { ellipse, square, triangle } from "ionicons/icons";
+import Tab1 from "./pages/Tab1";
+import Tab2 from "./pages/Tab2";
+import Tab3 from "./pages/Tab3";
 
 /* Core CSS required for Ionic components to work properly */
-import '@ionic/react/css/core.css';
+import "@ionic/react/css/core.css";
 
 /* Basic CSS for apps built with Ionic */
-import '@ionic/react/css/normalize.css';
-import '@ionic/react/css/structure.css';
-import '@ionic/react/css/typography.css';
+import "@ionic/react/css/normalize.css";
+import "@ionic/react/css/structure.css";
+import "@ionic/react/css/typography.css";
 
 /* Optional CSS utils that can be commented out */
-import '@ionic/react/css/padding.css';
-import '@ionic/react/css/float-elements.css';
-import '@ionic/react/css/text-alignment.css';
-import '@ionic/react/css/text-transformation.css';
-import '@ionic/react/css/flex-utils.css';
-import '@ionic/react/css/display.css';
+import "@ionic/react/css/padding.css";
+import "@ionic/react/css/float-elements.css";
+import "@ionic/react/css/text-alignment.css";
+import "@ionic/react/css/text-transformation.css";
+import "@ionic/react/css/flex-utils.css";
+import "@ionic/react/css/display.css";
 
 /* Theme variables */
-import './theme/variables.css';
-import {useContext, useEffect, useState} from "react";
-import {LoginPage} from "./pages/login/Login";
-import {DashboardPage} from "./pages/dashboard/DashboardPage";
-import {UserPage} from "./pages/users/UserPage";
-import {AddUserPage} from "./pages/users/Add/AddUserPage";
-import {EditUserPage} from "./pages/users/Edit/EditUserPage";
-import {RolePage} from "./pages/roles/RolePage";
-import {EditRolePage} from "./pages/roles/Edit/EditRolePage";
-import {AddRolePage} from "./pages/roles/Add/AddRolePage";
-import {PermissionPage} from "./pages/permissions/PermissionPage";
-import {AddPermissionPage} from "./pages/permissions/Add/AddPermissionPage";
-import {EditPermissionPage} from "./pages/permissions/Edit/EditPermissionPage";
-import {AuthContext} from "./context/Auth";
+import "./theme/variables.css";
+import { useContext, useEffect, useState } from "react";
+import { LoginPage } from "./pages/login/Login";
+import { DashboardPage } from "./pages/dashboard/DashboardPage";
+import { UserPage } from "./pages/users/UserPage";
+import { AddUserPage } from "./pages/users/Add/AddUserPage";
+import { EditUserPage } from "./pages/users/Edit/EditUserPage";
+import { RolePage } from "./pages/roles/RolePage";
+import { EditRolePage } from "./pages/roles/Edit/EditRolePage";
+import { AddRolePage } from "./pages/roles/Add/AddRolePage";
+import { PermissionPage } from "./pages/permissions/PermissionPage";
+import { AddPermissionPage } from "./pages/permissions/Add/AddPermissionPage";
+import { EditPermissionPage } from "./pages/permissions/Edit/EditPermissionPage";
+import { AuthContext } from "./context/Auth";
 import Cookies from "js-cookie";
 import fetchAPI from "./fetch";
+import { CoursePage } from "./pages/course/CoursePage";
+import { AddCoursePage } from "./pages/course/Add/AddCoursePage";
+import { EditCoursePage } from "./pages/course/Edit/EditCoursePage";
+import { MajorsPage } from "./pages/majors/MajorsPage";
+import { AddMajorPage } from "./pages/majors/Add/AddMajorPage";
+import { FacultiesPage } from "./pages/faculty/FacultiesPage";
+import { AddFacultiesPage } from "./pages/faculty/Add/AddFacultiesPage";
+import { EditFacultiesPage } from "./pages/faculty/Edit/EditFacultiesPage";
+import { EditMajorPage } from "./pages/majors/Edit/EditMajorPage";
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  const {isLogin, setIsLogin} = useContext(AuthContext);
+  const { isLogin, setIsLogin } = useContext(AuthContext);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -120,70 +129,78 @@ const App: React.FC = () => {
               exact
               path="/login"
               render={() =>
-                !isLogin.isLogin ? <LoginPage/> : <Redirect to={"/dashboard"}/>
+                !isLogin.isLogin ? (
+                  <LoginPage />
+                ) : (
+                  <Redirect to={"/dashboard"} />
+                )
               }
             />
             <Route
               exact
               path="/dashboard"
               render={() =>
-                isLogin.isLogin ? <DashboardPage/> : <Redirect to={"/login"}/>
+                isLogin.isLogin ? <DashboardPage /> : <Redirect to={"/login"} />
               }
             />
             <Route
               exact
               path="/users"
               render={() =>
-                isLogin.isLogin ? <UserPage/> : <Redirect to="/login"/>
+                isLogin.isLogin ? <UserPage /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
               path="/users/add"
               render={() =>
-                isLogin.isLogin ? <AddUserPage/> : <Redirect to="/login"/>
+                isLogin.isLogin ? <AddUserPage /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
               path="/users/edit/:id"
               render={() =>
-                isLogin.isLogin ? <EditUserPage/> : <Redirect to="/login"/>
+                isLogin.isLogin ? <EditUserPage /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
               path="/roles"
               render={() =>
-                isLogin.isLogin ? <RolePage/> : <Redirect to="/login"/>
+                isLogin.isLogin ? <RolePage /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
               path="/roles/edit/:id"
               render={() =>
-                isLogin.isLogin ? <EditRolePage/> : <Redirect to="/login"/>
+                isLogin.isLogin ? <EditRolePage /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
               path="/roles/add"
               render={() =>
-                isLogin.isLogin ? <AddRolePage/> : <Redirect to="/login"/>
+                isLogin.isLogin ? <AddRolePage /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
               path="/permissions"
               render={() =>
-                isLogin.isLogin ? <PermissionPage/> : <Redirect to="/login"/>
+                isLogin.isLogin ? <PermissionPage /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
               path="/permissions/add"
               render={() =>
-                isLogin.isLogin ? <AddPermissionPage/> : <Redirect to="/login"/>
+                isLogin.isLogin ? (
+                  <AddPermissionPage />
+                ) : (
+                  <Redirect to="/login" />
+                )
               }
             />
             <Route
@@ -191,9 +208,80 @@ const App: React.FC = () => {
               path="/permissions/edit/:id"
               render={() =>
                 isLogin.isLogin ? (
-                  <EditPermissionPage/>
+                  <EditPermissionPage />
                 ) : (
-                  <Redirect to="/login"/>
+                  <Redirect to="/login" />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/course"
+              render={() =>
+                isLogin.isLogin ? <CoursePage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/course/add"
+              render={() =>
+                isLogin.isLogin ? <AddCoursePage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/course/edit/:id"
+              render={() =>
+                isLogin.isLogin ? <EditCoursePage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/majors"
+              render={() =>
+                isLogin.isLogin ? <MajorsPage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/majors/add"
+              render={() =>
+                isLogin.isLogin ? <AddMajorPage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/majors/edit/:id"
+              render={() =>
+                isLogin.isLogin ? <EditMajorPage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/faculties"
+              render={() =>
+                isLogin.isLogin ? <FacultiesPage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/faculties/add"
+              render={() =>
+                isLogin.isLogin ? (
+                  <AddFacultiesPage />
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/faculties/edit/:id"
+              render={() =>
+                isLogin.isLogin ? (
+                  <EditFacultiesPage />
+                ) : (
+                  <Redirect to="/login" />
                 )
               }
             />
@@ -202,29 +290,29 @@ const App: React.FC = () => {
           <IonTabs>
             <IonRouterOutlet>
               <Route exact path="/tab1">
-                <Tab1/>
+                <Tab1 />
               </Route>
               <Route exact path="/tab2">
-                <Tab2/>
+                <Tab2 />
               </Route>
               <Route path="/tab3">
-                <Tab3/>
+                <Tab3 />
               </Route>
               <Route exact path="/">
-                <Redirect to="/tab1"/>
+                <Redirect to="/tab1" />
               </Route>
             </IonRouterOutlet>
             <IonTabBar slot="bottom">
               <IonTabButton tab="tab1" href="/tab1">
-                <IonIcon aria-hidden="true" icon={triangle}/>
+                <IonIcon aria-hidden="true" icon={triangle} />
                 <IonLabel>Home</IonLabel>
               </IonTabButton>
               <IonTabButton tab="tab2" href="/tab2">
-                <IonIcon aria-hidden="true" icon={ellipse}/>
+                <IonIcon aria-hidden="true" icon={ellipse} />
                 <IonLabel>My Absence</IonLabel>
               </IonTabButton>
               <IonTabButton tab="tab3" href="/tab3">
-                <IonIcon aria-hidden="true" icon={square}/>
+                <IonIcon aria-hidden="true" icon={square} />
                 <IonLabel>Profile</IonLabel>
               </IonTabButton>
             </IonTabBar>
@@ -232,7 +320,7 @@ const App: React.FC = () => {
         )}
       </IonReactRouter>
     </IonApp>
-  )
+  );
 };
 
 export default App;
