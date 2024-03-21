@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { UserLayout } from "../../../components/Layout/Layout";
-import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
 import { useHistory } from "react-router";
+import Alert from "../../../components/Alert";
 
 interface OptionsData {
   id: number;
@@ -33,12 +33,6 @@ export const AddMajorPage = () => {
     try {
       const response = await fetchAPI("/api/v1/majors", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
         body: JSON.stringify(form),
       });
 
@@ -46,6 +40,7 @@ export const AddMajorPage = () => {
 
       if (response.ok) {
         history.goBack();
+        Alert.success("Success", data.message);
       } else {
         setErrors(data.errors);
       }
@@ -56,15 +51,7 @@ export const AddMajorPage = () => {
 
   const getFacultyData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/faculties", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
-      });
+      const response = await fetchAPI("/api/v1/faculties", {method: "GET"});
       const data = await response.json();
       if (response.ok) {
         setFaculties(data.data);
@@ -101,18 +88,17 @@ export const AddMajorPage = () => {
                       }`}
                       placeholder="Major Name"
                       aria-label="Major Name"
-                      aria-describedby="basic-addon0"
                     />
                     <ErrorMessage field="name" errors={errors} />
                   </div>
                   <div className="input-group input-group-static mb-4">
-                    <label htmlFor="exampleFormControlSelect1" className="ms-0">
+                    <label htmlFor="faculties" className="ms-0">
                       Faculty
                     </label>
                     <select
                       name="faculty_id"
                       className="form-control"
-                      id="exampleFormControlSelect1"
+                      id="faculties"
                       onChange={handleChange}
                     >
                       {faculties.map((faculty) => (

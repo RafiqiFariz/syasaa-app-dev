@@ -1,24 +1,32 @@
-import { UserLayout } from "../../components/Layout/Layout";
 import { useEffect, useState } from "react";
+import { UserLayout } from "../../components/Layout/Layout";
 import { useHistory } from "react-router";
-import fetchAPI from "../../fetch";
-import Pagination from "react-js-pagination";
-import { DefaultPaginatedResponse } from "../../types";
 import Alert from "../../components/Alert";
-import Cookies from "js-cookie";
+import { DefaultPaginatedResponse } from "../../types";
+import Pagination from "react-js-pagination";
+import fetchAPI from "../../fetch";
 
 interface ItemData {
   id: number;
   name: string;
-  description?: string | null;
+  major_id: number;
+  lat: string;
+  lng: string;
+  major: {
+    id: number;
+    name: string;
+    faculty: {
+      id: number;
+      name: string;
+    }
+  };
 }
 
-export const CoursePage = () => {
+export const ClassPage = () => {
+  const [classes, setClasses] = useState<DefaultPaginatedResponse<ItemData>>({});
   const history = useHistory();
-  const [course, setCourse] = useState<DefaultPaginatedResponse<ItemData>>({});
-  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  const [currentPage, setCurrentPage] = useState(1);
   const columns = [
     {
       name: "ID",
@@ -31,20 +39,34 @@ export const CoursePage = () => {
       key: 2,
     },
     {
+      name: "Major",
+      selector: "major",
+      key: 3,
+    },
+    {
+      name: "Latitude",
+      selector: "latitude",
+      key: 4,
+    },
+    {
+      name: "Longitude",
+      selector: "longitude",
+      key: 5,
+    },
+    {
       name: "Action",
       selector: "action",
     },
   ];
 
-  const getCourseData = async () => {
+  const getClassData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/courses?page=${currentPage}`, {method: "GET"});
+      const response = await fetchAPI(`/api/v1/major-classes?page=${currentPage}`, {method: "GET"});
 
       const data = await response.json();
 
       if (response.ok) {
-        setCourse(data);
-        console.log(data);
+        setClasses(data);
         setIsLoading(false);
       }
     } catch (error) {
@@ -56,35 +78,37 @@ export const CoursePage = () => {
     setCurrentPage(newPage);
   };
 
-  const deleteCourse = async (id: number) => {
+  useEffect(() => {
+    getClassData();
+  }, [currentPage]);
+
+  const deleteClass = async (id: number) => {
     try {
-      const confirmed = await Alert.confirm("Delete Confirmation!", "Are you sure you want to delete this course?", "Yes, Delete it!");
+      const confirmed = await Alert.confirm(
+        "Delete Confirmation!",
+        "Are you sure you want to delete this class?",
+        "Yes, delete it!"
+      );
 
       if (!confirmed) return;
 
-      const response = await fetchAPI(`/api/v1/courses/${id}`, {
+      const response = await fetchAPI(`/api/v1/major-classes/${id}`, {
         method: "POST",
         body: JSON.stringify({ _method: "DELETE" })
       });
 
       const data = await response.json();
 
-      console.log(data, "data");
-
       if (response.ok) {
-        await getCourseData();
+        await getClassData();
         Alert.success("Success", data.message);
       } else {
         Alert.error("Error", data.message);
       }
     } catch (error) {
-      console.log(error, "error");
+      console.error(error, "Error");
     }
   };
-
-  useEffect(() => {
-    getCourseData();
-  }, [currentPage]);
 
   return (
     <UserLayout>
@@ -93,21 +117,19 @@ export const CoursePage = () => {
           <div
             className="card"
             style={{
-              height: course?.data?.length > 0 ? "100%" : "85vh",
+              height: classes?.data?.length > 0 ? "100%" : "85vh",
             }}
           >
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
-                <h6 className="text-white text-capitalize ps-3 mb-0">
-                  Courses
-                </h6>
+                <h6 className="text-white text-capitalize ps-3 mb-0">Classes</h6>
                 <button
                   className="btn btn-info btn-md mx-4 mb-0"
                   onClick={() => {
-                    history.push(`/course/add`);
+                    history.push(`/classes/add`);
                   }}
                 >
-                  Add Course
+                  Add Class
                 </button>
               </div>
             </div>
@@ -142,14 +164,14 @@ export const CoursePage = () => {
                             </td>
                           ))}
                       </tr>
-                    ) : course.data?.length === 0 ? (
+                    ) : classes.data?.length === 0 ? (
                       <tr>
                         <td colSpan={columns.length} className="text-center">
                           No data available
                         </td>
                       </tr>
                     ) : (
-                      course.data?.map((item: ItemData, index) => {
+                      classes.data?.map((item: ItemData, index) => {
                         return (
                           <tr key={index}>
                             <td className="text-sm font-weight-normal px-4 py-3">
@@ -158,19 +180,28 @@ export const CoursePage = () => {
                             <td className="text-sm font-weight-normal px-4 py-3">
                               {item.name}
                             </td>
+                            <td className="text-sm font-weight-normal px-4 py-3">
+                              {item.major?.name}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3">
+                              {item.lat}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3">
+                              {item.lng}
+                            </td>
                             <td className="align-middle">
                               <div className="d-flex gap-2">
                                 <button
                                   className="btn btn-primary btn-sm mb-0"
                                   onClick={() => {
-                                    history.push(`/course/edit/${item.id}`);
+                                    history.push(`/classes/edit/${item.id}`);
                                   }}
                                 >
                                   Edit
                                 </button>
                                 <button
                                   className="btn btn-danger btn-sm mb-0"
-                                  onClick={() => deleteCourse(item.id)}
+                                  onClick={() => deleteClass(item.id)}
                                 >
                                   Delete
                                 </button>
@@ -186,9 +217,9 @@ export const CoursePage = () => {
             </div>
             <div className="text-center pt-4 px-4">
               <Pagination
-                activePage={course?.meta?.current_page}
-                itemsCountPerPage={course?.meta?.per_page}
-                totalItemsCount={course?.meta?.total ?? 0}
+                activePage={classes?.meta?.current_page}
+                itemsCountPerPage={classes?.meta?.per_page}
+                totalItemsCount={classes?.meta?.total ?? 0}
                 onChange={handleChangePage}
                 itemClass="page-item"
                 linkClass="page-link"

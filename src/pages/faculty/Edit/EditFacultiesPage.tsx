@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useHistory, useParams } from "react-router";
-import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
-import Swal from "sweetalert2";
+import Alert from "../../../components/Alert";
 
 export const EditFacultiesPage = () => {
   const [form, setForm] = useState({
@@ -26,15 +25,7 @@ export const EditFacultiesPage = () => {
 
   const getFacultyData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/faculties/${id}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
-      });
+      const response = await fetchAPI(`/api/v1/faculties/${id}`, {method: "GET"});
       const data = await response.json();
       if (response.ok) {
         setForm(data.data);
@@ -51,47 +42,34 @@ export const EditFacultiesPage = () => {
   console.log(form, "form");
 
   const onFinish = async (event: any) => {
-    try {
-      event.preventDefault();
+    event.preventDefault();
 
+    try {
       const payload = {
         name: form.name,
         _method: "PUT",
       };
-      const result = await Swal.fire({
-        title: "Update Confirmation!",
-        text: "Are you sure you want to Update this faculty?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#1D24CA",
-        cancelButtonColor: "#F44335",
-        confirmButtonText: "Yes, Update it!",
-        customClass: {
-          confirmButton: "btn btn-primary btn-sm ",
-          cancelButton: "btn btn-danger btn-sm ",
-        },
-        heightAuto: false,
-      });
 
-      if (!result.isConfirmed) return;
+      const confirmed = await Alert.confirm(
+        "Update Confirmation!",
+        "Are you sure you want to update this faculty?",
+        "Yes, update it!"
+      );
+
+      if (!confirmed) return;
 
       const response = await fetchAPI(`/api/v1/faculties/${id}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
+        method: "POST",
         body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        setErrors(data.errors);
-      } else {
+      if (response.ok) {
         history.goBack();
+        Alert.success("Success", data.message);
+      } else {
+        setErrors(data.errors);
       }
     } catch (error) {
       console.error(error, "Error");
@@ -105,7 +83,7 @@ export const EditFacultiesPage = () => {
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                <h6 className="text-white text-capitalize ps-3">Add Faculty</h6>
+                <h6 className="text-white text-capitalize ps-3">Edit Faculty</h6>
               </div>
               <div className="card-body">
                 <form onSubmit={onFinish}>

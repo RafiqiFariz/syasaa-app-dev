@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
 import { useHistory } from "react-router";
-import Cookies from "js-cookie";
 import fetchAPI from "../../fetch";
 import Pagination from "react-js-pagination";
 import { DefaultPaginatedResponse } from "../../types";
+import Alert from "../../components/Alert";
 
 type ItemData = {
   id: number;
@@ -38,17 +38,7 @@ export const PermissionPage = () => {
 
   const getPermissionsData = async () => {
     try {
-      const response = await fetchAPI(
-        `/api/v1/permissions?page=${currentPage}`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetchAPI(`/api/v1/permissions?page=${currentPage}`, {method: "GET"});
 
       const data = await response.json();
 
@@ -68,21 +58,26 @@ export const PermissionPage = () => {
 
   const deletePermission = async (id: number) => {
     try {
-      const response = await fetchAPI(
-        `/api/v1/permissions/${id}`,
+      const confirmed = await Alert.confirm(
+        "Delete Confirmation!",
+        "Are you sure you want to delete this permission?",
+        "Yes, Delete it!"
+      );
+
+      if (!confirmed) return;
+
+      const response = await fetchAPI(`/api/v1/permissions/${id}`,
         {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-          },
+          method: "POST",
+          body: JSON.stringify({ _method: "DELETE" }),
         }
       );
 
+      const data = await response.json();
+
       if (response.ok) {
         await getPermissionsData();
+        Alert.success("Success", data.message);
       }
     } catch (error) {
       console.log(error, "error");

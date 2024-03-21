@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
-import Pagination from "react-js-pagination";
-import { DefaultPaginatedResponse } from "../../types";
 import { useHistory } from "react-router";
+import Alert from "../../components/Alert";
+import { DefaultPaginatedResponse } from "../../types";
+import Pagination from "react-js-pagination";
 import fetchAPI from "../../fetch";
-import Cookies from "js-cookie";
-import Swal from "sweetalert2";
 
 interface ItemData {
   id: number;
@@ -42,17 +41,10 @@ export const MajorsPage = () => {
       selector: "action",
     },
   ];
+
   const getMajorData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/majors`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
-      });
+      const response = await fetchAPI(`/api/v1/majors?page=${currentPage}`, {method: "GET"});
 
       const data = await response.json();
 
@@ -71,45 +63,36 @@ export const MajorsPage = () => {
 
   useEffect(() => {
     getMajorData();
-  }, []);
+  }, [currentPage]);
 
   const deleteMajor = async (id: number) => {
     try {
-      const result = await Swal.fire({
-        title: "Delete Confirmation!",
-        text: "Are you sure you want to delete this major?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#1D24CA",
-        cancelButtonColor: "#F44335",
-        confirmButtonText: "Yes, Delete it!",
-        customClass: {
-          confirmButton: "btn btn-primary btn-sm ",
-          cancelButton: "btn btn-danger btn-sm ",
-        },
-        heightAuto: false,
+      const confirmed = await Alert.confirm(
+        "Delete Confirmation!",
+        "Are you sure you want to delete this major?",
+        "Yes, Delete it!"
+      );
+
+      if (!confirmed) return;
+
+      const response = await fetchAPI(`/api/v1/majors/${id}`, {
+        method: "POST",
+        body: JSON.stringify({ _method: "DELETE" })
       });
 
-      if (!result.isConfirmed) return;
-      const response = await fetchAPI(`/api/v1/majors/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
-      });
+      const data = await response.json();
 
       if (response.ok) {
-        getMajorData();
+        await getMajorData();
+        Alert.success("Success", data.message);
+      } else {
+        Alert.error("Error", data.message);
       }
     } catch (error) {
       console.error(error, "Error");
     }
   };
 
-  console.log(major, "major");
   return (
     <UserLayout>
       <div className="row">

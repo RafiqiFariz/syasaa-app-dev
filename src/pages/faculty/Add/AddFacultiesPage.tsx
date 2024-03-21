@@ -3,7 +3,7 @@ import { ErrorMessage } from "../../../components/ErrorMessage";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useHistory } from "react-router";
 import fetchAPI from "../../../fetch";
-import Cookies from "js-cookie";
+import Alert from "../../../components/Alert";
 
 export const AddFacultiesPage = () => {
   const [form, setForm] = useState({
@@ -26,19 +26,16 @@ export const AddFacultiesPage = () => {
       event.preventDefault();
       const response = await fetchAPI("/api/v1/faculties", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
         body: JSON.stringify(form),
       });
+
       const data = await response.json();
-      if (!response.ok) {
-        setErrors(data.errors);
+
+      if (response.ok) {
+        history.goBack();
+        Alert.success("Success", data.message);
       } else {
-        history.push("/faculties");
+        setErrors(data.errors);
       }
     } catch (error) {
       console.error(error, "Error");

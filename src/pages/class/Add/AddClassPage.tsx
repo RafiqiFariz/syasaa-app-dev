@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { UserLayout } from "../../../components/Layout/Layout";
-import { useHistory, useParams } from "react-router";
 import { ErrorMessage } from "../../../components/ErrorMessage";
+import { UserLayout } from "../../../components/Layout/Layout";
 import fetchAPI from "../../../fetch";
+import { useHistory } from "react-router";
 import Alert from "../../../components/Alert";
 
 interface OptionsData {
@@ -10,15 +10,15 @@ interface OptionsData {
   name: string;
 }
 
-export const EditMajorPage = () => {
+export const AddClassPage = () => {
   const [form, setForm] = useState({
     name: "",
-    faculty_id: 1,
+    lat: "",
+    lng: "",
+    major_id: 1,
   });
   const [errors, setErrors] = useState({});
-  const [faculties, setFaculties] = useState<Array<OptionsData>>([]);
-
-  const { id } = useParams<{ id: string }>();
+  const [majors, setMajors] = useState<Array<OptionsData>>([]);
 
   const history = useHistory();
 
@@ -33,30 +33,16 @@ export const EditMajorPage = () => {
   const onFinish = async (event: any) => {
     event.preventDefault();
     try {
-      const payload = {
-        name: form.name,
-        faculty_id: form.faculty_id,
-        _method: "PUT",
-      };
-
-      const confirmed = await Alert.confirm(
-        "Update Confirmation!",
-        "Are you sure you want to update this major?",
-        "Yes, update it!"
-      );
-
-      if (!confirmed) return;
-
-      const response = await fetchAPI(`/api/v1/majors/${id}`, {
+      const response = await fetchAPI("/api/v1/major-classes", {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(form),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         history.goBack();
-        Alert.success("Success", data.message)
+        Alert.success("Success", data.message);
       } else {
         setErrors(data.errors);
       }
@@ -65,15 +51,12 @@ export const EditMajorPage = () => {
     }
   };
 
-  const getMajorData = async () => {
+  const getMajorsData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/majors/${id}`, {method: "GET"});
+      const response = await fetchAPI("/api/v1/majors", {method: "GET"});
       const data = await response.json();
       if (response.ok) {
-        setForm({
-          name: data.data.name,
-          faculty_id: data.data.faculty.id,
-        });
+        setMajors(data.data);
       }
     } catch (error) {
       console.error(error, "Error");
@@ -81,23 +64,7 @@ export const EditMajorPage = () => {
   };
 
   useEffect(() => {
-    getMajorData();
-  }, []);
-
-  const getFacultyData = async () => {
-    try {
-      const response = await fetchAPI("/api/v1/faculties", {method: "GET"});
-      const data = await response.json();
-      if (response.ok) {
-        setFaculties(data.data);
-      }
-    } catch (error) {
-      console.error(error, "Error");
-    }
-  };
-
-  useEffect(() => {
-    getFacultyData();
+    getMajorsData();
   }, []);
 
   return (
@@ -107,7 +74,7 @@ export const EditMajorPage = () => {
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                <h6 className="text-white text-capitalize ps-3">Edit Major</h6>
+                <h6 className="text-white text-capitalize ps-3">Add Class</h6>
               </div>
               <div className="card-body">
                 <form onSubmit={onFinish}>
@@ -120,25 +87,52 @@ export const EditMajorPage = () => {
                       className={`form-control ${
                         errors["name"] ? "is-invalid" : ""
                       }`}
-                      placeholder="Major Name"
-                      aria-label="Major Name"
-                      aria-describedby="basic-addon0"
+                      placeholder="Name"
+                      aria-label="Name"
                     />
-                    <ErrorMessage field="name" errors={errors} />
+                    <ErrorMessage field="name" errors={errors}/>
+                  </div>
+                  <div className="input-group input-group-dynamic mb-4 has-validation">
+                    <input
+                      name="lat"
+                      value={form.lat}
+                      onChange={handleChange}
+                      type="text"
+                      className={`form-control ${
+                        errors["lat"] ? "is-invalid" : ""
+                      }`}
+                      placeholder="Latitude"
+                      aria-label="Latitude"
+                    />
+                    <ErrorMessage field="lat" errors={errors}/>
+                  </div>
+                  <div className="input-group input-group-dynamic mb-4 has-validation">
+                    <input
+                      name="lng"
+                      value={form.lng}
+                      onChange={handleChange}
+                      type="text"
+                      className={`form-control ${
+                        errors["lng"] ? "is-invalid" : ""
+                      }`}
+                      placeholder="Longitude"
+                      aria-label="Longitude"
+                    />
+                    <ErrorMessage field="lng" errors={errors}/>
                   </div>
                   <div className="input-group input-group-static mb-4">
-                    <label htmlFor="faculties" className="ms-0">
-                      Faculty
+                    <label htmlFor="majors" className="ms-0">
+                      Major
                     </label>
                     <select
-                      name="faculty_id"
+                      name="major_id"
                       className="form-control"
-                      id="faculties"
+                      id="majors"
                       onChange={handleChange}
                     >
-                      {faculties.map((faculty) => (
-                        <option key={faculty.id} value={faculty.id}>
-                          {faculty.name}
+                      {majors.map((major) => (
+                        <option key={major.id} value={major.id}>
+                          {major.name}
                         </option>
                       ))}
                     </select>

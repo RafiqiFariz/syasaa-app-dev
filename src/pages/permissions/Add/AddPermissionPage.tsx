@@ -2,8 +2,8 @@ import { useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useHistory } from "react-router";
 import { ErrorMessage } from "../../../components/ErrorMessage";
-import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
+import Alert from "../../../components/Alert";
 
 export const AddPermissionPage = () => {
   const history = useHistory();
@@ -23,21 +23,16 @@ export const AddPermissionPage = () => {
       event.preventDefault();
       const response = await fetchAPI("/api/v1/permissions", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
         body: JSON.stringify(form),
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        setErrors(data.errors);
+      if (response.ok) {
+        history.goBack();
+        Alert.success("Success", data.message);
       } else {
-        history.push("/permissions");
+        setErrors(data.errors);
       }
     } catch (error) {
       console.error(error, "Error");
@@ -53,7 +48,7 @@ export const AddPermissionPage = () => {
               <div
                 className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">
-                  Create Permission
+                  Add Permission
                 </h6>
               </div>
               <div className="card-body">

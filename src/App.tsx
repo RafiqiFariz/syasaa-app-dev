@@ -57,6 +57,9 @@ import { FacultiesPage } from "./pages/faculty/FacultiesPage";
 import { AddFacultiesPage } from "./pages/faculty/Add/AddFacultiesPage";
 import { EditFacultiesPage } from "./pages/faculty/Edit/EditFacultiesPage";
 import { EditMajorPage } from "./pages/majors/Edit/EditMajorPage";
+import { ClassPage } from "./pages/class/ClassPage";
+import { AddClassPage } from "./pages/class/Add/AddClassPage";
+import { EditClassPage } from "./pages/class/Edit/EditClassPage";
 
 setupIonicReact();
 
@@ -233,6 +236,27 @@ const App: React.FC = () => {
               path="/course/edit/:id"
               render={() =>
                 isLogin.isLogin ? <EditCoursePage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/classes"
+              render={() =>
+                isLogin.isLogin ? <ClassPage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/classes/add"
+              render={() =>
+                isLogin.isLogin ? <AddClassPage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/classes/edit/:id"
+              render={() =>
+                isLogin.isLogin ? <EditClassPage /> : <Redirect to="/login" />
               }
             />
             <Route
