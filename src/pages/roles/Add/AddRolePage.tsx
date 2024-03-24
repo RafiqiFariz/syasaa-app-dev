@@ -4,15 +4,24 @@ import { useHistory } from "react-router";
 import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
 import { ErrorMessage } from "../../../components/ErrorMessage";
+import ReactSelect from "react-select";
+import makeAnimated from "react-select/animated";
+import Alert from "../../../components/Alert";
+
+interface IOptions {
+  label: string;
+  value: number;
+}
 
 export const AddRolePage = () => {
   const history = useHistory();
   const [form, setForm] = useState({
     name: "",
-    permissions: [{ id: 0, name: "" }],
+    permissions: [{ label: "", values: 0 }],
   });
-  const [options, setOptions] = useState<Array<any>>([]);
+  const [options, setOptions] = useState<Array<IOptions>>([]);
   const [errors, setErrors] = useState({});
+  const animatedComponents = makeAnimated();
 
   const handleChange = (event: any) => {
     const { name, value } = event.target;
@@ -24,63 +33,6 @@ export const AddRolePage = () => {
       };
     });
   };
-
-  const handleSelect = (event: any) => {
-    const { value } = event.target;
-
-    // Mengabaikan jika nilai yang dipilih adalah 0 atau sudah ada di dalam array permissions
-    if (
-      parseInt(value) === 0 ||
-      form.permissions.some((permission) => permission.id === parseInt(value))
-    ) {
-      return;
-    }
-
-    // Menyiapkan objek permission baru
-    const newPermission = {
-      id: parseInt(value),
-      name: options.find((option) => option.id === parseInt(value))?.name || "",
-    };
-
-    // Mengganti permissions dengan array baru yang termasuk permission baru
-    setForm((prev: any) => {
-      if (prev.permissions[0].id === 0) {
-        return {
-          ...prev,
-          permissions: [newPermission],
-        };
-      }
-      return {
-        ...prev,
-        permissions: [...prev.permissions, newPermission],
-      };
-    });
-  };
-
-  const deleteSelectedHandler = (index: number) => {
-    if (form.permissions.length === 1) {
-      setForm((prev: any) => {
-        return {
-          ...prev,
-          permissions: [
-            {
-              id: 0,
-              name: "",
-            },
-          ],
-        };
-      });
-      return;
-    }
-    setForm((prev: any) => {
-      return {
-        ...prev,
-        permissions: prev.permissions.filter((item: any) => item.id !== index),
-      };
-    });
-  };
-
-  console.log(form, "form");
 
   const getPermissions = async () => {
     try {
@@ -97,7 +49,9 @@ export const AddRolePage = () => {
       const data = await response.json();
 
       if (data) {
-        setOptions(data.data);
+        setOptions(
+          data.data.map((item: any) => ({ label: item.name, value: item.id }))
+        );
       }
       console.log(data, "data roles");
     } catch (error) {
@@ -110,9 +64,7 @@ export const AddRolePage = () => {
     try {
       const body = {
         name: form.name,
-        permissions: form.permissions.map((permission: any) =>
-          parseInt(permission.id)
-        ),
+        permissions: form.permissions.map((item: any) => item.value),
       };
 
       console.log(body, "body");
@@ -134,16 +86,33 @@ export const AddRolePage = () => {
       if (!response.ok) {
         setErrors(data.errors);
       } else {
-        history.push("/roles");
+        history.goBack();
+        Alert.success("Success", data.message);
       }
     } catch (error) {
       console.log(error, "Error");
     }
   };
 
+  const handleSelectNew = (selectedOptions) => {
+    // Dapatkan nilai dari options yang dipilih dan konversi ke format yang sesuai dengan state form
+    const newPermissions = selectedOptions.map((option) => ({
+      label: option.label,
+      value: option.value,
+    }));
+
+    // Perbarui state form dengan menambahkan nilai baru ke dalam array permissions
+    setForm((prevForm) => ({
+      ...prevForm,
+      permissions: newPermissions,
+    }));
+  };
+
   useEffect(() => {
     getPermissions();
   }, []);
+
+  console.log(form, "form");
 
   return (
     <UserLayout>
@@ -171,60 +140,17 @@ export const AddRolePage = () => {
                     />
                     <ErrorMessage field="name" errors={errors} />
                   </div>
-                  <div className="input-group input-group-static has-validation">
-                    <label className="ms-0">Permissions</label>
-                    <select
-                      id="permissions"
-                      title="Select Permissions"
+                  <div className="mt-3 mb-4 w-100">
+                    <ReactSelect
                       className={`form-control ${
                         errors["permissions"] ? "is-invalid" : ""
-                      }`}
-                      multiple
-                      onChange={handleSelect}
-                    >
-                      {options.map((option) => {
-                        return (
-                          <option key={option.id} value={option.id}>
-                            {option.name}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <ErrorMessage field="permissions" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-dynamic mt-3 mb-4 w-100">
-                    <div className="d-flex flex-wrap w-100 gap-2">
-                      {form.permissions.map(
-                        (permission: any, index: number) => {
-                          if (permission.id === 0) {
-                            return (
-                              <span
-                                key={index}
-                                className="badge bg-primary me-2 d-flex align-items-center"
-                              >
-                                No Permission
-                              </span>
-                            );
-                          }
-                          return (
-                            <span
-                              key={index}
-                              className="badge bg-primary me-2 d-flex align-items-center"
-                            >
-                              {permission.name}
-                              <button
-                                type="button"
-                                className="btn-close mx-2"
-                                aria-label="Close"
-                                onClick={() =>
-                                  deleteSelectedHandler(permission.id)
-                                }
-                              ></button>
-                            </span>
-                          );
-                        }
-                      )}
-                    </div>
+                      } w-100`}
+                      closeMenuOnSelect={false}
+                      components={animatedComponents}
+                      isMulti
+                      options={options}
+                      onChange={handleSelectNew}
+                    />
                   </div>
                   <div className="button-row d-flex mt-4">
                     <button

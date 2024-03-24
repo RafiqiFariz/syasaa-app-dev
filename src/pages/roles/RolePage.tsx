@@ -63,27 +63,27 @@ export const RolePage = () => {
   const deleteRole = async (id: number) => {
     try {
       const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'You won\'t be able to revert this!',
-        icon: 'warning',
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
         heightAuto: false,
       });
 
       if (!result.isConfirmed) return;
 
       const response = await fetchAPI(`/api/v1/roles/${id}`, {
-        method: 'POST',
-        credentials: 'include',
+        method: "POST",
+        credentials: "include",
         headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN') || '',
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
         },
-        body: JSON.stringify({_method: 'DELETE'})
+        body: JSON.stringify({ _method: "DELETE" }),
       });
 
       if (response.ok) {
@@ -113,11 +113,8 @@ export const RolePage = () => {
             }}
           >
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div
-                className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
-                <h6 className="text-white text-capitalize ps-3 mb-0">
-                  Roles
-                </h6>
+              <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
+                <h6 className="text-white text-capitalize ps-3 mb-0">Roles</h6>
                 <button
                   className="btn btn-info btn-md mx-4 mb-0"
                   onClick={() => {
@@ -132,62 +129,63 @@ export const RolePage = () => {
               <div className="table-responsive">
                 <table className="table align-items-center mb-0">
                   <thead>
-                  <tr>
-                    {columns.map((column, index) => (
-                      <th
-                        key={index}
-                        className="text-uppercase text-secondary text-xxs font-weight-bolder"
-                      >
-                        {column.name}
-                      </th>
-                    ))}
-                  </tr>
+                    <tr>
+                      {columns.map((column, index) => (
+                        <th
+                          key={index}
+                          className="text-uppercase text-secondary text-xxs font-weight-bolder text-center"
+                        >
+                          {column.name}
+                        </th>
+                      ))}
+                    </tr>
                   </thead>
                   <tbody>
-                  {isLoading ? (
-                    <tr>
-                      {Array(columns.length)
-                        .fill(0)
-                        .map((_, i) => (
-                          <td key={i} className="text-center placeholder-glow">
-                            <span className="placeholder col-10"></span>
-                          </td>
-                        ))}
-                    </tr>
-                  ) : (
-                    roles.data?.map((item, index) => {
-                      return (
-                        <tr key={index}>
-                          <td className="text-sm font-weight-normal px-4 py-3">
-                            {item.id}
-                          </td>
-                          <td className="text-sm font-weight-normal px-4 py-3">
-                            <h6 className="mb-0 text-sm">
-                              {item.name}
-                            </h6>
-                          </td>
-                          <td className="align-middle">
-                            <div className="d-flex gap-2">
-                              <button
-                                className="btn btn-primary btn-sm mb-0"
-                                onClick={() => {
-                                  history.push(`/roles/edit/${item.id}`);
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="btn btn-danger btn-sm mb-0"
-                                onClick={() => deleteRole(item.id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
+                    {isLoading ? (
+                      <tr>
+                        {Array(columns.length)
+                          .fill(0)
+                          .map((_, i) => (
+                            <td
+                              key={i}
+                              className="text-center placeholder-glow"
+                            >
+                              <span className="placeholder col-10"></span>
+                            </td>
+                          ))}
+                      </tr>
+                    ) : (
+                      roles.data?.map((item, index) => {
+                        return (
+                          <tr key={index}>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {item.id}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              <h6 className="mb-0 text-sm">{item.name}</h6>
+                            </td>
+                            <td className="align-middle text-center">
+                              <div className="d-flex gap-2 text-center justify-content-center">
+                                <button
+                                  className="btn btn-primary btn-sm mb-0"
+                                  onClick={() => {
+                                    history.push(`/roles/edit/${item.id}`);
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="btn btn-danger btn-sm mb-0"
+                                  onClick={() => deleteRole(item.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -51,7 +51,7 @@ export const AddMajorPage = () => {
 
   const getFacultyData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/faculties", {method: "GET"});
+      const response = await fetchAPI("/api/v1/faculties", { method: "GET" });
       const data = await response.json();
       if (response.ok) {
         setFaculties(data.data);
@@ -64,7 +64,7 @@ export const AddMajorPage = () => {
   useEffect(() => {
     getFacultyData();
   }, []);
-  console.log(form, "faculties");
+  console.log(faculties, "faculties");
 
   return (
     <UserLayout>

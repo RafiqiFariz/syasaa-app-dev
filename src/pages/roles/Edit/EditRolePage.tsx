@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
 import Swal from "sweetalert2";
+import makeAnimated from "react-select/animated";
+import ReactSelect from "react-select";
+import Alert from "../../../components/Alert";
+
+interface IOptions {
+  label: string;
+  value: number;
+}
 
 export const EditRolePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,13 +20,16 @@ export const EditRolePage = () => {
     name: "",
     permissions: [
       {
-        id: 0,
-        name: "",
+        label: "",
+        values: 0,
       },
     ],
   });
+  const [errors, setErrors] = useState({});
 
-  const [options, setOptions] = useState<Array<any>>([]);
+  const animatedComponents = makeAnimated();
+
+  const [options, setOptions] = useState<Array<IOptions>>([]);
 
   const history = useHistory();
 
@@ -53,7 +64,10 @@ export const EditRolePage = () => {
       if (response.ok) {
         setForm({
           name: data.data.name,
-          permissions: data.data.permissions,
+          permissions: data.data.permissions.map((permission: any) => ({
+            label: permission.name,
+            value: permission.id,
+          })),
         });
       }
     } catch (error) {
@@ -67,29 +81,14 @@ export const EditRolePage = () => {
     try {
       const payload = {
         name: form.name,
-        permissions: form.permissions.map((permission: any) => permission.id),
+        permissions: form.permissions.map(
+          (permission: any) => permission.value
+        ),
         _method: "PUT",
       };
 
-      const result = await Swal.fire({
-        title: "Update Confirmation!",
-        text: "Are you sure you want to Update this role?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#1D24CA",
-        cancelButtonColor: "#F44335",
-        confirmButtonText: "Yes, Update it!",
-        customClass: {
-          confirmButton: "btn btn-primary btn-sm ",
-          cancelButton: "btn btn-danger btn-sm ",
-        },
-        heightAuto: false,
-      });
-
-      if (!result.isConfirmed) return;
-
       const response = await fetchAPI(`/api/v1/roles/${id}`, {
-        method: "PUT",
+        method: "POST",
         credentials: "include",
         headers: {
           Accept: "application/json",
@@ -99,69 +98,18 @@ export const EditRolePage = () => {
         body: JSON.stringify(payload), // Convert form to JSON
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        history.push("/roles");
+        history.goBack();
+
+        Alert.success("Success", data.message);
+      } else {
+        setErrors(data.errors);
       }
     } catch (error) {
       console.log(error, "Error");
     }
-  };
-  const DeleteSelectedHandler = (index: number) => {
-    if (form.permissions.length === 1) {
-      setForm((prev: any) => {
-        return {
-          ...prev,
-
-          permissions: [
-            {
-              id: 0,
-              name: "",
-            },
-          ],
-        };
-      });
-
-      return;
-    }
-
-    setForm((prev: any) => {
-      return {
-        ...prev,
-        permissions: prev.permissions.filter((item: any) => item.id !== index),
-      };
-    });
-  };
-
-  const handleSelect = (event: any) => {
-    const { value } = event.target;
-
-    // Mengabaikan jika nilai yang dipilih adalah 0 atau sudah ada di dalam array permissions
-    if (
-      parseInt(value) === 0 ||
-      form.permissions.some((permission) => permission.id === parseInt(value))
-    ) {
-      return;
-    }
-
-    // Menyiapkan objek permission baru
-    const newPermission = {
-      id: parseInt(value),
-      name: options.find((option) => option.id === parseInt(value))?.name || "",
-    };
-
-    // Mengganti permissions dengan array baru yang termasuk permission baru
-    setForm((prev: any) => {
-      if (prev.permissions[0].id === 0) {
-        return {
-          ...prev,
-          permissions: [newPermission],
-        };
-      }
-      return {
-        ...prev,
-        permissions: [...prev.permissions, newPermission],
-      };
-    });
   };
 
   const getPermissions = async () => {
@@ -177,11 +125,28 @@ export const EditRolePage = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        setOptions(data.data);
+        console.log(data.data, "data");
+        setOptions(
+          data.data.map((item: any) => ({ label: item.name, value: item.id }))
+        );
       }
     } catch (error) {
       console.log(error, "error");
     }
+  };
+
+  const handleSelectNew = (selectedOptions) => {
+    // Dapatkan nilai dari options yang dipilih dan konversi ke format yang sesuai dengan state form
+    const newPermissions = selectedOptions.map((option) => ({
+      label: option.label,
+      value: option.value,
+    }));
+
+    // Perbarui state form dengan menambahkan nilai baru ke dalam array permissions
+    setForm((prevForm) => ({
+      ...prevForm,
+      permissions: newPermissions,
+    }));
   };
 
   useEffect(() => {
@@ -189,6 +154,7 @@ export const EditRolePage = () => {
     getPermissions();
   }, [id]);
 
+  console.log(options, "options");
   console.log(form, "form");
   return (
     <UserLayout>
@@ -209,75 +175,26 @@ export const EditRolePage = () => {
                       value={form.name}
                       onChange={handleChange}
                       type="text"
-                      className="form-control"
+                      className={`form-control ${
+                        errors["name"] ? "is-invalid" : ""
+                      }`}
                       placeholder="Role Name"
                       aria-label="Role Name"
                       aria-describedby="basic-addon0"
                     />
                   </div>
                   <div className="input-group input-group-static">
-                    <label className="ms-0">Permissions</label>
-                    <select
-                      className="form-control"
-                      id="exampleFormControlSelect2"
-                      title="Select Options"
-                      multiple
-                      onChange={handleSelect}
-                    >
-                      {options.map((option) => {
-                        return (
-                          <option
-                            key={option.id}
-                            value={option.id}
-                            disabled={form.permissions.some(
-                              (permission) => permission.id === option.id
-                            )}
-                          >
-                            {option.name}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </div>
-                  <div
-                    className="input-group input-group-dynamic mt-3 mb-4 w-100"
-                    style={{
-                      overflowY: "auto",
-                      maxHeight: "200px",
-                    }}
-                  >
-                    <div className="d-flex flex-wrap w-100 gap-2">
-                      {form.permissions.map(
-                        (permission: any, index: number) => {
-                          if (permission.id === 0) {
-                            return (
-                              <span
-                                key={index}
-                                className="badge bg-primary me-2 d-flex align-items-center"
-                              >
-                                No Permission
-                              </span>
-                            );
-                          }
-                          return (
-                            <span
-                              key={index}
-                              className="badge bg-primary me-2 d-flex align-items-center"
-                            >
-                              {permission.name}
-                              <button
-                                type="button"
-                                className="btn-close mx-2"
-                                aria-label="Close"
-                                onClick={() =>
-                                  DeleteSelectedHandler(permission.id)
-                                }
-                              ></button>
-                            </span>
-                          );
-                        }
-                      )}
-                    </div>
+                    <ReactSelect
+                      className={`form-control ${
+                        errors["permissions"] ? "is-invalid" : ""
+                      } w-100`}
+                      closeMenuOnSelect={false}
+                      value={form.permissions}
+                      components={animatedComponents}
+                      isMulti
+                      options={options}
+                      onChange={handleSelectNew}
+                    />
                   </div>
                   <div className="text-center">
                     <button

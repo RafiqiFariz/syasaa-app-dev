@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
 import { useHistory } from "react-router";
 import Cookies from "js-cookie";
 import fetchAPI from "../../fetch";
 import Pagination from "react-js-pagination";
 import { DefaultPaginatedResponse } from "../../types";
-import _ from "lodash";
+import _, { set } from "lodash";
 import Swal from "sweetalert2";
 
 interface ItemData {
@@ -32,6 +32,7 @@ export const UserPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const getUserData = async () => {
+    console.log("get user data");
     try {
       const response = await fetchAPI("/api/v1/users?includeRole=1", {
         method: "GET",
@@ -130,6 +131,8 @@ export const UserPage = () => {
   useEffect(() => {
     getUserData();
   }, [currentPage]);
+
+  console.log(users, "users");
 
   return (
     <UserLayout>
