@@ -1,13 +1,13 @@
-import Cookies from "js-cookie";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useHistory, useParams } from "react-router";
-import { useContext, useEffect, useState } from "react";
-import Alert from "../../../components/Alert";
+import { useEffect, useState } from "react";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { FilterRole } from "../components/FilterRole";
+import Alert from "../../../components/Alert";
+import fetchAPI from "../../../fetch";
 
 export const EditUserPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const {id} = useParams<{ id: string }>();
 
   const [form, setFrom] = useState({
     name: "",
@@ -17,17 +17,20 @@ export const EditUserPage = () => {
     phone: "",
     role_id: 1,
   });
+
   const [rolesOptions, setRolesOptions] = useState({
     faculty_id: 1,
     address: "",
     class_id: 1,
   });
+
   const [errors, setErrors] = useState({});
+  const [roles, setRoles] = useState<Array<any>>([]);
 
   const history = useHistory();
 
   const handleChange = (event: any) => {
-    const { name, value } = event.target;
+    const {name, value} = event.target;
 
     if (name === "role_id") {
       setFrom({
@@ -44,7 +47,7 @@ export const EditUserPage = () => {
   };
 
   const handleRoleOptionsChange = (event: any) => {
-    const { name, value } = event.target;
+    const {name, value} = event.target;
     console.log(event.target, "event.target.value");
     if (name === "faculty_id" || name === "class_id") {
       setRolesOptions({
@@ -61,15 +64,10 @@ export const EditUserPage = () => {
 
   const getUserDataById = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/users/${id}`, {
+      const response = await fetchAPI(`/api/v1/users/${id}`, {
         method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
       });
+
       const data = await response.json();
       console.log(data, "data");
       if (response.ok) {
@@ -85,29 +83,52 @@ export const EditUserPage = () => {
     }
   };
 
+  const getRoles = async () => {
+    try {
+      const response = await fetchAPI("/api/v1/roles", {
+        method: "GET",
+      });
+
+      const data = await response.json();
+
+      if (data) {
+        setRoles(data.data);
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
+  }
+
   const onFinish = async (event: any) => {
     event.preventDefault();
 
     const body = {
+      id: id,
       name: form.name,
       email: form.email,
       password: form.password,
       password_confirmation: form.password_confirmation,
       phone: form.phone,
       role_id: form.role_id,
+      _method: "PUT",
       ...rolesOptions,
     };
 
+    if (form.role_id === 2) {
+      delete body.class_id;
+      delete body.address;
+    } else if (form.role_id === 3) {
+      delete body.faculty_id;
+      delete body.class_id;
+    } else if (form.role_id === 4) {
+      delete body.faculty_id;
+      delete body.address;
+    }
+
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/users/${id}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-          "Content-Type": "application/json", // Add this line
-        },
-        body: JSON.stringify(body), // Convert form to JSON
+      const response = await fetchAPI(`/api/v1/users/${id}`, {
+        method: "POST",
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
@@ -122,127 +143,148 @@ export const EditUserPage = () => {
       console.log(error, "Error");
     }
   };
+
+  useEffect(() => {
+    getRoles();
+  }, []);
+
   useEffect(() => {
     getUserDataById();
   }, [id]);
+
   console.log(form, "form");
   console.log(rolesOptions, "rolesOptions");
   return (
     <UserLayout>
-      <div className="container-fluid py-4">
-        <div className="row">
-          <div className="col-12 d-flex justify-content-center">
-            <div className="card my-4 w-75">
-              <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                  <h6 className="text-white text-capitalize ps-3">
-                    Edit User Form
-                  </h6>
-                </div>
-                <div className="card-body px-5 pb-2">
-                  <form onSubmit={onFinish}>
-                    <div className="input-group input-group-dynamic mb-4">
-                      <input
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        type="text"
-                        className={`form-control ${
-                          errors["name"] ? "is-invalid" : ""
-                        }`}
-                        placeholder="Username"
-                        aria-label="Username"
-                        aria-describedby="basic-addon0"
-                      />
-                      <ErrorMessage field="name" errors={errors} />
-                    </div>
-                    <div className="input-group input-group-dynamic mb-4">
-                      <input
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        type="email"
-                        className={`form-control ${
-                          errors["email"] ? "is-invalid" : ""
-                        }`}
-                        placeholder="email"
-                        aria-label="email"
-                        aria-describedby="basic-addon1"
-                      />
-                      <ErrorMessage field="email" errors={errors} />
-                    </div>
-                    <div className="input-group input-group-dynamic mb-4">
-                      <input
-                        name="password"
-                        value={form.password}
-                        onChange={handleChange}
-                        type="password"
-                        className={`form-control ${
-                          errors["password"] ? "is-invalid" : ""
-                        }`}
-                        placeholder="password"
-                        aria-label="Password"
-                        aria-describedby="basic-addon2"
-                      />
-                      <ErrorMessage field="password" errors={errors} />
-                    </div>
-                    <div className="input-group input-group-dynamic mb-4">
-                      <input
-                        name="password_confirmation"
-                        value={form.password_confirmation}
-                        onChange={handleChange}
-                        type="password"
-                        className={`form-control ${
-                          errors["password_confirmation"] ? "is-invalid" : ""
-                        }`}
-                        placeholder="Confirm Password"
-                        aria-label="Confirm Password"
-                        aria-describedby="basic-addon3"
-                      />
-                      <ErrorMessage
-                        field="password_confirmation"
-                        errors={errors}
-                      />
-                    </div>
-                    <div className="input-group input-group-static mb-4">
-                      <label
-                        htmlFor="exampleFormControlSelect1"
-                        className="ms-0"
-                      >
-                        Role
-                      </label>
-                      <select
-                        name="role_id"
-                        value={form.role_id}
-                        className={`form-control ${
-                          errors["role_id"] ? "is-invalid" : ""
-                        }`}
-                        id="exampleFormControlSelect1"
-                        onChange={handleChange}
-                      >
-                        <option value={1}>Admin</option>
-                        <option value={2}>Staff</option>
-                        <option value={3}>Lecture</option>
-                        <option value={4}>Mahasiswa</option>
-                      </select>
-                      <ErrorMessage field="role_id" errors={errors} />
-                    </div>
-                    <FilterRole
-                      role={form.role_id}
-                      onChange={handleRoleOptionsChange}
-                      value={rolesOptions}
+      <div className="row">
+        <div className="col-12 col-lg-8 m-auto">
+          <div className="card my-4">
+            <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div
+                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+                <h6 className="text-white text-capitalize ps-3">
+                  Edit User
+                </h6>
+              </div>
+              <div className="card-body">
+                <form onSubmit={onFinish}>
+                  <div className="input-group input-group-dynamic mb-4">
+                    <input
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      type="text"
+                      className={`form-control ${
+                        errors["name"] ? "is-invalid" : ""
+                      }`}
+                      placeholder="Username"
+                      aria-label="Username"
+                      aria-describedby="basic-addon0"
+                    />
+                    <ErrorMessage field="name" errors={errors}/>
+                  </div>
+                  <div className="input-group input-group-dynamic mb-4">
+                    <input
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      type="email"
+                      className={`form-control ${
+                        errors["email"] ? "is-invalid" : ""
+                      }`}
+                      placeholder="email"
+                      aria-label="email"
+                      aria-describedby="basic-addon1"
+                    />
+                    <ErrorMessage field="email" errors={errors}/>
+                  </div>
+                  <div className="input-group input-group-dynamic mb-4 has-validation">
+                    <input
+                      name="phone"
+                      value={form.phone}
+                      onChange={handleChange}
+                      type="tel"
+                      className={`form-control ${
+                        errors["phone"] ? "is-invalid" : ""
+                      }`}
+                      placeholder="Phone"
+                      aria-label="phone"
+                    />
+                    <ErrorMessage field="phone" errors={errors}/>
+                  </div>
+                  <div className="input-group input-group-dynamic mb-4">
+                    <input
+                      name="password"
+                      value={form.password}
+                      onChange={handleChange}
+                      type="password"
+                      className={`form-control ${
+                        errors["password"] ? "is-invalid" : ""
+                      }`}
+                      placeholder="Password"
+                      aria-label="Password"
+                      aria-describedby="basic-addon2"
+                    />
+                    <ErrorMessage field="password" errors={errors}/>
+                  </div>
+                  <div className="input-group input-group-dynamic mb-4">
+                    <input
+                      name="password_confirmation"
+                      value={form.password_confirmation}
+                      onChange={handleChange}
+                      type="password"
+                      className={`form-control ${
+                        errors["password_confirmation"] ? "is-invalid" : ""
+                      }`}
+                      placeholder="Confirm Password"
+                      aria-label="Confirm Password"
+                      aria-describedby="basic-addon3"
+                    />
+                    <ErrorMessage
+                      field="password_confirmation"
                       errors={errors}
                     />
-                    <div className="text-center">
-                      <button
-                        type="submit"
-                        className="btn bg-primary w-100 my-4 mb-2 text-white"
-                      >
-                        Update User
-                      </button>
-                    </div>
-                  </form>
-                </div>
+                  </div>
+                  <div className="input-group input-group-static mb-4">
+                    <label
+                      htmlFor="exampleFormControlSelect1"
+                      className="ms-0"
+                    >
+                      Role
+                    </label>
+                    <select
+                      name="role_id"
+                      value={form.role_id}
+                      className={`form-control ${
+                        errors["role_id"] ? "is-invalid" : ""
+                      }`}
+                      id="selectRoles"
+                      onChange={handleChange}
+                    >
+                      {roles.map((role, i) => (
+                        <option key={i} value={role.id}>
+                          {role.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ErrorMessage field="role_id" errors={errors}/>
+                  </div>
+                  <FilterRole
+                    role={form.role_id}
+                    onChange={handleRoleOptionsChange}
+                    value={rolesOptions}
+                    errors={errors}
+                  />
+                  <div className="button-row d-flex mt-4">
+                    <button
+                      className="btn bg-gradient-dark ms-auto mb-0"
+                      type="submit"
+                      title="Send"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

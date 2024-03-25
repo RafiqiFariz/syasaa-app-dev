@@ -1,7 +1,7 @@
 export const Select = ({ name, options, handleChange, name_form }) => {
   return (
     <div className="input-group input-group-static mb-4 has-validation">
-      <label htmlFor="selectRoles" className="ms-0">
+      <label htmlFor={name_form} className="ms-0">
         {name}
       </label>
       <select

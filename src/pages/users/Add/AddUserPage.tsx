@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import { UserLayout } from "../../../components/Layout/Layout";
-import { useContext, useState } from "react";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import fetchAPI from "../../../fetch";
 import { ErrorMessage } from "../../../components/ErrorMessage";
@@ -25,18 +25,21 @@ export const AddUserPage = () => {
     phone: "",
     role_id: 1,
   });
+
   const [rolesOptions, setRolesOptions] = useState({
     faculty_id: 1,
     address: "",
     class_id: 1,
   });
+
   const [errors, setErrors] = useState({});
+  const [roles, setRoles] = useState<Array<any>>([]);
 
   const history = useHistory();
 
   // Handle form change
   const handleChange = (event: any) => {
-    const { name, value } = event.target;
+    const {name, value} = event.target;
 
     if (name === "role_id") {
       setFrom({
@@ -53,7 +56,7 @@ export const AddUserPage = () => {
   };
 
   const handleRoleOptionsChange = (event: any) => {
-    const { name, value } = event.target;
+    const {name, value} = event.target;
     console.log(event.target, "event.target.value");
     if (name === "faculty_id" || name === "class_id") {
       setRolesOptions({
@@ -65,6 +68,22 @@ export const AddUserPage = () => {
         ...rolesOptions,
         [name]: value,
       });
+    }
+  };
+
+  const getRoles = async () => {
+    try {
+      const response = await fetchAPI("/api/v1/roles", {
+        method: "GET",
+      });
+
+      const data = await response.json();
+
+      if (data) {
+        setRoles(data.data);
+      }
+    } catch (error) {
+      console.log(error, "error");
     }
   };
 
@@ -81,15 +100,20 @@ export const AddUserPage = () => {
       ...rolesOptions,
     };
 
+    if (form.role_id === 2) {
+      delete body.class_id;
+      delete body.address;
+    } else if (form.role_id === 3) {
+      delete body.faculty_id;
+      delete body.class_id;
+    } else if (form.role_id === 4) {
+      delete body.faculty_id;
+      delete body.address;
+    }
+
     try {
       const response = await fetchAPI("/api/v1/users", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(body),
       });
 
@@ -106,13 +130,18 @@ export const AddUserPage = () => {
     }
   };
 
+  useEffect(() => {
+    getRoles();
+  }, []);
+
   return (
     <UserLayout>
       <div className="row">
         <div className="col-12 col-lg-8 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+              <div
+                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">Add User</h6>
               </div>
               <div className="card-body">
@@ -130,7 +159,7 @@ export const AddUserPage = () => {
                       aria-label="Username"
                       aria-describedby="basic-addon0"
                     />
-                    <ErrorMessage field="name" errors={errors} />
+                    <ErrorMessage field="name" errors={errors}/>
                   </div>
                   <div className="input-group input-group-dynamic mb-4 has-validation">
                     <input
@@ -143,9 +172,22 @@ export const AddUserPage = () => {
                       }`}
                       placeholder="Email"
                       aria-label="email"
-                      aria-describedby="basic-addon1"
                     />
-                    <ErrorMessage field="email" errors={errors} />
+                    <ErrorMessage field="email" errors={errors}/>
+                  </div>
+                  <div className="input-group input-group-dynamic mb-4 has-validation">
+                    <input
+                      name="phone"
+                      value={form.phone}
+                      onChange={handleChange}
+                      type="tel"
+                      className={`form-control ${
+                        errors["phone"] ? "is-invalid" : ""
+                      }`}
+                      placeholder="Phone"
+                      aria-label="phone"
+                    />
+                    <ErrorMessage field="phone" errors={errors}/>
                   </div>
                   <div className="input-group input-group-dynamic mb-4 has-validation">
                     <input
@@ -160,7 +202,7 @@ export const AddUserPage = () => {
                       aria-label="Password"
                       aria-describedby="password"
                     />
-                    <ErrorMessage field="password" errors={errors} />
+                    <ErrorMessage field="password" errors={errors}/>
                   </div>
                   <div className="input-group input-group-dynamic mb-4 has-validation">
                     <input
@@ -175,7 +217,7 @@ export const AddUserPage = () => {
                       aria-label="Confirm Password"
                       aria-describedby="confirm-password"
                     />
-                    <ErrorMessage field="confirm_password" errors={errors} />
+                    <ErrorMessage field="confirm_password" errors={errors}/>
                   </div>
                   <div className="input-group input-group-static mb-4 has-validation">
                     <label htmlFor="selectRoles" className="ms-0">
@@ -193,9 +235,9 @@ export const AddUserPage = () => {
                       <option value={1}>Admin</option>
                       <option value={2}>Staff</option>
                       <option value={3}>Lecture</option>
-                      <option value={4}>Mahasiswa</option>
+                      <option value={4}>Student</option>
                     </select>
-                    <ErrorMessage field="role_id" errors={errors} />
+                    <ErrorMessage field="role_id" errors={errors}/>
                   </div>
                   <FilterRole
                     role={form.role_id}

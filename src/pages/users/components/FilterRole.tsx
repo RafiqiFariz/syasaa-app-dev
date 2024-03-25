@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import fetchAPI from "../../../fetch";
-import Cookies from "js-cookie";
-import ReactSelect from "react-select";
 import { Select } from "./Select";
 import { ErrorMessage } from "../../../components/ErrorMessage";
+import fetchAPI from "../../../fetch";
 
 export const FilterRole = ({ role, onChange, value, errors }) => {
   const [options, setOptions] = useState<Array<any>>([]);
@@ -15,12 +13,6 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
         if (role === 2) {
           const response = await fetchAPI("/api/v1/faculties", {
             method: "GET",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-              "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-            },
           });
 
           const data = await response.json();
@@ -35,15 +27,10 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
           }
           console.log(data, "data roles");
         }
+
         if (role === 4) {
           const response = await fetchAPI("/api/v1/major-classes", {
             method: "GET",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-              "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-            },
           });
 
           const data = await response.json();
@@ -92,7 +79,6 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
           } w-100`}
           placeholder="Address"
           aria-label="Address"
-          aria-describedby="basic-addon0"
         />
         <ErrorMessage field="address" errors={errors} />
       </div>
@@ -101,12 +87,12 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
     return (
       <Select
         options={options}
-        name={"Student"}
+        name={"Class"}
         name_form={"class_id"}
         handleChange={onChange}
       />
     );
   } else {
-    return <div>not found</div>;
+    return <div>Not Found</div>;
   }
 };
