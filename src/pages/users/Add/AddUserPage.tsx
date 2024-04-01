@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
@@ -6,6 +5,7 @@ import fetchAPI from "../../../fetch";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import Alert from "../../../components/Alert";
 import { FilterRole } from "../components/FilterRole";
+import * as _ from "lodash";
 
 interface IForm {
   name: string;
@@ -17,7 +17,7 @@ interface IForm {
 }
 
 export const AddUserPage = () => {
-  const [form, setFrom] = useState<IForm>({
+  const [form, setForm] = useState<IForm>({
     name: "",
     email: "",
     password: "",
@@ -42,14 +42,14 @@ export const AddUserPage = () => {
     const {name, value} = event.target;
 
     if (name === "role_id") {
-      setFrom({
+      setForm({
         ...form,
         [name]: parseInt(value),
       });
       return;
     }
 
-    setFrom({
+    setForm({
       ...form,
       [name]: value,
     });
@@ -128,6 +128,10 @@ export const AddUserPage = () => {
     } catch (error) {
       console.log(error, "Error");
     }
+  };
+
+  const formatRoleName = (name: string) => {
+    return _.startCase(_.snakeCase(_.replace(name, "_", " ")));
   };
 
   useEffect(() => {
@@ -232,10 +236,11 @@ export const AddUserPage = () => {
                       id="selectRoles"
                       onChange={handleChange}
                     >
-                      <option value={1}>Admin</option>
-                      <option value={2}>Staff</option>
-                      <option value={3}>Lecture</option>
-                      <option value={4}>Student</option>
+                      {roles.map((role, i) => (
+                        <option key={i} value={role.id}>
+                          {formatRoleName(role.name)}
+                        </option>
+                      ))}
                     </select>
                     <ErrorMessage field="role_id" errors={errors}/>
                   </div>

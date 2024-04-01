@@ -3,6 +3,7 @@ import { useHistory, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { FilterRole } from "../components/FilterRole";
+import * as _ from "lodash";
 import Alert from "../../../components/Alert";
 import fetchAPI from "../../../fetch";
 
@@ -144,6 +145,10 @@ export const EditUserPage = () => {
     }
   };
 
+  const formatRoleName = (name: string) => {
+    return _.startCase(_.snakeCase(_.replace(name, "_", " ")));
+  };
+
   useEffect(() => {
     getRoles();
   }, []);
@@ -263,7 +268,7 @@ export const EditUserPage = () => {
                     >
                       {roles.map((role, i) => (
                         <option key={i} value={role.id}>
-                          {role.name}
+                          {formatRoleName(role.name)}
                         </option>
                       ))}
                     </select>
