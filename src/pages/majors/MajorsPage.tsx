@@ -20,6 +20,8 @@ export const MajorsPage = () => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const userLogin = JSON.parse(localStorage.getItem("user") || "{}");
+
   const columns = [
     {
       name: "ID",
@@ -36,7 +38,7 @@ export const MajorsPage = () => {
       selector: "faculty",
       key: 3,
     },
-    {
+    userLogin.role_id === 1 && {
       name: "Action",
       selector: "action",
     },
@@ -44,12 +46,15 @@ export const MajorsPage = () => {
 
   const getMajorData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/majors?page=${currentPage}`, {method: "GET"});
+      const response = await fetchAPI(`/api/v1/majors?page=${currentPage}`, {
+        method: "GET",
+      });
 
       const data = await response.json();
 
       if (response.ok) {
         setMajor(data);
+        console.log(data, "data");
         setIsLoading(false);
       }
     } catch (error) {
@@ -77,7 +82,7 @@ export const MajorsPage = () => {
 
       const response = await fetchAPI(`/api/v1/majors/${id}`, {
         method: "POST",
-        body: JSON.stringify({ _method: "DELETE" })
+        body: JSON.stringify({ _method: "DELETE" }),
       });
 
       const data = await response.json();
@@ -125,7 +130,7 @@ export const MajorsPage = () => {
                         return (
                           <th
                             key={index}
-                            className="text-uppercase text-secondary text-xxs font-weight-bolder"
+                            className="text-uppercase text-secondary text-xxs font-weight-bolder text-center"
                           >
                             <div>{item.name}</div>
                           </th>
@@ -154,40 +159,51 @@ export const MajorsPage = () => {
                         </td>
                       </tr>
                     ) : (
-                      major.data?.map((item: ItemData, index) => {
-                        console.log(item.faculty?.name, "item");
-                        return (
-                          <tr key={index}>
-                            <td className="text-sm font-weight-normal px-4 py-3">
-                              {item.id}
-                            </td>
-                            <td className="text-sm font-weight-normal px-4 py-3">
-                              {item.name}
-                            </td>
-                            <td className="text-sm font-weight-normal px-4 py-3">
-                              {item.faculty?.name}
-                            </td>
-                            <td className="align-middle">
-                              <div className="d-flex gap-2">
-                                <button
-                                  className="btn btn-primary btn-sm mb-0"
-                                  onClick={() => {
-                                    history.push(`/majors/edit/${item.id}`);
-                                  }}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  className="btn btn-danger btn-sm mb-0"
-                                  onClick={() => deleteMajor(item.id)}
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })
+                      major.data
+                        ?.filter((item) => {
+                          if (userLogin.role_id === 1) return item;
+                          else if (userLogin.role_id === 2) {
+                            return (
+                              item?.faculty.id ===
+                              userLogin.faculty_staff.faculty_id
+                            );
+                          }
+                        })
+                        .map((item: ItemData, index) => {
+                          return (
+                            <tr key={index}>
+                              <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                                {item.id}
+                              </td>
+                              <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                                {item.name}
+                              </td>
+                              <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                                {item.faculty?.name}
+                              </td>
+                              <td className="align-middle">
+                                {userLogin.role_id !== 1 || (
+                                  <div className="d-flex gap-2 justify-content-center">
+                                    <button
+                                      className="btn btn-primary btn-sm mb-0"
+                                      onClick={() => {
+                                        history.push(`/majors/edit/${item.id}`);
+                                      }}
+                                    >
+                                      Edit
+                                    </button>
+                                    <button
+                                      className="btn btn-danger btn-sm mb-0"
+                                      onClick={() => deleteMajor(item.id)}
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
                     )}
                   </tbody>
                 </table>

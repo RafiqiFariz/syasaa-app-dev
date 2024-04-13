@@ -6,7 +6,7 @@ export const Sidebar = ({ user }: { user: any }) => {
   const [list, setList] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const location = useLocation();
-
+  console.log(user);
   const getList = () => {
     let list = [];
 
@@ -38,7 +38,7 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Courses Classes",
-          link: "/course-classes",
+          link: "/courses_classes",
         },
         {
           name: "Roles",
@@ -50,7 +50,7 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Attendances",
-          link: "/attendances",
+          link: "/attendences",
         },
         {
           name: "Profile",
@@ -59,9 +59,61 @@ export const Sidebar = ({ user }: { user: any }) => {
       ];
       setList(list);
     } else if (user.role_id === 2) {
-      console.log("faculty");
+      list = [
+        {
+          name: "Dashboard",
+          link: "/dashboard",
+        },
+        {
+          name: "Lectures",
+          link: "/users",
+        },
+        {
+          name: "Majors",
+          link: "/majors",
+        },
+        {
+          name: "Course Classes",
+          link: "/courses_classes",
+        },
+        {
+          name: "Attendances",
+          link: "/attendences",
+        },
+        {
+          name: "Attendances Request",
+          link: "/attendence_request",
+        },
+      ];
+      setList(list);
     } else if (user.role_id === 3) {
-      console.log("lecture");
+      list = [
+        {
+          name: "Dashboard",
+          link: "/dashboard",
+        },
+        {
+          name: "Students",
+          link: "/users",
+        },
+        {
+          name: "Course Classes",
+          link: "/courses_classes",
+        },
+        {
+          name: "Attendance",
+          link: "/attendences",
+        },
+        {
+          name: "Attendance Request",
+          link: "/attendence_request",
+        },
+        {
+          name: "Profile",
+          link: "/profile",
+        },
+      ];
+      setList(list);
     } else if (user.role_id === 4) {
       list = [
         {
@@ -69,16 +121,20 @@ export const Sidebar = ({ user }: { user: any }) => {
           link: "/dashboard",
         },
         {
+          name: "Schedules",
+          link: "/schedules",
+        },
+        {
           name: "Attendance",
-          link: "/attendance",
+          link: "/attendences",
+        },
+        {
+          name: "Attendance Request",
+          link: "/attendence_request",
         },
         {
           name: "Profile",
           link: "/profile",
-        },
-        {
-          name: "Notification",
-          link: "/notification",
         },
       ];
       setList(list);
@@ -114,7 +170,7 @@ export const Sidebar = ({ user }: { user: any }) => {
                 <Link
                   to={item.link}
                   className={`nav-link text-white ${
-                    location.pathname.includes(item.link)
+                    location.pathname === item.link
                       ? "active bg-primary bg-opacity-25"
                       : ""
                   }`}

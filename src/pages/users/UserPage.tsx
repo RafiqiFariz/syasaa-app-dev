@@ -31,8 +31,9 @@ export const UserPage = () => {
   const [users, setUsers] = useState<DefaultPaginatedResponse<ItemData>>({});
   const [currentPage, setCurrentPage] = useState(1);
 
+  const UserLogin = JSON.parse(localStorage.getItem("user"));
+
   const getUserData = async () => {
-    console.log("get user data");
     try {
       const response = await fetchAPI("/api/v1/users?includeRole=1", {
         method: "GET",
@@ -54,7 +55,6 @@ export const UserPage = () => {
       setIsLoading(false);
     }
   };
-
   // Table columns
   const columns = [
     {
@@ -82,12 +82,12 @@ export const UserPage = () => {
       selector: "role_id",
       key: 5,
     },
-    {
+    UserLogin.role_id === 1 && {
       name: "Action",
       selector: "action",
     },
   ];
-
+  console.log(UserLogin, "users");
   // Delete user data
   const deleteUser = async (id: number) => {
     try {
@@ -147,14 +147,16 @@ export const UserPage = () => {
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
                 <h6 className="text-white text-capitalize ps-3 mb-0">Users</h6>
-                <button
-                  className="btn btn-info btn-md mx-4 mb-0"
-                  onClick={() => {
-                    history.push(`/users/add`);
-                  }}
-                >
-                  Add User
-                </button>
+                {UserLogin.role_id === 1 && (
+                  <button
+                    className="btn btn-info btn-md mx-4 mb-0"
+                    onClick={() => {
+                      history.push(`/users/add`);
+                    }}
+                  >
+                    Add User
+                  </button>
+                )}
               </div>
             </div>
             <div className="card-body px-0 pb-2">
@@ -187,47 +189,59 @@ export const UserPage = () => {
                           ))}
                       </tr>
                     ) : (
-                      users.data?.map((item, index) => (
-                        <tr key={index}>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            <h6 className="mb-0 text-sm">{item.id}</h6>
-                          </td>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            <h6 className="mb-0 text-sm">{item.name}</h6>
-                          </td>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            <p className="text-xs font-weight-bold mb-0">
-                              {item.email}
-                            </p>
-                          </td>
-                          <td className="text-xs font-weight-bold px-4 py-3 text-center">
-                            {item.phone ?? "-"}
-                          </td>
-                          <td className="text-xs font-weight-bold px-4 py-3 text-center">
-                            {_.startCase(_.camelCase(item.role?.name)) ?? "-"}
-                          </td>
-                          <td className="align-middle">
-                            {userId !== item.id && (
-                              <div className="d-flex gap-2 text-center">
-                                <button
-                                  className="btn btn-primary btn-sm mb-0"
-                                  onClick={() => {
-                                    history.push(`/users/edit/${item.id}`);
-                                  }}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  className="btn btn-danger btn-sm mb-0"
-                                  onClick={() => deleteUser(item.id)}
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      ))
+                      users.data
+                        .filter((item) => {
+                          if (UserLogin.role_id === 1) {
+                            return item;
+                          } else if (UserLogin.role_id === 2) {
+                            return item.role.id === 3;
+                          } else if (UserLogin.role_id === 3) {
+                            return item.role.id === 4;
+                          }
+                        })
+                        .map((item, index) => (
+                          <tr key={index}>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              <h6 className="mb-0 text-sm">{item.id}</h6>
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              <h6 className="mb-0 text-sm">{item.name}</h6>
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              <p className="text-xs font-weight-bold mb-0">
+                                {item.email}
+                              </p>
+                            </td>
+                            <td className="text-xs font-weight-bold px-4 py-3 text-center">
+                              {item.phone ?? "-"}
+                            </td>
+                            <td className="text-xs font-weight-bold px-4 py-3 text-center">
+                              {_.startCase(_.camelCase(item.role?.name)) ?? "-"}
+                            </td>
+                            <td className="align-middle">
+                              {userId === item.id || UserLogin.role_id !== 1 ? (
+                                <div></div>
+                              ) : (
+                                <div className="d-flex gap-2 text-center">
+                                  <button
+                                    className="btn btn-primary btn-sm mb-0"
+                                    onClick={() => {
+                                      history.push(`/users/edit/${item.id}`);
+                                    }}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    className="btn btn-danger btn-sm mb-0"
+                                    onClick={() => deleteUser(item.id)}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))
                     )}
                   </tbody>
                 </table>

@@ -18,7 +18,7 @@ export const CoursePage = () => {
   const [course, setCourse] = useState<DefaultPaginatedResponse<ItemData>>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  console.log(course, "course");
   const columns = [
     {
       name: "ID",
@@ -38,7 +38,9 @@ export const CoursePage = () => {
 
   const getCourseData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/courses?page=${currentPage}`, {method: "GET"});
+      const response = await fetchAPI(`/api/v1/courses?page=${currentPage}`, {
+        method: "GET",
+      });
 
       const data = await response.json();
 
@@ -58,13 +60,17 @@ export const CoursePage = () => {
 
   const deleteCourse = async (id: number) => {
     try {
-      const confirmed = await Alert.confirm("Delete Confirmation!", "Are you sure you want to delete this course?", "Yes, Delete it!");
+      const confirmed = await Alert.confirm(
+        "Delete Confirmation!",
+        "Are you sure you want to delete this course?",
+        "Yes, Delete it!"
+      );
 
       if (!confirmed) return;
 
       const response = await fetchAPI(`/api/v1/courses/${id}`, {
         method: "POST",
-        body: JSON.stringify({ _method: "DELETE" })
+        body: JSON.stringify({ _method: "DELETE" }),
       });
 
       const data = await response.json();
@@ -120,9 +126,9 @@ export const CoursePage = () => {
                         return (
                           <th
                             key={index}
-                            className="text-uppercase text-secondary text-xxs font-weight-bolder"
+                            className="text-uppercase text-secondary text-xxs font-weight-bolder text-center"
                           >
-                            <div>{item.name}</div>
+                            {item.name}
                           </th>
                         );
                       })}
@@ -152,14 +158,14 @@ export const CoursePage = () => {
                       course.data?.map((item: ItemData, index) => {
                         return (
                           <tr key={index}>
-                            <td className="text-sm font-weight-normal px-4 py-3">
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.id}
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3">
                               {item.name}
                             </td>
                             <td className="align-middle">
-                              <div className="d-flex gap-2">
+                              <div className="d-flex gap-2 justify-content-center">
                                 <button
                                   className="btn btn-primary btn-sm mb-0"
                                   onClick={() => {

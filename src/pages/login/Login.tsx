@@ -107,7 +107,7 @@ export const LoginPage = () => {
           history.push("/dashboard");
           setIsLogin({
             isLogin: true,
-            isPending: true,
+            isPending: false,
           });
         } else {
           console.log("Login failed");
