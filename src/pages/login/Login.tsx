@@ -38,47 +38,6 @@ export const LoginPage = () => {
     });
   };
 
-  // Validate form
-  const validateForm = () => {
-    let isValid = true;
-
-    // Validate email
-    if (!form.email || !form.email.trim()) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        email: "Email is required",
-      }));
-
-      isValid = false;
-    } else if (!form.email.includes("@")) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        email: "Invalid email format",
-      }));
-
-      isValid = false;
-    }
-
-    // Validate password
-    if (!form.password || !form.password.trim()) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        password: "Password is required",
-      }));
-
-      isValid = false;
-    } else if (form.password.length < 8) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        password: "Password must be at least 8 characters",
-      }));
-
-      isValid = false;
-    }
-
-    return isValid;
-  };
-
   // Handle form submission
   const onFinish = async (event: any) => {
     event.preventDefault();
@@ -101,8 +60,6 @@ export const LoginPage = () => {
         });
         const meessage = await loginResponse.json();
         if (loginResponse.ok) {
-          localStorage.setItem("user", JSON.stringify(form));
-
           // Redirect to dashboard
           history.push("/dashboard");
           setIsLogin({

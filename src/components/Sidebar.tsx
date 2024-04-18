@@ -38,7 +38,7 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Courses Classes",
-          link: "/courses_classes",
+          link: "/courses-classes",
         },
         {
           name: "Roles",
@@ -74,7 +74,7 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Course Classes",
-          link: "/courses_classes",
+          link: "/courses-classes",
         },
         {
           name: "Attendances",
@@ -82,7 +82,7 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Attendances Request",
-          link: "/attendence_request",
+          link: "/attendence-request",
         },
       ];
       setList(list);
@@ -97,8 +97,8 @@ export const Sidebar = ({ user }: { user: any }) => {
           link: "/users",
         },
         {
-          name: "Course Classes",
-          link: "/courses_classes",
+          name: "Schedules",
+          link: "/courses-classes",
         },
         {
           name: "Attendance",
@@ -106,7 +106,7 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Attendance Request",
-          link: "/attendence_request",
+          link: "/attendence-request",
         },
         {
           name: "Profile",
@@ -130,7 +130,7 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Attendance Request",
-          link: "/attendence_request",
+          link: "/attendence-request",
         },
         {
           name: "Profile",

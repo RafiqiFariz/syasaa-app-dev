@@ -20,6 +20,7 @@ export const MajorsPage = () => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [user, setUser] = useState<any>({});
   const userLogin = JSON.parse(localStorage.getItem("user") || "{}");
 
   const columns = [
@@ -62,11 +63,28 @@ export const MajorsPage = () => {
     }
   };
 
+  const getUser = async () => {
+    try {
+      const response = await fetchAPI(`/api/v1/users/${userLogin.id}`, {
+        method: "GET",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser(data);
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
+
   const handleChangePage = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
   useEffect(() => {
+    getUser();
     getMajorData();
   }, [currentPage]);
 
@@ -163,9 +181,10 @@ export const MajorsPage = () => {
                         ?.filter((item) => {
                           if (userLogin.role_id === 1) return item;
                           else if (userLogin.role_id === 2) {
+                            console.log(user, "userLogin");
                             return (
                               item?.faculty.id ===
-                              userLogin.faculty_staff.faculty_id
+                              user.data.faculty_staff.faculty_id
                             );
                           }
                         })

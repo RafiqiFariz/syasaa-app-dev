@@ -5646,7 +5646,7 @@
 
   .page-link {
     position: relative;
-    display: block;
+    /* display: block; */
     padding: var(--bs-pagination-padding-y) var(--bs-pagination-padding-x);
     font-size: var(--bs-pagination-font-size);
     color: var(--bs-pagination-color);
@@ -5669,7 +5669,7 @@
   }
 
   .page-link:focus {
-    z-index: 3;
+    z-index: 0;
     color: var(--bs-pagination-focus-color);
     background-color: var(--bs-pagination-focus-bg);
     outline: 0;
@@ -5678,7 +5678,7 @@
 
   .page-link.active,
   .active>.page-link {
-    z-index: 3;
+    z-index: 0;
     color: var(--bs-pagination-active-color) !important;
     background-color: var(--bs-pagination-active-bg);
     border-color: var(--bs-pagination-active-border-color);

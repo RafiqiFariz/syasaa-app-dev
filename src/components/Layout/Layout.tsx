@@ -44,6 +44,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
       const data = await response.json();
 
       if (data) {
+        console.log(data, "data");
         setUserData({
           name: data.name,
           email: data.email,

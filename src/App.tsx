@@ -60,10 +60,10 @@ import { EditMajorPage } from "./pages/majors/Edit/EditMajorPage";
 import { ClassPage } from "./pages/class/ClassPage";
 import { AddClassPage } from "./pages/class/Add/AddClassPage";
 import { EditClassPage } from "./pages/class/Edit/EditClassPage";
-import { CoursesClasses } from "./pages/courses-classes/CoursesClassesPage";
-import { AttendancesPage } from "./pages/attendences/AttendencesPage";
+import { CoursesClasses } from "./pages/courses_classes/CoursesClassesPage";
+import { AttendancesPage } from "./pages/attendances/AttendancesPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
-import { AttendanceRequestPage } from "./pages/attendence-request/AttendenceRequestPage";
+import { AttendanceRequestPage } from "./pages/attendance_request/AttendanceRequestPage";
 
 setupIonicReact();
 
@@ -315,7 +315,7 @@ const App: React.FC = () => {
             />
             <Route
               exact
-              path="/courses_classes"
+              path="/courses-classes"
               render={() =>
                 isLogin.isLogin ? <CoursesClasses /> : <Redirect to="/login" />
               }
@@ -336,7 +336,7 @@ const App: React.FC = () => {
             />
             <Route
               exact
-              path="/attendence_request"
+              path="/attendence-request"
               render={() =>
                 isLogin.isLogin ? (
                   <AttendanceRequestPage />
