@@ -34,11 +34,11 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Courses",
-          link: "/course",
+          link: "/courses",
         },
         {
-          name: "Courses Classes",
-          link: "/courses-classes",
+          name: "Course Class",
+          link: "/course-class",
         },
         {
           name: "Roles",
@@ -50,7 +50,7 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Attendances",
-          link: "/attendences",
+          link: "/attendances",
         },
         {
           name: "Profile",
@@ -73,16 +73,16 @@ export const Sidebar = ({ user }: { user: any }) => {
           link: "/majors",
         },
         {
-          name: "Course Classes",
-          link: "/courses-classes",
+          name: "Course Class",
+          link: "/course-class",
         },
         {
           name: "Attendances",
-          link: "/attendences",
+          link: "/attendances",
         },
         {
-          name: "Attendances Request",
-          link: "/attendence-request",
+          name: "Attendance Requests",
+          link: "/attendance-requests",
         },
       ];
       setList(list);
@@ -98,15 +98,15 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Schedules",
-          link: "/courses-classes",
+          link: "/course-class",
         },
         {
-          name: "Attendance",
-          link: "/attendences",
+          name: "Attendances",
+          link: "/attendances",
         },
         {
-          name: "Attendance Request",
-          link: "/attendence-request",
+          name: "Attendance Requests",
+          link: "/attendance-requests",
         },
         {
           name: "Profile",
@@ -125,12 +125,12 @@ export const Sidebar = ({ user }: { user: any }) => {
           link: "/schedules",
         },
         {
-          name: "Attendance",
-          link: "/attendences",
+          name: "Attendances",
+          link: "/attendances",
         },
         {
-          name: "Attendance Request",
-          link: "/attendence-request",
+          name: "Attendance Requests",
+          link: "/attendance-requests",
         },
         {
           name: "Profile",
@@ -170,7 +170,7 @@ export const Sidebar = ({ user }: { user: any }) => {
                 <Link
                   to={item.link}
                   className={`nav-link text-white ${
-                    location.pathname === item.link
+                    location.pathname.includes(item.link)
                       ? "active bg-primary bg-opacity-25"
                       : ""
                   }`}

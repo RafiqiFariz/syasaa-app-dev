@@ -15,10 +15,10 @@ interface ItemData {
 
 export const CoursePage = () => {
   const history = useHistory();
-  const [course, setCourse] = useState<DefaultPaginatedResponse<ItemData>>({});
+  const [courses, setCourses] = useState<DefaultPaginatedResponse<ItemData>>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  console.log(course, "course");
+  console.log(courses, "courses");
   const columns = [
     {
       name: "ID",
@@ -36,7 +36,7 @@ export const CoursePage = () => {
     },
   ];
 
-  const getCourseData = async () => {
+  const getCoursesData = async () => {
     try {
       const response = await fetchAPI(`/api/v1/courses?page=${currentPage}`, {
         method: "GET",
@@ -45,7 +45,7 @@ export const CoursePage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setCourse(data);
+        setCourses(data);
         console.log(data);
         setIsLoading(false);
       }
@@ -78,7 +78,7 @@ export const CoursePage = () => {
       console.log(data, "data");
 
       if (response.ok) {
-        await getCourseData();
+        await getCoursesData();
         Alert.success("Success", data.message);
       } else {
         Alert.error("Error", data.message);
@@ -89,7 +89,7 @@ export const CoursePage = () => {
   };
 
   useEffect(() => {
-    getCourseData();
+    getCoursesData();
   }, [currentPage]);
 
   return (
@@ -99,7 +99,7 @@ export const CoursePage = () => {
           <div
             className="card"
             style={{
-              height: course?.data?.length > 0 ? "100%" : "85vh",
+              height: courses?.data?.length > 0 ? "100%" : "85vh",
             }}
           >
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
@@ -110,7 +110,7 @@ export const CoursePage = () => {
                 <button
                   className="btn btn-info btn-md mx-4 mb-0"
                   onClick={() => {
-                    history.push(`/course/add`);
+                    history.push(`/courses/add`);
                   }}
                 >
                   Add Course
@@ -148,14 +148,14 @@ export const CoursePage = () => {
                             </td>
                           ))}
                       </tr>
-                    ) : course.data?.length === 0 ? (
+                    ) : courses.data?.length === 0 ? (
                       <tr>
                         <td colSpan={columns.length} className="text-center">
                           No data available
                         </td>
                       </tr>
                     ) : (
-                      course.data?.map((item: ItemData, index) => {
+                      courses.data?.map((item: ItemData, index) => {
                         return (
                           <tr key={index}>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
@@ -169,7 +169,7 @@ export const CoursePage = () => {
                                 <button
                                   className="btn btn-primary btn-sm mb-0"
                                   onClick={() => {
-                                    history.push(`/course/edit/${item.id}`);
+                                    history.push(`/courses/edit/${item.id}`);
                                   }}
                                 >
                                   Edit
@@ -192,9 +192,9 @@ export const CoursePage = () => {
             </div>
             <div className="text-center pt-4 px-4">
               <Pagination
-                activePage={course?.meta?.current_page}
-                itemsCountPerPage={course?.meta?.per_page}
-                totalItemsCount={course?.meta?.total ?? 0}
+                activePage={courses?.meta?.current_page}
+                itemsCountPerPage={courses?.meta?.per_page}
+                totalItemsCount={courses?.meta?.total ?? 0}
                 onChange={handleChangePage}
                 itemClass="page-item"
                 linkClass="page-link"

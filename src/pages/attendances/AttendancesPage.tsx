@@ -32,6 +32,7 @@ export const AttendancesPage = () => {
     value: 0,
     label: "All Major",
   });
+
   const UserLogin = JSON.parse(localStorage.getItem("user") || "{}");
 
   let columns = [
@@ -152,7 +153,6 @@ export const AttendancesPage = () => {
   };
 
   const getData = async (class_id: number, major_id: number) => {
-    setIsLoading(true);
     try {
       let url = `/api/v1/attendances?page=${currentPage}`;
 

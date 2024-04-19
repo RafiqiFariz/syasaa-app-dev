@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
 import Pagination from "react-js-pagination";
 import { DefaultPaginatedResponse } from "../../types";
-import Select from "react-select";
 import fetchAPI from "../../fetch";
 import ReactSelect from "react-select";
 
-export const CoursesClasses = () => {
+export const CourseClass = () => {
   const columns = [
     {
       name: "ID",
@@ -44,7 +43,7 @@ export const CoursesClasses = () => {
     // },
   ];
 
-  const [CoursesClasses, setCoursesClasses] = useState<
+  const [courseClasses, setCourseClasses] = useState<
     DefaultPaginatedResponse<any>
   >({});
   const [user, setUser] = useState<any>({});
@@ -93,17 +92,16 @@ export const CoursesClasses = () => {
     }
   };
 
-  const getData = async (class_id: number, major_id: number) => {
-    setIsLoading(true);
+  const getData = async (classId: number, majorId: number) => {
     try {
       let url = `/api/v1/course-classes?includeClass=1&includeCourse=1&includeLecturer=1&page=${currentPage}`;
 
-      if (class_id !== 0 && major_id !== 0) {
-        url += `&class_id=${class_id}&major_id=${major_id}`;
-      } else if (class_id !== 0 && major_id === 0) {
-        url += `&class_id=${class_id}`;
-      } else if (class_id === 0 && major_id !== 0) {
-        url += `&major_id=${major_id}`;
+      if (classId !== 0 && majorId !== 0) {
+        url += `&class_id=${classId}&major_id=${majorId}`;
+      } else if (classId !== 0 && majorId === 0) {
+        url += `&class_id=${classId}`;
+      } else if (classId === 0 && majorId !== 0) {
+        url += `&major_id=${majorId}`;
       }
 
       const response = await fetchAPI(url, {
@@ -114,7 +112,7 @@ export const CoursesClasses = () => {
 
       if (response.ok) {
         setIsLoading(false);
-        setCoursesClasses(data);
+        setCourseClasses(data);
         setIsLoading(false);
       }
     } catch (error) {
@@ -235,7 +233,7 @@ export const CoursesClasses = () => {
     });
   };
 
-  console.log(CoursesClasses, user, "CoursesClasses");
+  console.log(courseClasses, user, "courseClasses");
 
   return (
     <UserLayout>
@@ -245,13 +243,13 @@ export const CoursesClasses = () => {
             className="card"
             style={{
               padding: "10px, 10px, 10px, 10px",
-              height: CoursesClasses?.data?.length > 0 ? "100%" : "85vh",
+              height: courseClasses?.data?.length > 0 ? "100%" : "85vh",
             }}
           >
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
                 <h6 className="text-white text-capitalize ps-3 mb-0">
-                  Courses Classes
+                  Course Class
                 </h6>
               </div>
             </div>
@@ -311,14 +309,14 @@ export const CoursesClasses = () => {
                             ))}
                         </tr>
                       </>
-                    ) : CoursesClasses.data?.length === 0 ? (
+                    ) : courseClasses.data?.length === 0 ? (
                       <tr>
                         <td colSpan={columns.length} className="text-center">
                           No data available
                         </td>
                       </tr>
                     ) : (
-                      CoursesClasses.data
+                      courseClasses.data
                         ?.filter((item, i) => {
                           if (UserLogin.role_id === 1) {
                             return item;
@@ -346,6 +344,7 @@ export const CoursesClasses = () => {
                           }
                         })
                         .map((item: any, index) => {
+                          console.log('ini item bre', item)
                           return (
                             <tr key={index}>
                               <td className="text-sm font-weight-normal px-4 py-3 text-center">
@@ -403,9 +402,9 @@ export const CoursesClasses = () => {
             </div>
             <div className="text-center pt-4 px-4">
               <Pagination
-                activePage={CoursesClasses?.meta?.current_page}
-                itemsCountPerPage={CoursesClasses?.meta?.per_page}
-                totalItemsCount={CoursesClasses?.meta?.total ?? 0}
+                activePage={courseClasses?.meta?.current_page}
+                itemsCountPerPage={courseClasses?.meta?.per_page}
+                totalItemsCount={courseClasses?.meta?.total ?? 0}
                 onChange={handleChangePage}
                 itemClass="page-item"
                 linkClass="page-link"

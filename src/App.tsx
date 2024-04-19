@@ -60,7 +60,7 @@ import { EditMajorPage } from "./pages/majors/Edit/EditMajorPage";
 import { ClassPage } from "./pages/class/ClassPage";
 import { AddClassPage } from "./pages/class/Add/AddClassPage";
 import { EditClassPage } from "./pages/class/Edit/EditClassPage";
-import { CoursesClasses } from "./pages/courses_classes/CoursesClassesPage";
+import { CourseClass } from "./pages/courses_classes/CourseClassPage";
 import { AttendancesPage } from "./pages/attendances/AttendancesPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { AttendanceRequestPage } from "./pages/attendance_request/AttendanceRequestPage";
@@ -223,21 +223,21 @@ const App: React.FC = () => {
             />
             <Route
               exact
-              path="/course"
+              path="/courses"
               render={() =>
                 isLogin.isLogin ? <CoursePage /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
-              path="/course/add"
+              path="/courses/add"
               render={() =>
                 isLogin.isLogin ? <AddCoursePage /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
-              path="/course/edit/:id"
+              path="/courses/edit/:id"
               render={() =>
                 isLogin.isLogin ? <EditCoursePage /> : <Redirect to="/login" />
               }
@@ -315,14 +315,14 @@ const App: React.FC = () => {
             />
             <Route
               exact
-              path="/courses-classes"
+              path="/course-class"
               render={() =>
-                isLogin.isLogin ? <CoursesClasses /> : <Redirect to="/login" />
+                isLogin.isLogin ? <CourseClass /> : <Redirect to="/login" />
               }
             />
             <Route
               exact
-              path="/attendences"
+              path="/attendances"
               render={() =>
                 isLogin.isLogin ? <AttendancesPage /> : <Redirect to="/login" />
               }
@@ -336,7 +336,7 @@ const App: React.FC = () => {
             />
             <Route
               exact
-              path="/attendence-request"
+              path="/attendance-requests"
               render={() =>
                 isLogin.isLogin ? (
                   <AttendanceRequestPage />
