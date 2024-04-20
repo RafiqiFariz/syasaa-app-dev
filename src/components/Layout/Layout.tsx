@@ -21,44 +21,6 @@ export const UserLayout = ({ children }: LayoutProps) => {
 
   let pathname = window.location.pathname.split("/").join(" / ");
 
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    role_id: "0",
-    role_name: "",
-  });
-
-  const getUsers = async () => {
-    try {
-      const response = await fetchAPI("/user", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
-      });
-
-      const data = await response.json();
-
-      if (data) {
-        console.log(data, "data");
-        setUserData({
-          name: data.name,
-          email: data.email,
-          phone: data?.phone,
-          role_id: data.role.id,
-          role_name: data.role.name,
-        });
-        localStorage.setItem("user", JSON.stringify(data));
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   const handleSignOut = async () => {
     try {
       const result = await Swal.fire({
@@ -96,6 +58,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
         setIsLogin({
           isLogin: false,
           isPending: true,
+          data: {},
         });
       }
     } catch (e) {
@@ -103,9 +66,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
     }
   };
 
-  useEffect(() => {
-    getUsers();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <div
@@ -113,7 +74,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
         nav ? "g-sidenav-pinned" : ""
       } h-100`}
     >
-      <Sidebar user={userData} />
+      <Sidebar />
       <PerfectScrollbar>
         <main className="main-content position-relative max-height-vh-100 h-100">
           <nav

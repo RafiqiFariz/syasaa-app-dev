@@ -91,13 +91,13 @@ const App: React.FC = () => {
             isLogin: false,
             isPending: false,
           });
-          console.log(data, "data123");
         } else {
           setIsLogin({
             isLogin: true,
             isPending: false,
+            data: data,
           });
-          console.log(data, "data");
+          localStorage.setItem("user", JSON.stringify(data));
         }
       } catch (error) {
         setIsLogin({
@@ -109,8 +109,6 @@ const App: React.FC = () => {
 
     getAuth();
   }, [isLogin.isLogin]);
-
-  console.log(isLogin, "isLogin");
 
   if (isLogin.isPending) {
     return (

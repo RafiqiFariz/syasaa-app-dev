@@ -93,6 +93,7 @@ export const CourseClass = () => {
   };
 
   const getData = async (classId: number, majorId: number) => {
+    setIsLoading(true);
     try {
       let url = `/api/v1/course-classes?includeClass=1&includeCourse=1&includeLecturer=1&page=${currentPage}`;
 
@@ -111,9 +112,25 @@ export const CourseClass = () => {
       const data = await response.json();
 
       if (response.ok) {
+        console.log(data, "data12312312");
         setIsLoading(false);
-        setCourseClasses(data);
-        setIsLoading(false);
+        const filtered = {
+          data: data.data.filter((item, i) => {
+            if (UserLogin.role_id === 3) {
+              return item;
+            } else if (UserLogin.role_id === 2) {
+              return (
+                item.class.major.faculty_id ===
+                user.data.faculty_staff.faculty_id
+              );
+            } else if (UserLogin.role_id === 3) {
+              return item.lecturer_id === user.data.lecturer.id;
+            } else if (UserLogin.role_id === 4) {
+              return item;
+            }
+          }),
+        };
+        setCourseClasses(filtered);
       }
     } catch (error) {
       console.log(error, "error");
@@ -132,7 +149,15 @@ export const CourseClass = () => {
       if (response.ok) {
         const mappedData = data.data
           .filter((item: any) => {
-            return item.faculty.id === user.data.faculty_staff.faculty_id;
+            if (UserLogin.role_id === 1) {
+              return item;
+            } else if (UserLogin.role_id === 2) {
+              return item.faculty.id === user.data.faculty_staff.faculty_id;
+            } else if (UserLogin.role_id === 3) {
+              return item;
+            } else if (UserLogin.role_id === 4) {
+              return item;
+            }
           })
           .map((item: any) => {
             return {
@@ -166,7 +191,17 @@ export const CourseClass = () => {
       if (response.ok) {
         const mappedData = data.data
           .filter((item: any) => {
-            return item.major.faculty.id === user.data.faculty_staff.faculty_id;
+            if (UserLogin.role_id === 1) {
+              return item;
+            } else if (UserLogin.role_id === 2) {
+              return (
+                item.major.faculty.id === user.data.faculty_staff.faculty_id
+              );
+            } else if (UserLogin.role_id === 3) {
+              return item;
+            } else if (UserLogin.role_id === 4) {
+              return item.major_id === user.data.student.class.major_id;
+            }
           })
           .map((item: any) => {
             return {
@@ -191,21 +226,15 @@ export const CourseClass = () => {
 
   useEffect(() => {
     getUser();
-    getData(selectedClass.value, selectedMajor.value);
-  }, [currentPage, selectedClass, selectedMajor]);
+  }, []);
 
   useEffect(() => {
-    if (user.data?.faculty_staff?.faculty_id) {
+    if (user.data) {
       getMajor();
       getClasses();
+      getData(selectedClass.value, selectedMajor.value);
     }
-  }, [user]);
-
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
+  }, [currentPage, selectedClass, selectedMajor, user]);
 
   const handleMajorChange = (e: any) => {
     if (e.value === 0) {
@@ -249,22 +278,24 @@ export const CourseClass = () => {
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
                 <h6 className="text-white text-capitalize ps-3 mb-0">
-                  Course Class
+                  {UserLogin.role_id === 3 ? "Schedules" : "Course Classes"}
                 </h6>
               </div>
             </div>
             <div className="card-body px-0 pb-2">
               {UserLogin.role_id !== 1 && (
-                <div className="d-flex mx-4 justify-content-start gap-2">
-                  <ReactSelect
-                    className="col-6"
-                    options={optionMajor}
-                    value={selectedMajor}
-                    name="Major"
-                    placeholder={"Select Major"}
-                    onChange={handleMajorChange}
-                    isLoading={isLoading}
-                  />
+                <div className="d-flex mx-4 justify-content-start gap-2 col-6">
+                  {UserLogin.role_id === 2 && (
+                    <ReactSelect
+                      className="col-6"
+                      options={optionMajor}
+                      value={selectedMajor}
+                      name="Major"
+                      placeholder={"Select Major"}
+                      onChange={handleMajorChange}
+                      isLoading={isLoading}
+                    />
+                  )}
                   <ReactSelect
                     className="col-6"
                     options={optionClass}
@@ -316,65 +347,37 @@ export const CourseClass = () => {
                         </td>
                       </tr>
                     ) : (
-                      courseClasses.data
-                        ?.filter((item, i) => {
-                          if (UserLogin.role_id === 1) {
-                            return item;
-                          } else if (UserLogin.role_id === 2) {
-                            return (
-                              item.class.major.faculty_id ===
-                              user.data.faculty_staff.faculty_id
-                            );
-                          } else if (UserLogin.role_id === 3) {
-                            return item.lecturer_id === user.data.lecturer.id;
-                          }
-                        })
-                        // .filter((item, i) => {
-                        //   if (selectedMajor.value === 0) {
-                        //     return item;
-                        //   } else {
-                        //     return item.class.major_id === selectedMajor.value;
-                        //   }
-                        // })
-                        .filter((item, i) => {
-                          if (selectedClass.value === 0) {
-                            return item;
-                          } else {
-                            return item.class_id === selectedClass.value;
-                          }
-                        })
-                        .map((item: any, index) => {
-                          console.log('ini item bre', item)
-                          return (
-                            <tr key={index}>
-                              <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                                {item.id}
-                              </td>
-                              <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                                {item.class.name}
-                              </td>
-                              <td className="text-sm font-weight-normal px-4 py-3 col-9">
-                                <div className="d-flex flex-column">
-                                  <span
-                                    className="course-name"
-                                    style={{
-                                      whiteSpace: "normal",
-                                    }}
-                                  >
-                                    {item.course.name}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="text-sm font-weight-normal px-4 py-3">
-                                {item.lecturer.user.name}
-                              </td>
-                              <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                                {item.start_time}
-                              </td>
-                              <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                                {item.end_time}
-                              </td>
-                              {/* <td className="align-middle">
+                      courseClasses.data?.map((item: any, index) => {
+                        return (
+                          <tr key={index}>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {item.id}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {item.class.name}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 col-9">
+                              <div className="d-flex flex-column">
+                                <span
+                                  className="course-name"
+                                  style={{
+                                    whiteSpace: "normal",
+                                  }}
+                                >
+                                  {item.course.name}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3">
+                              {item.lecturer.user.name}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {item.start_time}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {item.end_time}
+                            </td>
+                            {/* <td className="align-middle">
                               <div className="d-flex gap-2 justify-content-center">
                                 <button
                                   className="btn btn-primary btn-sm mb-0"
@@ -392,9 +395,9 @@ export const CourseClass = () => {
                                 </button>
                               </div>
                             </td> */}
-                            </tr>
-                          );
-                        })
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>

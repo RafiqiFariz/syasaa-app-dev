@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../context/Auth";
 
-export const Sidebar = ({ user }: { user: any }) => {
+export const Sidebar = () => {
   const [list, setList] = useState<any>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const location = useLocation();
-  console.log(user);
-  const getList = () => {
+  const { isLogin, setIsLogin } = useContext(AuthContext);
+
+  const getList = (user) => {
     let list = [];
 
     if (user.role_id === 1) {
@@ -122,7 +123,7 @@ export const Sidebar = ({ user }: { user: any }) => {
         },
         {
           name: "Schedules",
-          link: "/schedules",
+          link: "/course-class",
         },
         {
           name: "Attendances",
@@ -144,10 +145,10 @@ export const Sidebar = ({ user }: { user: any }) => {
   };
 
   useEffect(() => {
-    if (user) {
-      getList();
+    if (isLogin.data) {
+      getList(isLogin.data);
     }
-  }, [user]);
+  }, [isLogin.data]);
 
   const appName = import.meta.env.VITE_APP_NAME;
 

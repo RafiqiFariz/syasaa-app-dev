@@ -6,6 +6,7 @@ export const AuthContextProvider = ({ children }: any) => {
   const [isLogin, setIsLogin] = useState({
     isLogin: false,
     isPending: true,
+    data: {},
   });
 
   return (

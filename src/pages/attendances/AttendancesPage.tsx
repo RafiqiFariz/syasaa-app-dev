@@ -94,7 +94,13 @@ export const AttendancesPage = () => {
       if (response.ok) {
         const mappedData = data.data
           .filter((item: any) => {
-            return item.faculty.id === user.data.faculty_staff.faculty_id;
+            if (UserLogin.role_id === 1) {
+              return item;
+            } else if (UserLogin.role_id === 2) {
+              return item.faculty.id === user.data.faculty_staff.faculty_id;
+            } else if (UserLogin.role_id === 3) {
+              return item;
+            }
           })
           .map((item: any) => {
             return {
@@ -126,9 +132,21 @@ export const AttendancesPage = () => {
       const data = await response.json();
 
       if (response.ok) {
+        console.log(data, user, "data12312312312312");
+
         const mappedData = data.data
           .filter((item: any) => {
-            return item.major.faculty.id === user.data.faculty_staff.faculty_id;
+            if (UserLogin.role_id === 1) {
+              return item;
+            } else if (UserLogin.role_id === 2) {
+              return (
+                item.major.faculty.id === user.data.faculty_staff.faculty_id
+              );
+            } else if (UserLogin.role_id === 3) {
+              return item;
+            } else if (UserLogin.role_id === 4) {
+              return item.major_id === user.data.student.class.major_id;
+            }
           })
           .map((item: any) => {
             return {
@@ -136,7 +154,7 @@ export const AttendancesPage = () => {
               label: item.name,
             };
           });
-        console.log(data.data, "mappedData");
+        console.log(mappedData, "mappedData");
         setOptionClass((prev: any) => {
           const filteredOptions = mappedData.filter((newOption: any) => {
             return !prev.some(
@@ -152,16 +170,17 @@ export const AttendancesPage = () => {
     }
   };
 
-  const getData = async (class_id: number, major_id: number) => {
+  const getData = async (classId: number, majorId: number) => {
+    setIsLoading(true);
     try {
       let url = `/api/v1/attendances?page=${currentPage}`;
 
-      if (class_id !== 0 && major_id !== 0) {
-        url += `&class_id=${class_id}&major_id=${major_id}`;
-      } else if (class_id !== 0 && major_id === 0) {
-        url += `&class_id=${class_id}`;
-      } else if (class_id === 0 && major_id !== 0) {
-        url += `&major_id=${major_id}`;
+      if (classId !== 0 && majorId !== 0) {
+        url += `&class_id=${classId}&major_id=${majorId}`;
+      } else if (classId !== 0 && majorId === 0) {
+        url += `&class_id=${classId}`;
+      } else if (classId === 0 && majorId !== 0) {
+        url += `&major_id=${majorId}`;
       }
 
       const response = await fetchAPI(url, {
@@ -171,9 +190,22 @@ export const AttendancesPage = () => {
       const data = await response.json();
 
       if (response.ok) {
+        const filtered = {
+          data: data.data.filter((item, i) => {
+            if (UserLogin.role_id === 1) {
+              return item;
+            } else if (UserLogin.role_id === 2) {
+              return item;
+            } else if (UserLogin.role_id === 3) {
+              return item.course_class.lecturer_id === user.data.lecturer.id;
+            } else if (UserLogin.role_id === 4) {
+              return item.student.id === user.data.student.id;
+            }
+          }),
+        };
+        console.log(data, filtered, "data123123123123");
         setIsLoading(false);
-        setAttendances(data);
-        setIsLoading(false);
+        setAttendances(filtered);
       }
     } catch (error) {
       console.log(error, "error");
@@ -183,34 +215,21 @@ export const AttendancesPage = () => {
 
   useEffect(() => {
     getUser();
-    getData(selectedClass.value, selectedMajor.value);
-  }, [currentPage, selectedClass, selectedMajor]);
+  }, []);
 
   useEffect(() => {
     if (user.data) {
       getMajor();
       getClasses();
+      getData(selectedClass.value, selectedMajor.value);
     }
-  }, [user]);
+  }, [currentPage, selectedClass, selectedMajor, user]);
 
   const handleChangePage = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
   console.log(attendances, "attendances");
-
-  const handleMajorChange = (e: any) => {
-    if (e.value === 0) {
-      setSelectedMajor({
-        value: e.value,
-        label: e.label,
-      });
-    }
-    setSelectedMajor({
-      value: e.value,
-      label: e.label,
-    });
-  };
 
   const handleClassChange = (e: any) => {
     if (e.value === 0) {
@@ -220,6 +239,19 @@ export const AttendancesPage = () => {
       });
     }
     setSelectedClass({
+      value: e.value,
+      label: e.label,
+    });
+  };
+
+  const handleMajorChange = (e: any) => {
+    if (e.value === 0) {
+      setSelectedMajor({
+        value: e.value,
+        label: e.label,
+      });
+    }
+    setSelectedMajor({
       value: e.value,
       label: e.label,
     });
@@ -243,18 +275,20 @@ export const AttendancesPage = () => {
               </div>
             </div>
             <div className="card-body px-0 pb-2">
-              <div className="d-flex mx-4 justify-content-start gap-2">
+              <div className="d-flex mx-4 justify-content-start gap-2 col-6">
                 {UserLogin.role_id !== 1 && (
-                  <div className="d-flex mx-4 justify-content-start gap-2">
-                    <ReactSelect
-                      className="col-6"
-                      options={optionMajor}
-                      value={selectedMajor}
-                      name="Major"
-                      placeholder={"Select Major"}
-                      onChange={handleMajorChange}
-                      isLoading={isLoading}
-                    />
+                  <>
+                    {UserLogin.role_id === 2 && (
+                      <ReactSelect
+                        className="col-6"
+                        options={optionMajor}
+                        value={selectedMajor}
+                        name="Major"
+                        placeholder={"Select Major"}
+                        onChange={handleMajorChange}
+                        isLoading={isLoading}
+                      />
+                    )}
                     <ReactSelect
                       className="col-6"
                       options={optionClass}
@@ -264,7 +298,7 @@ export const AttendancesPage = () => {
                       isLoading={isLoading}
                       onChange={handleClassChange}
                     />
-                  </div>
+                  </>
                 )}
               </div>
               <div className="table-responsive">
@@ -315,7 +349,7 @@ export const AttendancesPage = () => {
                       </tr>
                     ) : (
                       attendances.data?.map((item: any, index) => {
-                        console.log(item.lecture_img, "item");
+                        console.log(item, "item");
                         return (
                           <tr key={index}>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
