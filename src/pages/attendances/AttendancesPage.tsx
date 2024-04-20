@@ -132,8 +132,6 @@ export const AttendancesPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log(data, user, "data12312312312312");
-
         const mappedData = data.data
           .filter((item: any) => {
             if (UserLogin.role_id === 1) {

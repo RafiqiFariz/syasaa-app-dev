@@ -278,7 +278,9 @@ export const CourseClass = () => {
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
                 <h6 className="text-white text-capitalize ps-3 mb-0">
-                  {UserLogin.role_id === 3 ? "Schedules" : "Course Classes"}
+                  {UserLogin.role_id === 3 || UserLogin.role_id === 4
+                    ? "Schedules"
+                    : "Course Classes"}
                 </h6>
               </div>
             </div>
