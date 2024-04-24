@@ -21,6 +21,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
   const [nav, setNav] = useState(false);
 
   let pathname = window.location.pathname.split("/").join(" / ");
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSignOut = async () => {
     try {
@@ -38,17 +39,13 @@ export const UserLayout = ({ children }: LayoutProps) => {
         },
         heightAuto: false,
       });
+
       console.log(result, "result");
+
       if (!result.isConfirmed) return;
 
       const response = await fetchAPI("/logout", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
       });
 
       if (response.ok) {
@@ -72,7 +69,9 @@ export const UserLayout = ({ children }: LayoutProps) => {
       setUser(isLogin.data);
     }
   }, [isLogin.data]);
+
   console.log(user, "data");
+
   return (
     <div
       className={`g-sidenav-show bg-gray-200 ${
@@ -120,7 +119,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
                 </h6>
               </nav>
               <div
-                className="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4 d-flex items-end"
+                className="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4"
                 id="navbar"
               >
                 <div className="ms-md-auto pe-md-3 d-flex align-items-center"></div>
@@ -138,66 +137,48 @@ export const UserLayout = ({ children }: LayoutProps) => {
                       </div>
                     </a>
                   </li>
-                  <li className="nav-item d-flex align-items-center">
-                    <div
-                      className="collapse navbar-collapse"
-                      id="navbarNavDarkDropdown"
+                  <li className="nav-item dropdown d-flex align-items-center">
+                    <a
+                      href="#"
+                      className="nav-link text-body p-0"
+                      id="dropdownMenuButton"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
                     >
-                      <ul className="navbar-nav">
-                        <li className="nav-item dropdown">
-                          <div
-                            className="nav-link d-flex flex-row border-bottom border-dark border-2 px-3 text-dark"
-                            // href="#"
-                            id="navbarDarkDropdownMenuLink"
-                            role="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                          >
-                            <span className="nav-link-text d-flex justify-content-center align-items-center text-md text-bold mx-2">
-                              {user && user.name ? user.name : "Guest"}
-                            </span>
-                            {user.role_id === 3 ||
-                              (user.role_id === 4 && (
-                                <img
-                                  src="https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png"
-                                  alt="user"
-                                  className="avatar avatar-sm me-2"
-                                  style={{ borderRadius: "50%" }}
-                                />
-                              ))}
-                          </div>
-                          <ul
-                            className="dropdown-menu "
-                            aria-labelledby="navbarDarkDropdownMenuLink"
-                          >
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={handleSignOut}
-                              >
-                                Sign Out
-                              </button>
-                            </li>
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => history.push("/profile")}
-                              >
-                                Profile
-                              </button>
-                            </li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </div>
-                    {/* <button
-                      className="nav-link text-body font-weight-bold px-0"
-                      data-bs-toggle="modal"
-                      data-bs-target="#exampleModal"
-                      onClick={handleSignOut}
-                    > */}
-                    {/* <span className="d-sm-inline d-none">Sign Out</span> */}
-                    {/* </button> */}
+                      <span className="d-flex align-items-center text-md text-bold gap-3">
+                        <span>{user && user.name ? user.name : "Guest"}</span>
+                        {user && user.image ? (
+                          <img
+                            src={`${API_URL}/${user.image}`}
+                            alt="profile"
+                            className="avatar shadow"
+                          />
+                        ) : (
+                          <i className="bi bi-person-circle fs-3"></i>
+                        )}
+                      </span>
+                    </a>
+                    <ul
+                      className="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4"
+                      aria-labelledby="dropdownMenuButton"
+                    >
+                      <li className="mb-2">
+                        <button
+                          className="dropdown-item"
+                          onClick={() => history.push("/profile")}
+                        >
+                          Profile
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          className="dropdown-item"
+                          onClick={handleSignOut}
+                        >
+                          Sign Out
+                        </button>
+                      </li>
+                    </ul>
                   </li>
                 </ul>
               </div>
