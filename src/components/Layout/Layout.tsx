@@ -21,7 +21,6 @@ export const UserLayout = ({children}: LayoutProps) => {
   const [nav, setNav] = useState(false);
 
   let pathname = window.location.pathname.split("/").join(" / ");
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSignOut = async () => {
     try {
@@ -63,6 +62,16 @@ export const UserLayout = ({children}: LayoutProps) => {
       console.log(e);
     }
   };
+
+  const getUserProfilePhoto = () => {
+    // jika path gambarnya ada di folder img/,
+    // maka asumsinya adalah gambar tersebut digunakan untuk seeder
+    if (user.image?.includes('img/')) {
+      return user.image?.replace('storage/', '');
+    }
+
+    return user.image;
+  }
 
   useEffect(() => {
     if (isLogin.data) {
@@ -143,15 +152,15 @@ export const UserLayout = ({children}: LayoutProps) => {
                       <span
                         className="d-flex align-items-center text-md text-bold gap-3">
                         <span>{user && user.name ? user.name : "Guest"}</span>
-                          {user && user.image ? (
-                            <img
-                              src={`${API_URL}/${user.image}`}
-                              alt="profile"
-                              className="avatar shadow"
-                            />
-                          ) : (
-                            <i className="bi bi-person-circle fs-3"></i>
-                          )}
+                        {user && user.image ? (
+                          <img
+                            src={getUserProfilePhoto()}
+                            alt="profile"
+                            className="avatar shadow"
+                          />
+                        ) : (
+                          <i className="bi bi-person-circle fs-3"></i>
+                        )}
                         </span>
                     </a>
                     <ul className="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4"
