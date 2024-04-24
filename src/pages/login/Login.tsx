@@ -1,9 +1,9 @@
-import { IonItem } from "@ionic/react";
 import Cookies from "js-cookie";
 import { useContext, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../context/Auth";
 import fetchAPI from "../../fetch";
+
 export const LoginPage = () => {
   const history = useHistory();
 
@@ -25,13 +25,11 @@ export const LoginPage = () => {
   const handleChange = (event: any) => {
     const { name, value } = event.target;
 
-    // Update form state
     setFrom({
       ...form,
       [name]: value,
     });
 
-    // Clear errors
     setErrors({
       ...errors,
       [name]: "",
@@ -48,18 +46,14 @@ export const LoginPage = () => {
       });
 
       if (response.status === 204) {
-        const loginResponse = await fetchAPI("/login", {
+        const response = await fetchAPI("/login", {
           method: "POST",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify(form),
         });
-        const meessage = await loginResponse.json();
-        if (loginResponse.ok) {
+
+        const message = await response.json();
+
+        if (response.ok) {
           // Redirect to dashboard
           history.push("/dashboard");
           setIsLogin({
@@ -71,9 +65,9 @@ export const LoginPage = () => {
 
           setErrors({
             ...errors,
-            email: meessage.errors.email ? meessage.errors.email[0] : "",
-            password: meessage.errors.password
-              ? meessage.errors.password[0]
+            email: message.errors.email ? message.errors.email[0] : "",
+            password: message.errors.password
+              ? message.errors.password[0]
               : "",
           });
         }
@@ -83,8 +77,6 @@ export const LoginPage = () => {
     }
   };
 
-  // console.log(errors, "errors");
-
   const appName = import.meta.env.VITE_APP_NAME;
 
   return (
@@ -93,7 +85,7 @@ export const LoginPage = () => {
         <div className="col-lg-4 col-md-8 col-12 mx-auto">
           <div className="card z-index-0 fadeIn3 fadeInBottom">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div className="bg-primary shadow-primary border-radius-lg py-3 pe-1 mt-3">
+              <div className="bg-primary shadow-primary border-radius-lg py-3 pe-1">
                 <h4 className="text-white font-weight-bolder text-center mt-2 mb-0">
                   {appName}
                 </h4>
@@ -101,35 +93,30 @@ export const LoginPage = () => {
             </div>
             <div className="card-body">
               <form onSubmit={onFinish} noValidate={true}>
-                <div className="input-group input-group-dynamic mb-2">
-                  <span className="input-group-text" id="basic-addon1">
-                    <i className="bi bi-person-fill"></i>
-                  </span>
+                <div className="input-group input-group-static mb-4">
+                  <label>Email</label>
                   <input
                     name="email"
                     value={form.email}
                     onChange={handleChange}
                     type="email"
                     className="form-control"
-                    placeholder="Email"
+                    placeholder="syasa@example.com"
                     aria-label="email"
-                    aria-describedby="basic-addon1"
                   />
                 </div>
                 {errors.email && (
                   <span className="text-danger text-s">{errors.email}</span>
                 )}
-                <div className="input-group input-group-dynamic mb-2">
-                  <span className="input-group-text" id="basic-addon2">
-                    <i className="bi bi-person-lock"></i>
-                  </span>
+                <div className="input-group input-group-static mb-4">
+                  <label>Password</label>
                   <input
                     name="password"
                     value={form.password}
                     onChange={handleChange}
                     type="password"
                     className="form-control"
-                    placeholder="Password"
+                    placeholder="********"
                     aria-label="Password"
                     aria-describedby="basic-addon2"
                   />
@@ -137,7 +124,7 @@ export const LoginPage = () => {
                 {errors.password && (
                   <span className="text-danger text-s">{errors.password}</span>
                 )}
-                <div className="form-check form-switch d-flex align-items-center my-3">
+                <div className="form-check form-switch d-flex align-items-center my-4">
                   <input
                     name="remember"
                     className="form-check-input"
@@ -151,20 +138,11 @@ export const LoginPage = () => {
                 <div className="text-center">
                   <button
                     type="submit"
-                    className="btn bg-primary w-100 my-4 mb-2 text-white"
+                    className="btn bg-gradient-dark w-100 mb-0 text-white"
                   >
                     Sign in
                   </button>
                 </div>
-                <p className="mt-4 text-sm text-center">
-                  Don't have an account?
-                  <Link
-                    className="text-primary font-weight-bold ms-2"
-                    to="/register"
-                  >
-                    Sign up
-                  </Link>
-                </p>
               </form>
             </div>
           </div>

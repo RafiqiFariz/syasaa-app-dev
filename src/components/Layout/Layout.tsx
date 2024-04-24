@@ -39,17 +39,13 @@ export const UserLayout = ({children}: LayoutProps) => {
         },
         heightAuto: false,
       });
+
       console.log(result, "result");
+
       if (!result.isConfirmed) return;
 
       const response = await fetchAPI("/logout", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
       });
 
       if (response.ok) {
