@@ -146,7 +146,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
                       <ul className="navbar-nav">
                         <li className="nav-item dropdown">
                           <div
-                            className="nav-link d-flex flex-row"
+                            className="nav-link d-flex flex-row border-bottom border-dark border-2 px-3 text-dark"
                             // href="#"
                             id="navbarDarkDropdownMenuLink"
                             role="button"
@@ -156,12 +156,15 @@ export const UserLayout = ({ children }: LayoutProps) => {
                             <span className="nav-link-text d-flex justify-content-center align-items-center text-md text-bold mx-2">
                               {user && user.name ? user.name : "Guest"}
                             </span>
-                            <img
-                              src="https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png"
-                              alt="user"
-                              className="avatar avatar-sm me-2"
-                              style={{ borderRadius: "50%" }}
-                            />
+                            {user.role_id === 3 ||
+                              (user.role_id === 4 && (
+                                <img
+                                  src="https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png"
+                                  alt="user"
+                                  className="avatar avatar-sm me-2"
+                                  style={{ borderRadius: "50%" }}
+                                />
+                              ))}
                           </div>
                           <ul
                             className="dropdown-menu "
