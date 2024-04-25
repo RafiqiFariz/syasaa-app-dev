@@ -7,6 +7,7 @@ import { AuthContext } from "../../context/Auth";
 import fetchAPI from "../../fetch";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import Swal from "sweetalert2";
+import { useGeoLocation } from "../../hooks/useGeoLocation";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -63,6 +64,9 @@ export const UserLayout = ({ children }: LayoutProps) => {
       console.log(e);
     }
   };
+
+  const location = useGeoLocation();
+  console.log(location, "location");
 
   useEffect(() => {
     if (isLogin.data) {
@@ -149,7 +153,9 @@ export const UserLayout = ({ children }: LayoutProps) => {
                         <span>{user && user.name ? user.name : "Guest"}</span>
                         {user && user.image ? (
                           <img
-                            src={`${API_URL}/${user.image}`}
+                            src={`${
+                              user.image ?? "https://via.placeholder.com/150"
+                            }`}
                             alt="profile"
                             className="avatar shadow"
                           />

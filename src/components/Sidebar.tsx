@@ -53,10 +53,6 @@ export const Sidebar = () => {
           name: "Attendances",
           link: "/attendances",
         },
-        {
-          name: "Profile",
-          link: "/profile",
-        },
       ];
       setList(list);
     } else if (user.role_id === 2) {
@@ -109,10 +105,6 @@ export const Sidebar = () => {
           name: "Attendance Requests",
           link: "/attendance-requests",
         },
-        {
-          name: "Profile",
-          link: "/profile",
-        },
       ];
       setList(list);
     } else if (user.role_id === 4) {
@@ -132,10 +124,6 @@ export const Sidebar = () => {
         {
           name: "Attendance Requests",
           link: "/attendance-requests",
-        },
-        {
-          name: "Profile",
-          link: "/profile",
         },
       ];
       setList(list);

@@ -64,6 +64,7 @@ import { CourseClass } from "./pages/courses_classes/CourseClassPage";
 import { AttendancesPage } from "./pages/attendances/AttendancesPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { AttendanceRequestPage } from "./pages/attendance_request/AttendanceRequestPage";
+import { EditProfileRequestPage } from "./pages/profile/edit/EditProfileRequestPage";
 
 setupIonicReact();
 
@@ -330,6 +331,17 @@ const App: React.FC = () => {
               path="/profile"
               render={() =>
                 isLogin.isLogin ? <ProfilePage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/profile/edit/:id"
+              render={() =>
+                isLogin.isLogin ? (
+                  <EditProfileRequestPage />
+                ) : (
+                  <Redirect to="/login" />
+                )
               }
             />
             <Route
