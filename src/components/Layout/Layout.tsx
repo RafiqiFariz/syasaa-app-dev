@@ -22,7 +22,6 @@ export const UserLayout = ({ children }: LayoutProps) => {
   const [nav, setNav] = useState(false);
 
   let pathname = window.location.pathname.split("/").join(" / ");
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSignOut = async () => {
     try {
@@ -67,6 +66,15 @@ export const UserLayout = ({ children }: LayoutProps) => {
 
   const location = useGeoLocation();
   console.log(location, "location");
+  const getUserProfilePhoto = () => {
+    // jika path gambarnya ada di folder img/,
+    // maka asumsinya adalah gambar tersebut digunakan untuk seeder
+    if (user.image?.includes("img/")) {
+      return user.image?.replace("storage/", "");
+    }
+
+    return user.image;
+  };
 
   useEffect(() => {
     if (isLogin.data) {
@@ -153,9 +161,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
                         <span>{user && user.name ? user.name : "Guest"}</span>
                         {user && user.image ? (
                           <img
-                            src={`${
-                              user.image ?? "https://via.placeholder.com/150"
-                            }`}
+                            src={getUserProfilePhoto()}
                             alt="profile"
                             className="avatar shadow"
                           />
