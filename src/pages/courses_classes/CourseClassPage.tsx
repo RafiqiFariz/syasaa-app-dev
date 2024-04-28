@@ -116,7 +116,7 @@ export const CourseClass = () => {
         setIsLoading(false);
         const filtered = {
           data: data.data.filter((item, i) => {
-            if (UserLogin.role_id === 3) {
+            if (UserLogin.role_id === 1) {
               return item;
             } else if (UserLogin.role_id === 2) {
               return (
@@ -129,6 +129,8 @@ export const CourseClass = () => {
               return item;
             }
           }),
+          links: data.links,
+          meta: data.meta,
         };
         setCourseClasses(filtered);
       }
@@ -280,7 +282,7 @@ export const CourseClass = () => {
                 <h6 className="text-white text-capitalize ps-3 mb-0">
                   {UserLogin.role_id === 3 || UserLogin.role_id === 4
                     ? "Schedules"
-                    : "Course Classes"}
+                    : "Course Class"}
                 </h6>
               </div>
             </div>
