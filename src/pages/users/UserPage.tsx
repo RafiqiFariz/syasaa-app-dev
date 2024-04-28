@@ -1,12 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
 import { useHistory } from "react-router";
-import Cookies from "js-cookie";
 import fetchAPI from "../../fetch";
 import Pagination from "react-js-pagination";
 import { DefaultPaginatedResponse } from "../../types";
-import _, { set } from "lodash";
-import Swal from "sweetalert2";
+import _ from "lodash";
+import Alert from "../../components/Alert";
 
 interface ItemData {
   id: number;
@@ -35,14 +34,7 @@ export const UserPage = () => {
 
   const getUserData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/users?includeRole=1", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetchAPI("/api/v1/users?includeRole=1", {method: "GET"});
 
       const data = await response.json();
 
@@ -87,36 +79,31 @@ export const UserPage = () => {
       selector: "action",
     },
   ];
+
   console.log(UserLogin, "users");
-  // Delete user data
+
   const deleteUser = async (id: number) => {
     try {
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-        heightAuto: false,
-      });
+      const confirmed = await Alert.confirm(
+        "Delete Confirmation!",
+        "Are you sure you want to delete this user?",
+        "Yes, Delete it!"
+      );
 
-      if (!result.isConfirmed) return;
+      if (!confirmed) return;
 
       const response = await fetchAPI(`/api/v1/users/${id}`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
         body: JSON.stringify({ _method: "DELETE" }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         await getUserData();
+        Alert.success("Success", data.message);
+      } else {
+        Alert.error("Error", data.message);
       }
     } catch (error) {
       console.log(error, "error");

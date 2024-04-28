@@ -62,7 +62,6 @@ export const AddPermissionPage = () => {
                       className={`form-control ${errors['name'] ? "is-invalid" : ""}`}
                       placeholder="Permission Name"
                       aria-label="Permissions Name"
-                      aria-describedby="basic-addon0"
                     />
                     <ErrorMessage field="name" errors={errors}/>
                   </div>

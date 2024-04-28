@@ -10,23 +10,26 @@ import fetchAPI from "../../../fetch";
 export const EditUserPage = () => {
   const {id} = useParams<{ id: string }>();
 
-  const [form, setFrom] = useState({
+  const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     password_confirmation: "",
     phone: "",
     role_id: 1,
+    lecturer: {address: ""},
+    student: {class_id: null},
+    faculty_staff: {faculty_id: null}
   });
 
   const [rolesOptions, setRolesOptions] = useState({
     faculty_id: 1,
-    address: "",
     class_id: 1,
+    address: "",
   });
 
-  const [errors, setErrors] = useState({});
   const [roles, setRoles] = useState<Array<any>>([]);
+  const [errors, setErrors] = useState({});
 
   const history = useHistory();
 
@@ -34,14 +37,14 @@ export const EditUserPage = () => {
     const {name, value} = event.target;
 
     if (name === "role_id") {
-      setFrom({
+      setForm({
         ...form,
         [name]: parseInt(value),
       });
       return;
     }
 
-    setFrom({
+    setForm({
       ...form,
       [name]: value,
     });
@@ -65,19 +68,11 @@ export const EditUserPage = () => {
 
   const getUserDataById = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/users/${id}`, {
-        method: "GET",
-      });
+      const response = await fetchAPI(`/api/v1/users/${id}`, {method: "GET"});
 
       const data = await response.json();
-      console.log(data, "data");
       if (response.ok) {
-        setFrom(data.data);
-        setRolesOptions({
-          address: data.data?.lecturer.address ?? "",
-          faculty_id: data.data.faculty ?? 1,
-          class_id: data.data.student ?? 1,
-        });
+        setForm(data.data);
       }
     } catch (error) {
       console.log(error, "error");
@@ -86,9 +81,7 @@ export const EditUserPage = () => {
 
   const getRoles = async () => {
     try {
-      const response = await fetchAPI("/api/v1/roles", {
-        method: "GET",
-      });
+      const response = await fetchAPI("/api/v1/roles", {method: "GET"});
 
       const data = await response.json();
 
@@ -157,6 +150,14 @@ export const EditUserPage = () => {
     getUserDataById();
   }, [id]);
 
+  useEffect(() => {
+    setRolesOptions({
+      faculty_id: form.faculty_staff?.faculty_id,
+      class_id: form.student?.class_id,
+      address: form.lecturer?.address,
+    });
+  }, [form]);
+
   console.log(form, "form");
   console.log(rolesOptions, "rolesOptions");
   return (
@@ -184,7 +185,6 @@ export const EditUserPage = () => {
                       }`}
                       placeholder="Username"
                       aria-label="Username"
-                      aria-describedby="basic-addon0"
                     />
                     <ErrorMessage field="name" errors={errors}/>
                   </div>
@@ -199,7 +199,6 @@ export const EditUserPage = () => {
                       }`}
                       placeholder="email"
                       aria-label="email"
-                      aria-describedby="basic-addon1"
                     />
                     <ErrorMessage field="email" errors={errors}/>
                   </div>
@@ -228,7 +227,6 @@ export const EditUserPage = () => {
                       }`}
                       placeholder="Password"
                       aria-label="Password"
-                      aria-describedby="basic-addon2"
                     />
                     <ErrorMessage field="password" errors={errors}/>
                   </div>
@@ -243,7 +241,6 @@ export const EditUserPage = () => {
                       }`}
                       placeholder="Confirm Password"
                       aria-label="Confirm Password"
-                      aria-describedby="basic-addon3"
                     />
                     <ErrorMessage
                       field="password_confirmation"
@@ -252,7 +249,7 @@ export const EditUserPage = () => {
                   </div>
                   <div className="input-group input-group-static mb-4">
                     <label
-                      htmlFor="exampleFormControlSelect1"
+                      htmlFor="selectRoles"
                       className="ms-0"
                     >
                       Role

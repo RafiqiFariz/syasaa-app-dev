@@ -4,6 +4,8 @@ import { useHistory, useParams } from "react-router";
 import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
 import Swal from "sweetalert2";
+import { ErrorMessage } from "../../../components/ErrorMessage";
+import Alert from "../../../components/Alert";
 
 export const EditPermissionPage = () => {
   const [form, setForm] = useState({
@@ -11,21 +13,14 @@ export const EditPermissionPage = () => {
   });
   const history = useHistory();
   const { id } = useParams<{ id: string }>();
+  const [errors, setErrors] = useState({});
 
   const getPermissionsById = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/permissions/${id}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetchAPI(`/api/v1/permissions/${id}`, {method: "GET"});
       const data = await response.json();
       if (data) {
         setForm(data.data);
-        console.log(data, "data");
       }
     } catch (error) {
       console.log(error, "error");
@@ -49,39 +44,21 @@ export const EditPermissionPage = () => {
         _method: "PUT",
       };
 
-      const result = await Swal.fire({
-        title: "Update Confirmation!",
-        text: "Are you sure you want to Update this permission?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#1D24CA",
-        cancelButtonColor: "#F44335",
-        confirmButtonText: "Yes, Update it!",
-        customClass: {
-          confirmButton: "btn btn-primary btn-sm ",
-          cancelButton: "btn btn-danger btn-sm ",
-        },
-        heightAuto: false,
-      });
-
-      if (!result.isConfirmed) return;
-
       const response = await fetchAPI(`/api/v1/permissions/${id}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
+        method: "POST",
         body: JSON.stringify(payload),
       });
+
       const data = await response.json();
-      if (data) {
-        history.push("/permissions");
+
+      if (response.ok) {
+        history.goBack();
+        Alert.success("Success", data.message);
+      } else {
+        setErrors(data.errors);
       }
     } catch (error) {
-      console.log(error, "Error");
+      console.error(error, "Error");
     }
   };
 
@@ -92,35 +69,30 @@ export const EditPermissionPage = () => {
   return (
     <UserLayout>
       <div className="row">
-        <div className="col-12 d-flex justify-content-center">
-          <div className="card my-4 w-50">
+        <div className="col-12 col-lg-6 m-auto">
+          <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">
-                  Create Permissions Form
+                  Edit Permission
                 </h6>
               </div>
-              <div className="card-body px-5 pb-2">
+              <div className="card-body">
                 <form onSubmit={onFinish}>
-                  <div className="input-group input-group-dynamic mb-4">
+                  <div className="input-group input-group-dynamic mb-4 has-validation">
                     <input
                       name="name"
                       value={form.name}
                       onChange={handleChange}
                       type="text"
-                      className="form-control"
+                      className={`form-control ${errors['name'] ? "is-invalid" : ""}`}
                       placeholder="Permissions Name"
                       aria-label="Permissions Name"
-                      aria-describedby="basic-addon0"
                     />
+                    <ErrorMessage field="name" errors={errors}/>
                   </div>
-                  <div className="text-center">
-                    <button
-                      type="submit"
-                      className="btn bg-primary w-100 my-4 mb-2 text-white"
-                    >
-                      Update Permissions
-                    </button>
+                  <div className="button-row d-flex mt-4">
+                    <button className="btn bg-gradient-dark ms-auto mb-0" type="submit">Submit</button>
                   </div>
                 </form>
               </div>
