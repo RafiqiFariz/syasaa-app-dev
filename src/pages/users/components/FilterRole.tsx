@@ -11,9 +11,7 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
     const fetchData = async () => {
       try {
         if (role === 2) {
-          const response = await fetchAPI("/api/v1/faculties", {
-            method: "GET",
-          });
+          const response = await fetchAPI("/api/v1/faculties", {method: "GET"});
 
           const data = await response.json();
 
@@ -29,9 +27,7 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
         }
 
         if (role === 4) {
-          const response = await fetchAPI("/api/v1/major-classes", {
-            method: "GET",
-          });
+          const response = await fetchAPI("/api/v1/major-classes", {method: "GET"});
 
           const data = await response.json();
 
@@ -59,8 +55,9 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
       <Select
         options={options}
         name={"Faculty"}
-        name_form={"faculty_id"}
+        nameForm={"faculty_id"}
         handleChange={onChange}
+        value={value.faculty_id}
       />
     );
   } else if (role === 3) {
@@ -88,8 +85,9 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
       <Select
         options={options}
         name={"Class"}
-        name_form={"class_id"}
+        nameForm={"class_id"}
         handleChange={onChange}
+        value={value.class_id}
       />
     );
   } else {

@@ -1,12 +1,11 @@
 import { useHistory, useParams } from "react-router";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
-import Swal from "sweetalert2";
 import makeAnimated from "react-select/animated";
 import ReactSelect from "react-select";
 import Alert from "../../../components/Alert";
+import { ErrorMessage } from "../../../components/ErrorMessage";
 
 interface IOptions {
   label: string;
@@ -25,12 +24,9 @@ export const EditRolePage = () => {
       },
     ],
   });
-  const [errors, setErrors] = useState({});
-
   const animatedComponents = makeAnimated();
-
+  const [errors, setErrors] = useState({});
   const [options, setOptions] = useState<Array<IOptions>>([]);
-
   const history = useHistory();
 
   const handleChange = (event: any) => {
@@ -48,15 +44,7 @@ export const EditRolePage = () => {
     try {
       const response = await fetchAPI(
         `/api/v1/roles/${id}?includePermissions=${id}`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-          },
-        }
+        {method: "GET"}
       );
 
       const data = await response.json();
@@ -89,20 +77,13 @@ export const EditRolePage = () => {
 
       const response = await fetchAPI(`/api/v1/roles/${id}`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-          "Content-Type": "application/json", // Add this line
-        },
-        body: JSON.stringify(payload), // Convert form to JSON
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         history.goBack();
-
         Alert.success("Success", data.message);
       } else {
         setErrors(data.errors);
@@ -114,18 +95,9 @@ export const EditRolePage = () => {
 
   const getPermissions = async () => {
     try {
-      const response = await fetchAPI("/api/v1/permissions", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
-      });
+      const response = await fetchAPI("/api/v1/permissions", {method: "GET"});
       const data = await response.json();
       if (response.ok) {
-        console.log(data.data, "data");
         setOptions(
           data.data.map((item: any) => ({ label: item.name, value: item.id }))
         );
@@ -159,17 +131,17 @@ export const EditRolePage = () => {
   return (
     <UserLayout>
       <div className="row">
-        <div className="col-12 d-flex justify-content-center">
-          <div className="card my-4 w-75">
+        <div className="col-12 col-lg-8 m-auto">
+          <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">
-                  Edit Role Form
+                  Edit Role
                 </h6>
               </div>
-              <div className="card-body px-5 pb-2">
+              <div className="card-body">
                 <form onSubmit={onFinish}>
-                  <div className="input-group input-group-dynamic mb-4">
+                  <div className="input-group input-group-dynamic mb-4 has-validation">
                     <input
                       name="name"
                       value={form.name}
@@ -182,8 +154,9 @@ export const EditRolePage = () => {
                       aria-label="Role Name"
                       aria-describedby="basic-addon0"
                     />
+                    <ErrorMessage field="name" errors={errors}/>
                   </div>
-                  <div className="input-group input-group-static">
+                  <div className="mt-3 mb-4 w-100">
                     <ReactSelect
                       className={`form-control ${
                         errors["permissions"] ? "is-invalid" : ""
@@ -196,12 +169,12 @@ export const EditRolePage = () => {
                       onChange={handleSelectNew}
                     />
                   </div>
-                  <div className="text-center">
+                  <div className="button-row d-flex mt-4">
                     <button
+                      className="btn bg-gradient-dark ms-auto mb-0"
                       type="submit"
-                      className="btn bg-primary w-100 my-4 mb-2 text-white"
                     >
-                      Update Role
+                      Submit
                     </button>
                   </div>
                 </form>
