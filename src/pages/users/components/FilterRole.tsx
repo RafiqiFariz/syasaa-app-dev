@@ -11,7 +11,9 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
     const fetchData = async () => {
       try {
         if (role === 2) {
-          const response = await fetchAPI("/api/v1/faculties", {method: "GET"});
+          const response = await fetchAPI("/api/v1/faculties", {
+            method: "GET",
+          });
 
           const data = await response.json();
 
@@ -27,7 +29,10 @@ export const FilterRole = ({ role, onChange, value, errors }) => {
         }
 
         if (role === 4) {
-          const response = await fetchAPI("/api/v1/major-classes", {method: "GET"});
+          const response = await fetchAPI(
+            "/api/v1/major-classes?paginate=false",
+            { method: "GET" }
+          );
 
           const data = await response.json();
 

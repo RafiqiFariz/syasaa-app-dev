@@ -33,26 +33,17 @@ export const AddAttandancesPage = () => {
         longitude: parseFloat(user.student.class.lng),
       }
     );
-    if (distance >= 1000000000000) {
-      const result = await Swal.fire({
-        title: "Location Confirmation",
-        text: "You are not in the class location, please change places or do attendance request!",
-        icon: "warning",
-        showCancelButton: false,
-        confirmButtonColor: "#1D24CA",
-        cancelButtonColor: "#F44335",
-        confirmButtonText: "Back",
-        customClass: {
-          confirmButton: "btn btn-primary btn-sm ",
-        },
-        heightAuto: false,
-      });
+    if (distance >= 10) {
+      const result = await Alert.confirm(
+        "Location Confirmation",
+        "You are not in the class location, please change places or do attendance request!",
+        "Go Back to Attendances"
+      );
       console.log(result, "result");
-      if (result.isConfirmed || result.isDismissed) {
-        return history.push("/attendances");
-      }
+      return history.push("/attendances");
     }
   };
+
   const getCourseClass = async () => {
     try {
       const response = await fetchAPI(
@@ -67,6 +58,10 @@ export const AddAttandancesPage = () => {
           });
         }
         setCourses(data.data);
+        setForm({
+          ...form,
+          course_class_id: data.data[0].id,
+        });
       }
     } catch (error) {
       console.error(error, "Error");
@@ -78,7 +73,7 @@ export const AddAttandancesPage = () => {
     if (files) {
       setForm({
         ...form,
-        [name]: files[0], // Simpan file gambar ke dalam state
+        [name]: files[0],
       });
     } else if (name === "present") {
       setForm({
@@ -96,13 +91,13 @@ export const AddAttandancesPage = () => {
   const onFinish = async (e: any) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("student_image", form.student_image); // Mengambil file pertama dari array
-    formData.append("lecturer_image", form.lecturer_image); // Mengambil file pertama dari array
+    formData.append("student_image", form.student_image);
+    formData.append("lecturer_image", form.lecturer_image);
     formData.append("student_id", user.student.id);
     formData.append("course_class_id", form.course_class_id);
     formData.append("is_present", "1");
 
-    console.log(form.student_image, "form123");
+    console.log(formData.get("course_class_id"), "form123");
     try {
       const response = await fetch("http://localhost:8000/api/v1/attendances", {
         method: "POST",
@@ -110,22 +105,22 @@ export const AddAttandancesPage = () => {
         credentials: "include",
         headers: {
           Accept: "application/json",
-          // "Content-Type": "multipart/form-data",
-
+          "Content-Type": "multipart/form-data",
           "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
         },
       });
       const data = await response.json();
       console.log(data, "data");
+      console.log(response, "response");
       if (response.ok) {
-        history.push("/attendances");
-        Alert.success("Success", data.message);
+        // history.push("/attendances");
+        // Alert.success("Success", data.message);
       } else {
         Alert.error("Error", data.message);
-        setErrors(data.errors);
+        // setErrors(data.errors);
       }
     } catch (error) {
-      setErrors(error.errors);
+      // setErrors(error.errors);
       console.error(error, "error");
     }
   };
@@ -168,32 +163,36 @@ export const AddAttandancesPage = () => {
                         errors["course_class_id"] ? "is-invalid" : ""
                       }`}
                       // id={name_form}
+                      value={form.course_class_id}
                       onChange={handleChange}
                       disabled={courses.length === 0}
                     >
-                      {courses.map((item, i) => (
-                        <option key={i} value={item.id}>
-                          {item.course.name}
-                        </option>
-                      ))}
+                      {courses.map((item, i) => {
+                        console.log(item, "item");
+                        return (
+                          <option key={i} value={item.id}>
+                            {item.course.name} - {user.student.class.name}
+                          </option>
+                        );
+                      })}
                     </select>
                     <ErrorMessage field="course_class_id" errors={errors} />
                   </div>
-                  <div className="input-group input-group-static has-validation mb-3">
+                  <div className="has-validation mb-3">
                     <label className="mb-1">Student Image</label>
                     <input
                       name="student_image"
                       className={`form-control form-control-sm ${
                         errors["student_image"] ? "is-invalid" : ""
                       }`}
-                      id="formFileSm"
+                      id="formFilesm"
                       type="file"
                       accept="image/*"
                       onChange={handleChange}
                     />
                     <ErrorMessage field="student_image" errors={errors} />
                   </div>
-                  <div className="input-group input-group-static has-validation mb-3">
+                  <div className="has-validation mb-3">
                     <label className="mb-1">Lecturer Image</label>
                     <input
                       className={`form-control form-control-sm ${

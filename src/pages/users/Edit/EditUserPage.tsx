@@ -8,7 +8,7 @@ import Alert from "../../../components/Alert";
 import fetchAPI from "../../../fetch";
 
 export const EditUserPage = () => {
-  const {id} = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
 
   const [form, setForm] = useState({
     name: "",
@@ -17,9 +17,9 @@ export const EditUserPage = () => {
     password_confirmation: "",
     phone: "",
     role_id: 1,
-    lecturer: {address: ""},
-    student: {class_id: null},
-    faculty_staff: {faculty_id: null}
+    lecturer: { address: "" },
+    student: { class_id: null },
+    faculty_staff: { faculty_id: null },
   });
 
   const [rolesOptions, setRolesOptions] = useState({
@@ -34,7 +34,7 @@ export const EditUserPage = () => {
   const history = useHistory();
 
   const handleChange = (event: any) => {
-    const {name, value} = event.target;
+    const { name, value } = event.target;
 
     if (name === "role_id") {
       setForm({
@@ -51,7 +51,7 @@ export const EditUserPage = () => {
   };
 
   const handleRoleOptionsChange = (event: any) => {
-    const {name, value} = event.target;
+    const { name, value } = event.target;
     console.log(event.target, "event.target.value");
     if (name === "faculty_id" || name === "class_id") {
       setRolesOptions({
@@ -68,11 +68,16 @@ export const EditUserPage = () => {
 
   const getUserDataById = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/users/${id}`, {method: "GET"});
+      const response = await fetchAPI(`/api/v1/users/${id}`, { method: "GET" });
 
       const data = await response.json();
       if (response.ok) {
         setForm(data.data);
+        setRolesOptions({
+          faculty_id: data.data?.faculty_staff?.faculty_id || "",
+          class_id: data.data?.student?.class_id || "",
+          address: data.data?.lecturer?.address || "",
+        });
       }
     } catch (error) {
       console.log(error, "error");
@@ -81,7 +86,7 @@ export const EditUserPage = () => {
 
   const getRoles = async () => {
     try {
-      const response = await fetchAPI("/api/v1/roles", {method: "GET"});
+      const response = await fetchAPI("/api/v1/roles", { method: "GET" });
 
       const data = await response.json();
 
@@ -91,7 +96,7 @@ export const EditUserPage = () => {
     } catch (error) {
       console.log(error, "error");
     }
-  }
+  };
 
   const onFinish = async (event: any) => {
     event.preventDefault();
@@ -120,16 +125,17 @@ export const EditUserPage = () => {
     }
 
     try {
+      console.log(body, "body123123");
       const response = await fetchAPI(`/api/v1/users/${id}`, {
         method: "POST",
         body: JSON.stringify(body),
       });
-
       const data = await response.json();
 
       if (response.ok) {
-        history.goBack();
+        console.log(data, "data123123");
         Alert.success("Success", data.message);
+        history.goBack();
       } else {
         setErrors(data.errors);
       }
@@ -148,29 +154,16 @@ export const EditUserPage = () => {
 
   useEffect(() => {
     getUserDataById();
-  }, [id]);
+  }, []);
 
-  useEffect(() => {
-    setRolesOptions({
-      faculty_id: form.faculty_staff?.faculty_id,
-      class_id: form.student?.class_id,
-      address: form.lecturer?.address,
-    });
-  }, [form]);
-
-  console.log(form, "form");
-  console.log(rolesOptions, "rolesOptions");
   return (
     <UserLayout>
       <div className="row">
         <div className="col-12 col-lg-8 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div
-                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                <h6 className="text-white text-capitalize ps-3">
-                  Edit User
-                </h6>
+              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+                <h6 className="text-white text-capitalize ps-3">Edit User</h6>
               </div>
               <div className="card-body">
                 <form onSubmit={onFinish}>
@@ -186,7 +179,7 @@ export const EditUserPage = () => {
                       placeholder="Username"
                       aria-label="Username"
                     />
-                    <ErrorMessage field="name" errors={errors}/>
+                    <ErrorMessage field="name" errors={errors} />
                   </div>
                   <div className="input-group input-group-dynamic mb-4">
                     <input
@@ -200,7 +193,7 @@ export const EditUserPage = () => {
                       placeholder="email"
                       aria-label="email"
                     />
-                    <ErrorMessage field="email" errors={errors}/>
+                    <ErrorMessage field="email" errors={errors} />
                   </div>
                   <div className="input-group input-group-dynamic mb-4 has-validation">
                     <input
@@ -214,7 +207,7 @@ export const EditUserPage = () => {
                       placeholder="Phone"
                       aria-label="phone"
                     />
-                    <ErrorMessage field="phone" errors={errors}/>
+                    <ErrorMessage field="phone" errors={errors} />
                   </div>
                   <div className="input-group input-group-dynamic mb-4">
                     <input
@@ -228,7 +221,7 @@ export const EditUserPage = () => {
                       placeholder="Password"
                       aria-label="Password"
                     />
-                    <ErrorMessage field="password" errors={errors}/>
+                    <ErrorMessage field="password" errors={errors} />
                   </div>
                   <div className="input-group input-group-dynamic mb-4">
                     <input
@@ -248,10 +241,7 @@ export const EditUserPage = () => {
                     />
                   </div>
                   <div className="input-group input-group-static mb-4">
-                    <label
-                      htmlFor="selectRoles"
-                      className="ms-0"
-                    >
+                    <label htmlFor="selectRoles" className="ms-0">
                       Role
                     </label>
                     <select
@@ -269,7 +259,7 @@ export const EditUserPage = () => {
                         </option>
                       ))}
                     </select>
-                    <ErrorMessage field="role_id" errors={errors}/>
+                    <ErrorMessage field="role_id" errors={errors} />
                   </div>
                   <FilterRole
                     role={form.role_id}

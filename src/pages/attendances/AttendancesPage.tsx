@@ -271,7 +271,7 @@ export const AttendancesPage = () => {
       }
     }
     return image;
-  }
+  };
 
   return (
     <UserLayout>
@@ -295,7 +295,7 @@ export const AttendancesPage = () => {
                       history.push(`/attendances/add`);
                     }}
                   >
-                    Add Attendance
+                    Clock In
                   </button>
                 )}
               </div>

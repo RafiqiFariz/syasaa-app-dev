@@ -7,7 +7,16 @@ import { useHistory } from "react-router";
 export const ProfilePage = () => {
   const { isLogin, setIsLogin } = useContext(AuthContext);
   const history = useHistory();
-  console.log(isLogin, "isLogin");
+  const user = isLogin.data;
+  const getUserProfilePhoto = () => {
+    // jika path gambarnya ada di folder img/,
+    // maka asumsinya adalah gambar tersebut digunakan untuk seeder
+    if (user.image?.includes("img/")) {
+      return user.image?.replace("storage/", "");
+    }
+
+    return user.image;
+  };
   return (
     <UserLayout>
       <div className="container-fluid px-2 px-md-4">
@@ -25,7 +34,7 @@ export const ProfilePage = () => {
             <div className="d-flex justify-content-center zindex-fixed h-100 mb-3">
               <div className="avatar avatar-xl position-relative zindex-fixed h-100">
                 <img
-                  src="https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png"
+                  src={getUserProfilePhoto()}
                   alt="profile_image"
                   className="shadow w-100 rounded-circle"
                 />

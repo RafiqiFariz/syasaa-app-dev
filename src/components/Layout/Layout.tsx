@@ -157,15 +157,12 @@ export const UserLayout = ({ children }: LayoutProps) => {
                     >
                       <span className="d-flex align-items-center text-md text-bold gap-3">
                         <span>{user && user.name ? user.name : "Guest"}</span>
-                        {user && user.image ? (
-                          <img
-                            src={getUserProfilePhoto()}
-                            alt="profile"
-                            className="avatar shadow"
-                          />
-                        ) : (
-                          <i className="bi bi-person-circle fs-3"></i>
-                        )}
+
+                        <img
+                          src={getUserProfilePhoto()}
+                          alt="profile"
+                          className="avatar shadow"
+                        />
                       </span>
                     </a>
                     <ul
