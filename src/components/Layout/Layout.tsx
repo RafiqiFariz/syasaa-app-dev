@@ -64,8 +64,6 @@ export const UserLayout = ({ children }: LayoutProps) => {
     }
   };
 
-  const location = useGeoLocation();
-  console.log(location, "location");
   const getUserProfilePhoto = () => {
     // jika path gambarnya ada di folder img/,
     // maka asumsinya adalah gambar tersebut digunakan untuk seeder

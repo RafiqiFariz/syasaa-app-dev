@@ -7,6 +7,7 @@ export const AuthContextProvider = ({ children }: any) => {
     isLogin: false,
     isPending: true,
     data: {},
+    location: {},
   });
 
   return (

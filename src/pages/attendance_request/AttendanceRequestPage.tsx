@@ -3,17 +3,17 @@ import { UserLayout } from "../../components/Layout/Layout";
 import fetchAPI from "../../fetch";
 
 export const AttendanceRequestPage = () => {
-  const [data, setData] = useState<any>();
+  const [attendances, setAttendances] = useState<any>({});
   const getData = async () => {
     try {
       const response = await fetchAPI("/api/v1/attendance-requests", {
         method: "GET",
       });
 
-      const data = await response.json();
-
+      // const data = await response.json();
+      console.log(response, "data123");
       if (response.ok) {
-        console.log(data, "data");
+        // console.log(data, "data123");
       }
     } catch (error) {
       console.log(error, "error");
@@ -22,7 +22,7 @@ export const AttendanceRequestPage = () => {
   useEffect(() => {
     getData();
   }, []);
-  console.log();
+  // console.log();
   return (
     <UserLayout>
       <div className="row">

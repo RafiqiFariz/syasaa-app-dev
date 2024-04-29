@@ -38,8 +38,8 @@ export const Sidebar = () => {
           link: "/courses",
         },
         {
-          name: "Course Class",
-          link: "/course-class",
+          name: "Schedules",
+          link: "/schedules",
         },
         {
           name: "Roles",
@@ -70,8 +70,8 @@ export const Sidebar = () => {
           link: "/majors",
         },
         {
-          name: "Course Class",
-          link: "/course-class",
+          name: "Schedules",
+          link: "/schedules",
         },
         {
           name: "Attendances",
@@ -95,7 +95,7 @@ export const Sidebar = () => {
         },
         {
           name: "Schedules",
-          link: "/course-class",
+          link: "/schedules",
         },
         {
           name: "Attendances",
@@ -115,7 +115,7 @@ export const Sidebar = () => {
         },
         {
           name: "Schedules",
-          link: "/course-class",
+          link: "/schedules",
         },
         {
           name: "Attendances",

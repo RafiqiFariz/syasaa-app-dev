@@ -34,7 +34,9 @@ export const UserPage = () => {
 
   const getUserData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/users?includeRole=1", {method: "GET"});
+      const response = await fetchAPI("/api/v1/users?includeRole=1", {
+        method: "GET",
+      });
 
       const data = await response.json();
 
@@ -151,14 +153,19 @@ export const UserPage = () => {
                 <table className="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      {columns.map((item, i) => (
-                        <th
-                          key={i}
-                          className="text-uppercase text-secondary text-xs font-weight-bolder text-center"
-                        >
-                          {item.name}
-                        </th>
-                      ))}
+                      {columns.map((item, i) => {
+                        if (!item) {
+                          return null;
+                        }
+                        return (
+                          <th
+                            key={i}
+                            className="text-uppercase text-secondary text-xs font-weight-bolder text-center"
+                          >
+                            {item.name}
+                          </th>
+                        );
+                      })}
                     </tr>
                   </thead>
                   <tbody>
@@ -166,14 +173,26 @@ export const UserPage = () => {
                       <tr>
                         {Array(columns.length)
                           .fill(0)
-                          .map((_, i) => (
-                            <td
-                              key={i}
-                              className="text-center placeholder-glow"
-                            >
-                              <span className="placeholder col-10"></span>
-                            </td>
-                          ))}
+                          .map((_, i) => {
+                            if (!columns[i]) {
+                              return (
+                                <td
+                                  key={i}
+                                  style={{
+                                    display: "none",
+                                  }}
+                                ></td>
+                              );
+                            }
+                            return (
+                              <td
+                                key={i}
+                                className="text-center placeholder-glow"
+                              >
+                                <span className="placeholder col-10"></span>
+                              </td>
+                            );
+                          })}
                       </tr>
                     ) : (
                       users.data
@@ -205,27 +224,33 @@ export const UserPage = () => {
                             <td className="text-xs font-weight-bold px-4 py-3 text-center">
                               {_.startCase(_.camelCase(item.role?.name)) ?? "-"}
                             </td>
-                            <td className="align-middle">
-                              {userId === item.id || UserLogin.role_id !== 1 ? (
-                                <div></div>
-                              ) : (
-                                <div className="d-flex gap-2 text-center">
-                                  <button
-                                    className="btn btn-primary btn-sm mb-0"
-                                    onClick={() => {
-                                      history.push(`/users/edit/${item.id}`);
-                                    }}
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    className="btn btn-danger btn-sm mb-0"
-                                    onClick={() => deleteUser(item.id)}
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              )}
+
+                            <td
+                              className="align-middle"
+                              style={{
+                                display: `${
+                                  userId === item.id || UserLogin.role_id !== 1
+                                    ? "none"
+                                    : "block"
+                                }`,
+                              }}
+                            >
+                              <div className="d-flex gap-2 text-center">
+                                <button
+                                  className="btn btn-primary btn-sm mb-0"
+                                  onClick={() => {
+                                    history.push(`/users/edit/${item.id}`);
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="btn btn-danger btn-sm mb-0"
+                                  onClick={() => deleteUser(item.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))

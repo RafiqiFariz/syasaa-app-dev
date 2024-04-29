@@ -65,6 +65,8 @@ import { AttendancesPage } from "./pages/attendances/AttendancesPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { AttendanceRequestPage } from "./pages/attendance_request/AttendanceRequestPage";
 import { EditProfileRequestPage } from "./pages/profile/edit/EditProfileRequestPage";
+import { AddAttandancesPage } from "./pages/attendances/Add/AddAttandancesPage";
+import { useGeoLocation } from "./hooks/useGeoLocation";
 
 setupIonicReact();
 
@@ -314,7 +316,7 @@ const App: React.FC = () => {
             />
             <Route
               exact
-              path="/course-class"
+              path="/schedules"
               render={() =>
                 isLogin.isLogin ? <CourseClass /> : <Redirect to="/login" />
               }
@@ -324,6 +326,17 @@ const App: React.FC = () => {
               path="/attendances"
               render={() =>
                 isLogin.isLogin ? <AttendancesPage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
+              path="/attendances/add"
+              render={() =>
+                isLogin.isLogin ? (
+                  <AddAttandancesPage />
+                ) : (
+                  <Redirect to="/login" />
+                )
               }
             />
             <Route

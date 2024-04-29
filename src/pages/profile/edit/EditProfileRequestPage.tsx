@@ -2,71 +2,80 @@ import { useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
 import fetchAPI from "../../../fetch";
 import Cookies from "js-cookie";
+import { useHistory } from "react-router";
+import { ErrorMessage } from "../../../components/ErrorMessage";
 
 export const EditProfileRequestPage = () => {
   const [form, setForm] = useState({
-    changeField: "",
+    new_value: "",
+    changeField: "name",
     description: "",
-    image: "",
+    image: null,
   });
 
+  const [errors, setErrors] = useState({});
+
   const options = [
-    {
-      value: "name",
-      label: "Name",
-    },
-    {
-      value: "email",
-      label: "Email",
-    },
-    {
-      value: "phone",
-      label: "Phone",
-    },
+    { value: "name", label: "Name" },
+    { value: "email", label: "Email" },
+    { value: "phone", label: "Phone" },
+    { value: "image", label: "Image" },
   ];
+
+  const history = useHistory();
+
   const UserLogin = JSON.parse(localStorage.getItem("user"));
-  console.log(UserLogin, "UserLogin");
-  const handleChange = (e: any) => {
+
+  const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (files) {
-      setForm({
-        ...form,
-        [name]: files[0], // Simpan file gambar ke dalam state
-      });
-    } else {
-      setForm({
-        ...form,
-        [name]: value,
-      });
-    }
+    setForm({
+      ...form,
+      [name]: files ? files[0] : value,
+    });
   };
+  console.log(form, "form.changeField");
 
-  const onFinish = async (e: any) => {
+  const onFinish = async (e) => {
     e.preventDefault();
-    const formData = {
-      changed_data: form.changeField,
-      description: form.description,
-      image: form.image,
-      status: "pending",
-      student_id: UserLogin.student.id,
-      change_to: UserLogin.name,
-    };
-    // Buat objek FormData
+    const formData = new FormData();
 
-    console.log(formData, "formData");
+    formData.append("changed_data", form.changeField);
+    formData.append("description", form.description);
+    formData.append("status", "pending");
+    formData.append("student_id", UserLogin.student.id);
+
+    if (form.changeField === "image") {
+      console.log("salah masuk sini");
+      formData.append("image", form.image);
+      formData.delete("old_value");
+    } else {
+      console.log("masuk sini");
+      formData.append("new_value", form.new_value);
+      formData.append("old_value", UserLogin[form.changeField]);
+    }
+    console.log("fdataorm ", form);
+
     try {
       const response = await fetchAPI("/api/v1/update-profile-requests", {
         method: "POST",
-
-        body: JSON.stringify(formData), // Kirim FormData ke API
+        body: formData,
+        headers: {
+          Accept: "application/json",
+          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+        },
       });
       const data = await response.json();
-      console.log("Response from API:", data);
+      console.log(data, "response");
+
+      if (response.ok) {
+        history.push("/profile");
+      }
     } catch (error) {
       console.error("Error:", error);
+      setErrors(error.errors);
     }
   };
-  console.log(form, "form");
+
   return (
     <UserLayout>
       <div className="row">
@@ -83,10 +92,10 @@ export const EditProfileRequestPage = () => {
                   <div className="input-group input-group-static mb-4 has-validation">
                     <label>Change Profile Data</label>
                     <select
-                      name={"changeField"}
+                      name="changeField"
                       className="form-control"
-                      // id={name_form}
                       onChange={handleChange}
+                      value={form.changeField}
                     >
                       {options.map((item, i) => (
                         <option key={i} value={item.value}>
@@ -94,23 +103,42 @@ export const EditProfileRequestPage = () => {
                         </option>
                       ))}
                     </select>
+                    <ErrorMessage field="changeField" errors={errors} />
                   </div>
-                  <div className="input-group input-group-static has-validation mb-3">
-                    <label className="mb-1">Change Image</label>
-                    <input
-                      className="form-control form-control-sm"
-                      id="formFileSm"
-                      type="file"
-                      name="image"
-                      onChange={handleChange}
-                    />
-                  </div>
+                  {form.changeField === "image" ? (
+                    <div className="input-group input-group-static has-validation mb-3">
+                      <label className="mb-1">Change Image</label>
+                      <input
+                        className="form-control form-control-sm"
+                        id="formFileSm"
+                        type="file"
+                        name="image"
+                        onChange={handleChange}
+                      />
+                      <ErrorMessage field="image" errors={errors} />
+                    </div>
+                  ) : (
+                    <div className="input-group input-group-static mb-4 has-validation">
+                      <label className="mb-1">New {form.changeField}</label>
+                      <input
+                        name="new_value"
+                        value={form.new_value || ""}
+                        onChange={handleChange}
+                        type="text"
+                        className={`form-control ${
+                          errors["new_value"] ? "is-invalid" : ""
+                        }`}
+                        placeholder={`New ${form.changeField}`}
+                      />
+                      <ErrorMessage field="new_value" errors={errors} />
+                    </div>
+                  )}
+
                   <div className="input-group input-group-static has-validation mt-3 mb-4 w-100">
                     <label>Description</label>
                     <textarea
                       name="description"
                       className="form-control"
-                      // value={form.description ?? ""}
                       rows={5}
                       placeholder="Description"
                       spellCheck="false"
@@ -122,7 +150,7 @@ export const EditProfileRequestPage = () => {
                       type="submit"
                       className="btn bg-primary w-100 my-4 mb-2 text-white"
                     >
-                      Update Permissions
+                      Send Request
                     </button>
                   </div>
                 </form>

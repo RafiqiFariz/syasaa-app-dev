@@ -4,6 +4,7 @@ import fetchAPI from "../../fetch";
 import { DefaultPaginatedResponse } from "../../types";
 import Pagination from "react-js-pagination";
 import ReactSelect from "react-select";
+import { useHistory } from "react-router";
 
 export const AttendancesPage = () => {
   const [attendances, setAttendances] = useState<DefaultPaginatedResponse<any>>(
@@ -32,6 +33,7 @@ export const AttendancesPage = () => {
     value: 0,
     label: "All Major",
   });
+  const history = useHistory();
 
   const UserLogin = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -66,6 +68,7 @@ export const AttendancesPage = () => {
       selector: "action",
     },
   ];
+  console.log(columns, "columns");
 
   const getUser = async () => {
     try {
@@ -172,6 +175,10 @@ export const AttendancesPage = () => {
     setIsLoading(true);
     try {
       let url = `/api/v1/attendances?page=${currentPage}`;
+      console.log(user, "user");
+      if (user.data.role_id === 4) {
+        url = `/api/v1/attendances?page=${currentPage}&student_id=${user.data.student.id}`;
+      }
 
       if (classId !== 0 && majorId !== 0) {
         url += `&class_id=${classId}&major_id=${majorId}`;
@@ -200,8 +207,9 @@ export const AttendancesPage = () => {
               return item.student.id === user.data.student.id;
             }
           }),
+          links: data.links,
+          meta: data.meta,
         };
-        console.log(data, filtered, "data123123123123");
         setIsLoading(false);
         setAttendances(filtered);
       }
@@ -270,6 +278,16 @@ export const AttendancesPage = () => {
                 <h6 className="text-white text-capitalize ps-3 mb-0">
                   Attendances
                 </h6>
+                {UserLogin.role_id === 4 && (
+                  <button
+                    className="btn btn-info btn-md mx-4 mb-0"
+                    onClick={() => {
+                      history.push(`/attendances/add`);
+                    }}
+                  >
+                    Add Attendance
+                  </button>
+                )}
               </div>
             </div>
             <div className="card-body px-0 pb-2">
@@ -287,15 +305,17 @@ export const AttendancesPage = () => {
                         isLoading={isLoading}
                       />
                     )}
-                    <ReactSelect
-                      className="col-6"
-                      options={optionClass}
-                      name={"Class"}
-                      value={selectedClass}
-                      placeholder={"Select Class"}
-                      isLoading={isLoading}
-                      onChange={handleClassChange}
-                    />
+                    {UserLogin.role_id !== 4 && (
+                      <ReactSelect
+                        className="col-6"
+                        options={optionClass}
+                        name={"Class"}
+                        value={selectedClass}
+                        placeholder={"Select Class"}
+                        isLoading={isLoading}
+                        onChange={handleClassChange}
+                      />
+                    )}
                   </>
                 )}
               </div>
@@ -330,14 +350,26 @@ export const AttendancesPage = () => {
                       <tr>
                         {Array(columns.length)
                           .fill(0)
-                          .map((_, i) => (
-                            <td
-                              key={i}
-                              className="text-center placeholder-glow"
-                            >
-                              <span className="placeholder col-10"></span>
-                            </td>
-                          ))}
+                          .map((_, i) => {
+                            if (!columns[i]) {
+                              return (
+                                <td
+                                  key={i}
+                                  style={{
+                                    display: "none",
+                                  }}
+                                ></td>
+                              );
+                            }
+                            return (
+                              <td
+                                key={i}
+                                className="text-center placeholder-glow"
+                              >
+                                <span className="placeholder col-10"></span>
+                              </td>
+                            );
+                          })}
                       </tr>
                     ) : attendances.data?.length === 0 ? (
                       <tr>

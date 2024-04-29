@@ -22537,7 +22537,7 @@
 
   .form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked,
   .form-check:not(.form-switch) .form-check-input[type="radio"]:checked {
-    border-color: #e91e63;
+    border-color: #1D24CA;
   }
 
   .form-check:not(.form-switch) .form-check-input[type="checkbox"] {
@@ -22560,7 +22560,7 @@
   }
 
   .form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked {
-    background: #e91e63;
+    background: #1D24CA;
   }
 
   .form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked:after {

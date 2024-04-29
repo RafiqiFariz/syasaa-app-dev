@@ -1,12 +1,12 @@
 import Cookies from "js-cookie";
 
-const fetchAbsolute = (fetch: any, baseUrl: any) => {
+const fetchAbsolute = (fetch: any, baseUrl: any, content?: string) => {
   return async (url: string, ...params: any) => {
     const defaultOptions = {
       credentials: "include",
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: content || "application/json",
+        "Content-Type": content || "application/json",
         "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
       },
     };

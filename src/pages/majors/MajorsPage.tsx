@@ -145,6 +145,9 @@ export const MajorsPage = () => {
                   <thead>
                     <tr>
                       {columns.map((item, index) => {
+                        if (!item) {
+                          return null;
+                        }
                         return (
                           <th
                             key={index}
@@ -161,14 +164,26 @@ export const MajorsPage = () => {
                       <tr>
                         {Array(columns.length)
                           .fill(0)
-                          .map((_, i) => (
-                            <td
-                              key={i}
-                              className="text-center placeholder-glow"
-                            >
-                              <span className="placeholder col-10"></span>
-                            </td>
-                          ))}
+                          .map((_, i) => {
+                            if (!columns[i]) {
+                              return (
+                                <td
+                                  key={i}
+                                  style={{
+                                    display: "none",
+                                  }}
+                                ></td>
+                              );
+                            }
+                            return (
+                              <td
+                                key={i}
+                                className="text-center placeholder-glow"
+                              >
+                                <span className="placeholder col-10"></span>
+                              </td>
+                            );
+                          })}
                       </tr>
                     ) : major.data?.length === 0 ? (
                       <tr>
@@ -200,8 +215,8 @@ export const MajorsPage = () => {
                               <td className="text-sm font-weight-normal px-4 py-3 text-center">
                                 {item.faculty?.name}
                               </td>
-                              <td className="align-middle">
-                                {userLogin.role_id !== 1 || (
+                              {userLogin.role_id !== 1 || (
+                                <td className="align-middle">
                                   <div className="d-flex gap-2 justify-content-center">
                                     <button
                                       className="btn btn-primary btn-sm mb-0"
@@ -218,8 +233,8 @@ export const MajorsPage = () => {
                                       Delete
                                     </button>
                                   </div>
-                                )}
-                              </td>
+                                </td>
+                              )}
                             </tr>
                           );
                         })

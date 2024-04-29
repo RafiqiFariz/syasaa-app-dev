@@ -92,10 +92,16 @@ export const CourseClass = () => {
     }
   };
 
+  console.log(user, "user");
+
   const getData = async (classId: number, majorId: number) => {
     setIsLoading(true);
     try {
       let url = `/api/v1/course-classes?includeClass=1&includeCourse=1&includeLecturer=1&page=${currentPage}`;
+
+      if (UserLogin.role_id === 4) {
+        url += `&class_id=${user.data.student.class.id}`;
+      }
 
       if (classId !== 0 && majorId !== 0) {
         url += `&class_id=${classId}&major_id=${majorId}`;
@@ -112,7 +118,6 @@ export const CourseClass = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log(data, "data12312312");
         setIsLoading(false);
         const filtered = {
           data: data.data.filter((item, i) => {
@@ -300,15 +305,17 @@ export const CourseClass = () => {
                       isLoading={isLoading}
                     />
                   )}
-                  <ReactSelect
-                    className="col-6"
-                    options={optionClass}
-                    name={"Class"}
-                    value={selectedClass}
-                    placeholder={"Select Class"}
-                    isLoading={isLoading}
-                    onChange={handleClassChange}
-                  />
+                  {UserLogin.role_id !== 4 && (
+                    <ReactSelect
+                      className="col-6"
+                      options={optionClass}
+                      name={"Class"}
+                      value={selectedClass}
+                      placeholder={"Select Class"}
+                      isLoading={isLoading}
+                      onChange={handleClassChange}
+                    />
+                  )}
                 </div>
               )}
 
