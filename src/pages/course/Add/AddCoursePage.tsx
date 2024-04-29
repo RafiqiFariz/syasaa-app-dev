@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { UserLayout } from "../../../components/Layout/Layout";
-import Cookies from "js-cookie";
-import fetchAPI from "../../../fetch";
 import { useHistory } from "react-router";
+import fetchAPI from "../../../fetch";
+import Alert from "../../../components/Alert";
 
 export const AddCoursePage = () => {
   const history = useHistory();
@@ -28,21 +28,16 @@ export const AddCoursePage = () => {
     try {
       const response = await fetchAPI("/api/v1/courses", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
         body: JSON.stringify(form),
       });
       const data = await response.json();
       console.log(response, "data");
-      if (!response.ok) {
-        setErrors(data.errors);
-      }
+
       if (response.ok) {
         history.goBack();
+        Alert.success("Success", data.message);
+      } else {
+        setErrors(data.errors);
       }
     } catch (error) {
       console.log(error, "error");

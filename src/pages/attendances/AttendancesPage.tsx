@@ -54,12 +54,12 @@ export const AttendancesPage = () => {
       key: 3,
     },
     {
-      name: "Lecture Image",
-      selector: "lecture_img",
+      name: "Lecturer Image",
+      selector: "lecturer_img",
       key: 3,
     },
     {
-      name: "Attendence",
+      name: "Attendance",
       selector: "is_present",
       key: 3,
     },
@@ -264,7 +264,7 @@ export const AttendancesPage = () => {
   };
 
   const formatImage = (image: string) => {
-    if (image.includes("via.placeholder.com")) {
+    if (image?.includes("via.placeholder.com")) {
       const parts = image.split("/storage/");
       if (parts.length > 1) {
         return parts[1];
@@ -400,20 +400,28 @@ export const AttendancesPage = () => {
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               <div className="avatar avatar-xl position-relative">
-                                <img
-                                  src={formatImage(item.student_image)}
-                                  alt="profile_image"
-                                  className="w-100 border-radius-lg shadow-sm"
-                                />
+                                {item.student_image ? (
+                                  <img
+                                    src={formatImage(item.student_image)}
+                                    alt="profile_image"
+                                    className="w-100 border-radius-lg shadow-sm"
+                                  />
+                                ) : (
+                                  <>-</>
+                                )}
                               </div>
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               <div className="avatar avatar-xl position-relative">
-                                <img
-                                  src={formatImage(item.lecturer_image)}
-                                  alt="profile_image"
-                                  className="w-100 border-radius-lg shadow-sm"
-                                />
+                                {item.lecturer_image ? (
+                                  <img
+                                    src={formatImage(item.lecturer_image)}
+                                    alt="profile_image"
+                                    className="w-100 border-radius-lg shadow-sm"
+                                  />
+                                ) : (
+                                  <>-</>
+                                )}
                               </div>
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
@@ -428,7 +436,7 @@ export const AttendancesPage = () => {
                                   <button
                                     className="btn btn-primary btn-sm mb-0"
                                     onClick={() => {
-                                      // history.push(`/users/edit/${item.id}`);
+                                      // history.push(`/users/Edit/${item.id}`);
                                     }}
                                   >
                                     Edit

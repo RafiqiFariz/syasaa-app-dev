@@ -64,7 +64,7 @@ import { CourseClass } from "./pages/courses_classes/CourseClassPage";
 import { AttendancesPage } from "./pages/attendances/AttendancesPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { AttendanceRequestPage } from "./pages/attendance_request/AttendanceRequestPage";
-import { EditProfileRequestPage } from "./pages/profile/edit/EditProfileRequestPage";
+import { EditProfileRequestPage } from "./pages/profile/Edit/EditProfileRequestPage";
 import { AddAttandancesPage } from "./pages/attendances/Add/AddAttandancesPage";
 import { useGeoLocation } from "./hooks/useGeoLocation";
 

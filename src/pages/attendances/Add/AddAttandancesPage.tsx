@@ -1,17 +1,18 @@
 import { useContext, useEffect, useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
-import fetchAPI from "../../../fetch";
 import { useGeoLocation } from "../../../hooks/useGeoLocation";
 import { useHistory } from "react-router";
-import Swal from "sweetalert2";
 import { getDistance } from "geolib";
-import Cookies from "js-cookie";
 import { ErrorMessage } from "../../../components/ErrorMessage";
+import Cookies from "js-cookie";
+import fetchAPI from "../../../fetch";
+import Swal from "sweetalert2";
+import Alert from "../../../components/Alert";
 
 export const AddAttandancesPage = () => {
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
-    course_id: "",
+    course_class_id: "",
     student_image: "",
     lecturer_image: "",
   });
@@ -19,6 +20,7 @@ export const AddAttandancesPage = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const getUserLocation = useGeoLocation();
   const history = useHistory();
+
   const getLocation = async () => {
     console.log(getUserLocation, "location");
     const distance = getDistance(
@@ -97,7 +99,7 @@ export const AddAttandancesPage = () => {
     formData.append("student_image", form.student_image); // Mengambil file pertama dari array
     formData.append("lecturer_image", form.lecturer_image); // Mengambil file pertama dari array
     formData.append("student_id", user.student.id);
-    formData.append("course_class_id", form.course_id);
+    formData.append("course_class_id", form.course_class_id);
     formData.append("is_present", "1");
 
     console.log(form.student_image, "form123");
@@ -117,7 +119,9 @@ export const AddAttandancesPage = () => {
       console.log(data, "data");
       if (response.ok) {
         history.push("/attendances");
+        Alert.success("Success", data.message);
       } else {
+        Alert.error("Error", data.message);
         setErrors(data.errors);
       }
     } catch (error) {

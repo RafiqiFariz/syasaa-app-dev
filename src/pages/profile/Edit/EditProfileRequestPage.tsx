@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
-import fetchAPI from "../../../fetch";
-import Cookies from "js-cookie";
 import { useHistory } from "react-router";
 import { ErrorMessage } from "../../../components/ErrorMessage";
+import * as _ from "lodash";
+import fetchAPI from "../../../fetch";
+import Cookies from "js-cookie";
 
 export const EditProfileRequestPage = () => {
   const [form, setForm] = useState({
@@ -33,7 +34,8 @@ export const EditProfileRequestPage = () => {
       [name]: files ? files[0] : value,
     });
   };
-  console.log(form, "form.changeField");
+
+  console.log(form, "form.changed_data");
 
   const onFinish = async (e) => {
     e.preventDefault();
@@ -53,7 +55,8 @@ export const EditProfileRequestPage = () => {
       formData.append("new_value", form.new_value);
       formData.append("old_value", UserLogin[form.changeField]);
     }
-    console.log("fdataorm ", form);
+
+    console.log("data form ", form);
 
     try {
       const response = await fetchAPI("/api/v1/update-profile-requests", {
@@ -64,6 +67,7 @@ export const EditProfileRequestPage = () => {
           "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
         },
       });
+
       const data = await response.json();
       console.log(data, "response");
 
@@ -79,18 +83,18 @@ export const EditProfileRequestPage = () => {
   return (
     <UserLayout>
       <div className="row">
-        <div className="col-12 d-flex justify-content-center">
-          <div className="card my-4 w-50">
+        <div className="col-12 col-lg-6 m-auto">
+          <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">
-                  Edit Profile Request Form
+                  Edit Profile Request
                 </h6>
               </div>
-              <div className="card-body px-5 pb-2">
+              <div className="card-body">
                 <form onSubmit={onFinish}>
                   <div className="input-group input-group-static mb-4 has-validation">
-                    <label>Change Profile Data</label>
+                    <label>Changed Data</label>
                     <select
                       name="changeField"
                       className="form-control"
@@ -103,7 +107,7 @@ export const EditProfileRequestPage = () => {
                         </option>
                       ))}
                     </select>
-                    <ErrorMessage field="changeField" errors={errors} />
+                    <ErrorMessage field="changed_data" errors={errors} />
                   </div>
                   {form.changeField === "image" ? (
                     <div className="input-group input-group-static has-validation mb-3">
@@ -119,7 +123,7 @@ export const EditProfileRequestPage = () => {
                     </div>
                   ) : (
                     <div className="input-group input-group-static mb-4 has-validation">
-                      <label className="mb-1">New {form.changeField}</label>
+                      <label className="mb-1">New {_.startCase(form.changeField)}</label>
                       <input
                         name="new_value"
                         value={form.new_value || ""}
@@ -128,7 +132,7 @@ export const EditProfileRequestPage = () => {
                         className={`form-control ${
                           errors["new_value"] ? "is-invalid" : ""
                         }`}
-                        placeholder={`New ${form.changeField}`}
+                        placeholder={`New ${_.startCase(form.changeField)}`}
                       />
                       <ErrorMessage field="new_value" errors={errors} />
                     </div>
@@ -148,9 +152,9 @@ export const EditProfileRequestPage = () => {
                   <div className="text-center">
                     <button
                       type="submit"
-                      className="btn bg-primary w-100 my-4 mb-2 text-white"
+                      className="btn bg-gradient-dark w-100 my-4 mb-2 text-white"
                     >
-                      Send Request
+                      Submit Request
                     </button>
                   </div>
                 </form>
