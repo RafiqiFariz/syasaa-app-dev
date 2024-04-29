@@ -54,7 +54,7 @@ export const AddAttandancesPage = () => {
   const getCourseClass = async () => {
     try {
       const response = await fetchAPI(
-        `/api/v1/course-classes?class_id=${user.class_id}`
+        `/api/v1/course-classes?includeCourse=1&class_id=${user.student.class_id}`
       );
       const data = await response.json();
       console.log(data, "data123123");
@@ -169,7 +169,7 @@ export const AddAttandancesPage = () => {
                     >
                       {courses.map((item, i) => (
                         <option key={i} value={item.id}>
-                          {item.name}
+                          {item.course.name}
                         </option>
                       ))}
                     </select>

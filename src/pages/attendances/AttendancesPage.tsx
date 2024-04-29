@@ -263,6 +263,16 @@ export const AttendancesPage = () => {
     });
   };
 
+  const formatImage = (image: string) => {
+    if (image.includes("via.placeholder.com")) {
+      const parts = image.split("/storage/");
+      if (parts.length > 1) {
+        return parts[1];
+      }
+    }
+    return image;
+  }
+
   return (
     <UserLayout>
       <div className="row">
@@ -391,7 +401,7 @@ export const AttendancesPage = () => {
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               <div className="avatar avatar-xl position-relative">
                                 <img
-                                  src={item.student_image}
+                                  src={formatImage(item.student_image)}
                                   alt="profile_image"
                                   className="w-100 border-radius-lg shadow-sm"
                                 />
@@ -400,7 +410,7 @@ export const AttendancesPage = () => {
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               <div className="avatar avatar-xl position-relative">
                                 <img
-                                  src={item.lecturer_image}
+                                  src={formatImage(item.lecturer_image)}
                                   alt="profile_image"
                                   className="w-100 border-radius-lg shadow-sm"
                                 />
