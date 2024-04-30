@@ -33,8 +33,8 @@ export const AddAttandancesPage = () => {
         longitude: parseFloat(user.student.class.lng),
       }
     );
-    if (distance >= 10) {
-      const result = await Alert.confirm(
+    if (distance >= 1000000000) {
+      const result = await Alert.confirmLocation(
         "Location Confirmation",
         "You are not in the class location, please change places or do attendance request!",
         "Go Back to Attendances"
@@ -97,7 +97,7 @@ export const AddAttandancesPage = () => {
     formData.append("course_class_id", form.course_class_id);
     formData.append("is_present", "1");
 
-    console.log(formData.get("course_class_id"), "form123");
+    console.log(form, "form123");
     try {
       const response = await fetch("http://localhost:8000/api/v1/attendances", {
         method: "POST",
@@ -105,7 +105,6 @@ export const AddAttandancesPage = () => {
         credentials: "include",
         headers: {
           Accept: "application/json",
-          "Content-Type": "multipart/form-data",
           "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
         },
       });
@@ -113,11 +112,11 @@ export const AddAttandancesPage = () => {
       console.log(data, "data");
       console.log(response, "response");
       if (response.ok) {
-        // history.push("/attendances");
-        // Alert.success("Success", data.message);
+        history.push("/attendances");
+        Alert.success("Success", data.message);
       } else {
         Alert.error("Error", data.message);
-        // setErrors(data.errors);
+        setErrors(data.errors);
       }
     } catch (error) {
       // setErrors(error.errors);

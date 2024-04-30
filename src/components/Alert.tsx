@@ -2,7 +2,18 @@ import React from "react";
 import Swal from "sweetalert2";
 
 class Alert extends React.Component {
-  static alert(title: string, message: string, type: "success" | "info" | "warning" | "error" | "question" | "image" | "html" = "info") {
+  static alert(
+    title: string,
+    message: string,
+    type:
+      | "success"
+      | "info"
+      | "warning"
+      | "error"
+      | "question"
+      | "image"
+      | "html" = "info"
+  ) {
     // @ts-ignore
     Swal.fire({
       title,
@@ -32,7 +43,14 @@ class Alert extends React.Component {
     this.alert(title, message, "question");
   }
 
-  static image(title: string, description: string, imageUrl: string, imageWidth: number, imageHeight: number, imageAlt: string) {
+  static image(
+    title: string,
+    description: string,
+    imageUrl: string,
+    imageWidth: number,
+    imageHeight: number,
+    imageAlt: string
+  ) {
     Swal.fire({
       title,
       text: description,
@@ -44,7 +62,11 @@ class Alert extends React.Component {
     });
   }
 
-  static html(title: string, htmlCode: string, type: "success" | "info" | "warning" | "error" | "question" = "info") {
+  static html(
+    title: string,
+    htmlCode: string,
+    type: "success" | "info" | "warning" | "error" | "question" = "info"
+  ) {
     Swal.fire({
       title,
       html: htmlCode,
@@ -53,7 +75,10 @@ class Alert extends React.Component {
     });
   }
 
-  static toast(message: string, type: "success" | "info" | "warning" | "error" = "info") {
+  static toast(
+    message: string,
+    type: "success" | "info" | "warning" | "error" = "info"
+  ) {
     Swal.fire({
       toast: true,
       position: "top-end",
@@ -66,12 +91,36 @@ class Alert extends React.Component {
     });
   }
 
-  static async confirm(title: string, text: string, confirmText: string = "Yes", cancelText: string =  "No"): Promise<boolean> {
+  static async confirm(
+    title: string,
+    text: string,
+    confirmText: string = "Yes",
+    cancelText: string = "No"
+  ): Promise<boolean> {
     const result = await Swal.fire({
       title,
       text,
       icon: "warning",
       showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: confirmText,
+      cancelButtonText: cancelText,
+      heightAuto: false,
+    });
+    return result.isConfirmed;
+  }
+  static async confirmLocation(
+    title: string,
+    text: string,
+    confirmText: string = "Yes",
+    cancelText: string = "No"
+  ): Promise<boolean> {
+    const result = await Swal.fire({
+      title,
+      text,
+      icon: "warning",
+      showCancelButton: false,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: confirmText,
