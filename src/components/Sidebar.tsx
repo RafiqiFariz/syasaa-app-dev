@@ -77,10 +77,6 @@ export const Sidebar = () => {
           name: "Attendances",
           link: "/attendances",
         },
-        {
-          name: "Attendance Requests",
-          link: "/attendance-requests",
-        },
       ];
       setList(list);
     } else if (user.role_id === 3) {

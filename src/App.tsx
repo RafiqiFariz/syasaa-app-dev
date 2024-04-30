@@ -67,6 +67,7 @@ import { AttendanceRequestPage } from "./pages/attendance_request/AttendanceRequ
 import { EditProfileRequestPage } from "./pages/profile/Edit/EditProfileRequestPage";
 import { AddAttandancesPage } from "./pages/attendances/Add/AddAttandancesPage";
 import { useGeoLocation } from "./hooks/useGeoLocation";
+import { EditProfilePage } from "./pages/profile/Edit/EditProfilePage";
 
 setupIonicReact();
 
@@ -348,13 +349,20 @@ const App: React.FC = () => {
             />
             <Route
               exact
-              path="/profile/edit/:id"
+              path="/profile/edit-request/:id"
               render={() =>
                 isLogin.isLogin ? (
                   <EditProfileRequestPage />
                 ) : (
                   <Redirect to="/login" />
                 )
+              }
+            />
+            <Route
+              exact
+              path="/profile/edit/:id"
+              render={() =>
+                isLogin.isLogin ? <EditProfilePage /> : <Redirect to="/login" />
               }
             />
             <Route

@@ -1,23 +1,62 @@
 import { useEffect, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
 import fetchAPI from "../../fetch";
+import { DefaultPaginatedResponse } from "../../types";
+import Pagination from "react-js-pagination";
 
 export const AttendanceRequestPage = () => {
-  const [attendances, setAttendances] = useState<any>({});
+  const [attendancesReq, setAttendanceReq] = useState<
+    DefaultPaginatedResponse<any>
+  >({});
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const UserLogin = JSON.parse(localStorage.getItem("user") || "{}");
+  let columns = [
+    {
+      name: "ID",
+      selector: "id",
+      key: 1,
+    },
+    {
+      name: "Student",
+      selector: "student",
+      key: 2,
+    },
+    {
+      name: "Student Image",
+      selector: "student_image",
+      key: 3,
+    },
+    {
+      name: "Course",
+      selector: "course",
+      key: 4,
+    },
+    {
+      name: "Status",
+      selector: "status",
+      key: 5,
+    },
+  ];
   const getData = async () => {
     try {
       const response = await fetchAPI("/api/v1/attendance-requests", {
         method: "GET",
       });
 
-      // const data = await response.json();
-      console.log(response, "data123");
+      const data = await response.json();
+      console.log(data, "data123");
       if (response.ok) {
         // console.log(data, "data123");
+        setAttendanceReq(data);
+        setIsLoading(false);
       }
     } catch (error) {
       console.log(error, "error");
     }
+  };
+  const handleChangePage = (newPage: number) => {
+    setCurrentPage(newPage);
   };
   useEffect(() => {
     getData();
@@ -29,17 +68,25 @@ export const AttendanceRequestPage = () => {
         <div className="col-12">
           <div
             className="card"
-            style={
-              {
-                // height: attendances?.data?.length > 0 ? "100%" : "85vh",
-              }
-            }
+            style={{
+              height: attendancesReq?.data?.length > 0 ? "100%" : "85vh",
+            }}
           >
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
                 <h6 className="text-white text-capitalize ps-3 mb-0">
                   Attendance Requests
                 </h6>
+                {UserLogin.role_id === 4 && (
+                  <button
+                    className="btn btn-info btn-md mx-4 mb-0"
+                    onClick={() => {
+                      // history.push(`/attendances/add`);
+                    }}
+                  >
+                    Add Attendance Request
+                  </button>
+                )}
               </div>
             </div>
             <div className="card-body px-0 pb-2">
@@ -73,7 +120,7 @@ export const AttendanceRequestPage = () => {
                 <table className="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      {/* {columns.map((item, index) => {
+                      {columns.map((item, index) => {
                         if (!item) {
                           return (
                             <div
@@ -92,11 +139,11 @@ export const AttendanceRequestPage = () => {
                             {item.name}
                           </th>
                         );
-                      })} */}
+                      })}
                     </tr>
                   </thead>
                   <tbody>
-                    {/* {isLoading ? (
+                    {isLoading ? (
                       <tr>
                         {Array(columns.length)
                           .fill(0)
@@ -109,14 +156,14 @@ export const AttendanceRequestPage = () => {
                             </td>
                           ))}
                       </tr>
-                    ) : attendances.data?.length === 0 ? (
+                    ) : attendancesReq.data?.length === 0 ? (
                       <tr>
                         <td colSpan={columns.length} className="text-center">
                           No data available
                         </td>
                       </tr>
                     ) : (
-                      attendances.data?.map((item: any, index) => {
+                      attendancesReq.data?.map((item: any, index) => {
                         console.log(item, "item");
                         return (
                           <tr key={index}>
@@ -173,16 +220,16 @@ export const AttendanceRequestPage = () => {
                           </tr>
                         );
                       })
-                    )} */}
+                    )}
                   </tbody>
                 </table>
               </div>
             </div>
             <div className="text-center pt-4 px-4">
-              {/* <Pagination
-                activePage={attendances?.meta?.current_page}
-                itemsCountPerPage={attendances?.meta?.per_page}
-                totalItemsCount={attendances?.meta?.total ?? 0}
+              <Pagination
+                activePage={attendancesReq?.meta?.current_page}
+                itemsCountPerPage={attendancesReq?.meta?.per_page}
+                totalItemsCount={attendancesReq?.meta?.total ?? 0}
                 onChange={handleChangePage}
                 itemClass="page-item"
                 linkClass="page-link"
@@ -190,7 +237,7 @@ export const AttendanceRequestPage = () => {
                 lastPageText="Last"
                 prevPageText={<>&laquo;</>}
                 nextPageText={<>&raquo;</>}
-              /> */}
+              />
             </div>
           </div>
         </div>

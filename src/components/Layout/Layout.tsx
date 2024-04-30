@@ -40,8 +40,6 @@ export const UserLayout = ({ children }: LayoutProps) => {
         heightAuto: false,
       });
 
-      console.log(result, "result");
-
       if (!result.isConfirmed) return;
 
       const response = await fetchAPI("/logout", {
@@ -79,8 +77,6 @@ export const UserLayout = ({ children }: LayoutProps) => {
       setUser(isLogin.data);
     }
   }, [isLogin.data]);
-
-  console.log(user, "data");
 
   return (
     <div

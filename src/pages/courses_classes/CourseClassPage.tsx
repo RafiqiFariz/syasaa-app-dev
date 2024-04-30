@@ -101,6 +101,8 @@ export const CourseClass = () => {
 
       if (UserLogin.role_id === 4) {
         url += `&class_id=${user.data.student.class.id}`;
+      } else if (UserLogin.role_id === 3) {
+        url += `&lecturer_id=${user.data.lecturer.id}`;
       }
 
       if (classId !== 0 && majorId !== 0) {

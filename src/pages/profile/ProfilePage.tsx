@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
 import { AuthContext } from "../../context/Auth";
 import _ from "lodash";
@@ -17,6 +17,7 @@ export const ProfilePage = () => {
 
     return user.image;
   };
+
   return (
     <UserLayout>
       <div className="container-fluid px-2 px-md-4">
@@ -65,7 +66,7 @@ export const ProfilePage = () => {
                     <li className="list-group-item border-0 p-0 text-lg mb-2 d-flex justify-content-center">
                       {isLogin.data.email || "@"}
                     </li>
-                    <li className="list-group-item border-0 p-0 text-lg mb-2 d-flex justify-content-center">
+                    <li className="list-group-item border-0 p-0 text-lg text-center mb-2 d-flex justify-content-center">
                       {/* {isLogin.data.student.class.name || "XII RPL"} */}
                       {isLogin.data.role_id === 3
                         ? isLogin.data.lecturer.address
@@ -82,9 +83,21 @@ export const ProfilePage = () => {
               style={{
                 height: "50px",
               }}
-              onClick={() => history.push(`/profile/edit/${isLogin.data.id}`)}
+              onClick={() => {
+                if (isLogin.data.role_id === 3) {
+                  return history.push(`/profile/edit/${isLogin.data.id}`);
+                } else {
+                  return history.push(
+                    `/profile/edit-request/${isLogin.data.id}`
+                  );
+                }
+              }}
             >
-              <span className="p-1">Request Edit Profile</span>
+              <span className="p-1">
+                {isLogin.data.role_id === 3
+                  ? "Edit Profile"
+                  : "Edit Profile Request"}
+              </span>
             </button>
           </div>
         </div>

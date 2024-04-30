@@ -59,9 +59,10 @@ export const EditProfileRequestPage = () => {
     console.log("data form ", form);
 
     try {
-      const response = await fetchAPI("/api/v1/update-profile-requests", {
+      const response = await fetch("/api/v1/update-profile-requests", {
         method: "POST",
         body: formData,
+        credentials: "include",
         headers: {
           Accept: "application/json",
           "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
@@ -123,7 +124,9 @@ export const EditProfileRequestPage = () => {
                     </div>
                   ) : (
                     <div className="input-group input-group-static mb-4 has-validation">
-                      <label className="mb-1">New {_.startCase(form.changeField)}</label>
+                      <label className="mb-1">
+                        New {_.startCase(form.changeField)}
+                      </label>
                       <input
                         name="new_value"
                         value={form.new_value || ""}
@@ -149,12 +152,13 @@ export const EditProfileRequestPage = () => {
                       onChange={handleChange}
                     />
                   </div>
-                  <div className="text-center">
+                  <div className="button-row d-flex mt-4">
                     <button
+                      className="btn bg-gradient-dark ms-auto mb-0"
                       type="submit"
-                      className="btn bg-gradient-dark w-100 my-4 mb-2 text-white"
+                      title="Send"
                     >
-                      Submit Request
+                      Submit
                     </button>
                   </div>
                 </form>
