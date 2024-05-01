@@ -5,7 +5,7 @@ import _ from "lodash";
 import { useHistory } from "react-router";
 
 export const ProfilePage = () => {
-  const { isLogin, setIsLogin } = useContext(AuthContext);
+  const {isLogin, setIsLogin} = useContext(AuthContext);
   const history = useHistory();
   const user = isLogin.data;
   const getUserProfilePhoto = () => {
@@ -65,12 +65,11 @@ export const ProfilePage = () => {
                     <li className="list-group-item border-0 p-0 text-lg mb-2 d-flex justify-content-center">
                       {isLogin.data.email || "@"}
                     </li>
-                    <li className="list-group-item border-0 p-0 text-lg mb-2 d-flex justify-content-center">
-                      {/* {isLogin.data.student.class.name || "XII RPL"} */}
-                      {isLogin.data.role_id === 3
-                        ? isLogin.data.lecturer.address
-                        : isLogin.data.student.class.name}
-                    </li>
+                    {isLogin.data.role_id === 3 || isLogin.data.role_id === 4 && (
+                      <li className="list-group-item border-0 p-0 text-lg mb-2 d-flex justify-content-center">
+                        {isLogin.data.role_id === 3 ? isLogin.data?.lecturer?.address : isLogin.data?.student?.class.name}
+                      </li>
+                    )}
                   </ul>
                 </div>
               </div>
