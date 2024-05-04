@@ -3,6 +3,9 @@ import { UserLayout } from "../../components/Layout/Layout";
 import fetchAPI from "../../fetch";
 import { DefaultPaginatedResponse } from "../../types";
 import Pagination from "react-js-pagination";
+import { useHistory } from "react-router";
+import Alert from "../../components/Alert";
+import Cookies from "js-cookie";
 
 export const AttendanceRequestPage = () => {
   const [attendancesReq, setAttendanceReq] = useState<
@@ -10,6 +13,7 @@ export const AttendanceRequestPage = () => {
   >({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const history = useHistory();
   const UserLogin = JSON.parse(localStorage.getItem("user") || "{}");
   let columns = [
     {
@@ -17,11 +21,11 @@ export const AttendanceRequestPage = () => {
       selector: "id",
       key: 1,
     },
-    {
-      name: "Student",
-      selector: "student",
-      key: 2,
-    },
+    // {
+    //   name: "Student",
+    //   selector: "student",
+    //   key: 2,
+    // },
     {
       name: "Student Image",
       selector: "student_image",
@@ -33,14 +37,29 @@ export const AttendanceRequestPage = () => {
       key: 4,
     },
     {
+      name: "Evidance",
+      selector: "evidance",
+      key: 5,
+    },
+    {
       name: "Status",
       selector: "status",
       key: 5,
     },
+    UserLogin.role_id === 1 || UserLogin.role_id === 3
+      ? {
+          name: "Action",
+          selector: "action",
+        }
+      : null,
   ];
   const getData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/attendance-requests", {
+      let url = `/api/v1/attendance-requests?page=${currentPage}`;
+      if (UserLogin.role_id === 4) {
+        url = `/api/v1/attendance-requests?page=${currentPage}&student_id=${UserLogin.student.id}`;
+      }
+      const response = await fetchAPI(url, {
         method: "GET",
       });
 
@@ -55,9 +74,51 @@ export const AttendanceRequestPage = () => {
       console.log(error, "error");
     }
   };
+
   const handleChangePage = (newPage: number) => {
     setCurrentPage(newPage);
   };
+
+  const handleStatusChange = async (id: number, status: string) => {
+    let confirm;
+    if (status === "accepted") {
+      confirm = await Alert.confirm(
+        "Accepted Confirmation!",
+        "Are you sure you want to accepted this Attandance?",
+        "Yes, accepted it!"
+      );
+    } else {
+      confirm = await Alert.confirm(
+        "Reject Confirmation!",
+        "Are you sure you want to reject this Attandance?",
+        "Yes, reject it!"
+      );
+    }
+    if (!confirm) return;
+
+    const payload = {
+      _method: "PUT",
+      status: status,
+    };
+
+    try {
+      const response = await fetchAPI(
+        `/api/v1/attendance-requests/${id}/status`,
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+        }
+      );
+      const data = await response.json();
+      console.log(data, "data1234");
+      if (response.ok) {
+        getData();
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -81,7 +142,7 @@ export const AttendanceRequestPage = () => {
                   <button
                     className="btn btn-info btn-md mx-4 mb-0"
                     onClick={() => {
-                      // history.push(`/attendances/add`);
+                      history.push(`/attendance-requests/add`);
                     }}
                   >
                     Add Attendance Request
@@ -170,9 +231,9 @@ export const AttendanceRequestPage = () => {
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.id}
                             </td>
-                            <td className="text-sm font-weight-normal px-4 py-3">
-                              {item.student.user.name}
-                            </td>
+                            {/* <td className="text-sm font-weight-normal px-4 py-3">
+                              {item.student.user_id}
+                            </td> */}
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               <div className="avatar avatar-xl position-relative">
                                 <img
@@ -182,38 +243,71 @@ export const AttendanceRequestPage = () => {
                                 />
                               </div>
                             </td>
-                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                              <div className="avatar avatar-xl position-relative">
-                                <img
-                                  src={item.lecturer_image}
-                                  alt="profile_image"
-                                  className="w-100 border-radius-lg shadow-sm"
-                                />
+                            <td className="text-sm font-weight-normal px-4 py-3 col-5">
+                              <div className="d-flex flex-column">
+                                <span
+                                  className="course-name"
+                                  style={{
+                                    whiteSpace: "normal",
+                                  }}
+                                >
+                                  {item.course_class.course.name}
+                                </span>
                               </div>
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                              {item.is_present !== 0 ? "Present" : "Absent"}
+                              {item.evidence}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {item.status === "pending" ? (
+                                <span className="badge badge-sm bg-gradient-warning d-flex justify-content-center">
+                                  Pending
+                                </span>
+                              ) : item.status === "accepted" ? (
+                                <span className="badge badge-sm bg-gradient-success d-flex justify-content-center">
+                                  accepted
+                                </span>
+                              ) : (
+                                <span className="badge badge-sm bg-gradient-danger d-flex justify-content-center">
+                                  Rejected
+                                </span>
+                              )}
                             </td>
 
-                            {UserLogin.role_id !== 1 ? (
+                            {UserLogin.role_id === 2 ||
+                            UserLogin.role_id === 4 ? (
                               <></>
                             ) : (
                               <td className="align-middle">
                                 <div className="d-flex gap-2 justify-content-center">
-                                  <button
-                                    className="btn btn-primary btn-sm mb-0"
-                                    onClick={() => {
-                                      // history.push(`/users/edit/${item.id}`);
-                                    }}
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    className="btn btn-danger btn-sm mb-0"
-                                    // onClick={() => deleteUser(item.id)}
-                                  >
-                                    Delete
-                                  </button>
+                                  {(UserLogin.role_id == 1 ||
+                                    UserLogin.role_id == 3) &&
+                                    item.status === "pending" && (
+                                      <>
+                                        <button
+                                          className="btn btn-primary btn-sm mb-0"
+                                          onClick={() => {
+                                            handleStatusChange(
+                                              item.id,
+                                              "accepted"
+                                            );
+                                          }}
+                                        >
+                                          Accept
+                                        </button>
+                                        <button
+                                          className="btn btn-danger btn-sm mb-0"
+                                          onClick={() => {
+                                            handleStatusChange(
+                                              item.id,
+                                              "rejected"
+                                            );
+                                          }}
+                                        >
+                                          Reject
+                                        </button>
+                                      </>
+                                    )}
                                 </div>
                               </td>
                             )}

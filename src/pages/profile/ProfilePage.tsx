@@ -61,7 +61,7 @@ export const ProfilePage = () => {
                 <div className="card-body p-0 d-flex justify-content-center">
                   <ul className="list-group">
                     <li className="list-group-item border-0 p-0 mb-2 text-lg d-flex justify-content-center">
-                      {isLogin.data.phone_number || "088809990777"}
+                      {isLogin.data.phone || "088809990777"}
                     </li>
                     <li className="list-group-item border-0 p-0 text-lg mb-2 d-flex justify-content-center">
                       {isLogin.data.email || "@"}

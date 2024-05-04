@@ -4,8 +4,13 @@ import Pagination from "react-js-pagination";
 import { DefaultPaginatedResponse } from "../../types";
 import fetchAPI from "../../fetch";
 import ReactSelect from "react-select";
+import { useHistory } from "react-router";
+import Alert from "../../components/Alert";
+import Cookies from "js-cookie";
 
 export const CourseClass = () => {
+  const UserLogin = JSON.parse(localStorage.getItem("user"));
+
   const columns = [
     {
       name: "ID",
@@ -37,11 +42,13 @@ export const CourseClass = () => {
       selector: "end_time",
       key: 6,
     },
-    // {
-    //   name: "Action",
-    //   selector: "action",
-    // },
+    UserLogin.role_id === 1 && {
+      name: "Action",
+      selector: "action",
+    },
   ];
+
+  console.log(columns, "UserLogin");
 
   const [courseClasses, setCourseClasses] = useState<
     DefaultPaginatedResponse<any>
@@ -69,8 +76,6 @@ export const CourseClass = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const UserLogin = JSON.parse(localStorage.getItem("user"));
 
   const handleChangePage = (newPage: number) => {
     setCurrentPage(newPage);
@@ -271,7 +276,38 @@ export const CourseClass = () => {
     });
   };
 
-  console.log(courseClasses, user, "courseClasses");
+  const history = useHistory();
+
+  const deleteSchedule = async (id: number) => {
+    const bodyData = new FormData();
+    bodyData.append("_method", "DELETE");
+    const confirmed = await Alert.confirm(
+      "Delete Confirmation!",
+      "Are you sure you want to delete this schedule?",
+      "Yes, Delete it!"
+    );
+
+    if (!confirmed) return;
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/v1/course-classes/${id}`,
+        {
+          method: "POST",
+          body: bodyData,
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+          },
+        }
+      );
+      if (response.ok) {
+        getData(selectedClass.value, selectedMajor.value);
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
+  };
 
   return (
     <UserLayout>
@@ -287,10 +323,16 @@ export const CourseClass = () => {
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
                 <h6 className="text-white text-capitalize ps-3 mb-0">
-                  {UserLogin.role_id === 3 || UserLogin.role_id === 4
-                    ? "Schedules"
-                    : "Course Class"}
+                  Schedules
                 </h6>
+                <button
+                  className="btn btn-info btn-md mx-4 mb-0"
+                  onClick={() => {
+                    history.push(`/schedules/add`);
+                  }}
+                >
+                  Add Schedule
+                </button>
               </div>
             </div>
             <div className="card-body px-0 pb-2">
@@ -326,12 +368,15 @@ export const CourseClass = () => {
                   <thead>
                     <tr>
                       {columns.map((item, index) => {
+                        if (!item) {
+                          return null;
+                        }
                         return (
                           <th
                             key={index}
                             className="text-uppercase text-secondary text-xxs font-weight-bolder text-center"
                           >
-                            {item.name}
+                            <div>{item.name}</div>
                           </th>
                         );
                       })}
@@ -390,24 +435,24 @@ export const CourseClass = () => {
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.end_time}
                             </td>
-                            {/* <td className="align-middle">
+                            <td className="align-middle">
                               <div className="d-flex gap-2 justify-content-center">
                                 <button
                                   className="btn btn-primary btn-sm mb-0"
                                   onClick={() => {
-                                    // history.push(`/course/edit/${item.id}`);
+                                    history.push(`/schedules/edit/${item.id}`);
                                   }}
                                 >
                                   Edit
                                 </button>
                                 <button
                                   className="btn btn-danger btn-sm mb-0"
-                                  // onClick={() => deleteCourse(item.id)}
+                                  onClick={() => deleteSchedule(item.id)}
                                 >
                                   Delete
                                 </button>
                               </div>
-                            </td> */}
+                            </td>
                           </tr>
                         );
                       })
