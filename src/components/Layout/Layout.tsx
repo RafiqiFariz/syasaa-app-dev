@@ -165,14 +165,17 @@ export const UserLayout = ({ children }: LayoutProps) => {
                       className="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4"
                       aria-labelledby="dropdownMenuButton"
                     >
-                      <li className="mb-2">
-                        <button
-                          className="dropdown-item"
-                          onClick={() => history.push("/profile")}
-                        >
-                          Profile
-                        </button>
-                      </li>
+                      {user.role_id === 3 ||
+                        (user.role_id === 4 && (
+                          <li className="mb-2">
+                            <button
+                              className="dropdown-item"
+                              onClick={() => history.push("/profile")}
+                            >
+                              Profile
+                            </button>
+                          </li>
+                        ))}
                       <li>
                         <button
                           className="dropdown-item"

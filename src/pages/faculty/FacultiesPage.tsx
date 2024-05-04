@@ -43,7 +43,9 @@ export const FacultiesPage = () => {
 
   const getFacultyData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/faculties?page=${currentPage}`, {method: "GET"});
+      const response = await fetchAPI(`/api/v1/faculties?page=${currentPage}`, {
+        method: "GET",
+      });
 
       const data = await response.json();
 
@@ -68,7 +70,7 @@ export const FacultiesPage = () => {
 
       const response = await fetchAPI(`/api/v1/faculties/${id}`, {
         method: "POST",
-        body: JSON.stringify({ _method: "DELETE" })
+        body: JSON.stringify({ _method: "DELETE" }),
       });
 
       const data = await response.json();
@@ -121,9 +123,9 @@ export const FacultiesPage = () => {
                         return (
                           <th
                             key={index}
-                            className="text-uppercase text-secondary text-xxs font-weight-bolder"
+                            className="text-uppercase text-secondary text-xxs font-weight-bolder text-center"
                           >
-                            <div>{item.name}</div>
+                            {item.name}
                           </th>
                         );
                       })}
@@ -137,7 +139,7 @@ export const FacultiesPage = () => {
                           .map((_, i) => (
                             <td
                               key={i}
-                              className="text-center placeholder-glow"
+                              className="text-center placeholder-glow "
                             >
                               <span className="placeholder col-10"></span>
                             </td>
@@ -153,13 +155,13 @@ export const FacultiesPage = () => {
                       faculty.data?.map((item: ItemData, index) => {
                         return (
                           <tr key={index}>
-                            <td className="text-sm font-weight-normal px-4 py-3">
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.id}
                             </td>
-                            <td className="text-sm font-weight-normal px-4 py-3">
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.name}
                             </td>
-                            <td className="align-middle">
+                            <td className="align-middle d-flex justify-content-center">
                               <div className="d-flex gap-2">
                                 <button
                                   className="btn btn-primary btn-sm mb-0"
