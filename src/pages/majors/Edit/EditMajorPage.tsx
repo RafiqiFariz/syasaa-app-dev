@@ -56,7 +56,7 @@ export const EditMajorPage = () => {
 
       if (response.ok) {
         history.goBack();
-        Alert.success("Success", data.message)
+        Alert.success("Success", data.message);
       } else {
         setErrors(data.errors);
       }
@@ -67,7 +67,9 @@ export const EditMajorPage = () => {
 
   const getMajorData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/majors/${id}`, {method: "GET"});
+      const response = await fetchAPI(`/api/v1/majors/${id}`, {
+        method: "GET",
+      });
       const data = await response.json();
       if (response.ok) {
         setForm({
@@ -86,7 +88,7 @@ export const EditMajorPage = () => {
 
   const getFacultyData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/faculties", {method: "GET"});
+      const response = await fetchAPI("/api/v1/faculties", { method: "GET" });
       const data = await response.json();
       if (response.ok) {
         setFaculties(data.data);
@@ -106,8 +108,7 @@ export const EditMajorPage = () => {
         <div className="col-12 col-lg-6 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div
-                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">Edit Major</h6>
               </div>
             </div>
@@ -126,7 +127,7 @@ export const EditMajorPage = () => {
                     aria-label="Major Name"
                     aria-describedby="basic-addon0"
                   />
-                  <ErrorMessage field="name" errors={errors}/>
+                  <ErrorMessage field="name" errors={errors} />
                 </div>
                 <div className="input-group input-group-static mb-4">
                   <label htmlFor="faculties" className="ms-0">
@@ -137,6 +138,7 @@ export const EditMajorPage = () => {
                     className="form-control"
                     id="faculties"
                     onChange={handleChange}
+                    value={form.faculty_id}
                   >
                     {faculties.map((faculty) => (
                       <option key={faculty.id} value={faculty.id}>

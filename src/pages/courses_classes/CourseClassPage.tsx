@@ -325,14 +325,16 @@ export const CourseClass = () => {
                 <h6 className="text-white text-capitalize ps-3 mb-0">
                   Schedules
                 </h6>
-                <button
-                  className="btn btn-info btn-md mx-4 mb-0"
-                  onClick={() => {
-                    history.push(`/schedules/add`);
-                  }}
-                >
-                  Add Schedule
-                </button>
+                {UserLogin.role_id === 1 && (
+                  <button
+                    className="btn btn-info btn-md mx-4 mb-0"
+                    onClick={() => {
+                      history.push(`/schedules/add`);
+                    }}
+                  >
+                    Add Schedule
+                  </button>
+                )}
               </div>
             </div>
             <div className="card-body px-0 pb-2">
