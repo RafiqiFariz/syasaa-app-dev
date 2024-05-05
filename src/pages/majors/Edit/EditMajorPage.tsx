@@ -111,52 +111,52 @@ export const EditMajorPage = () => {
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">Edit Major</h6>
               </div>
-              <div className="card-body">
-                <form onSubmit={onFinish}>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      type="text"
-                      className={`form-control ${
-                        errors["name"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Major Name"
-                      aria-label="Major Name"
-                      aria-describedby="basic-addon0"
-                    />
-                    <ErrorMessage field="name" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-static mb-4">
-                    <label htmlFor="faculties" className="ms-0">
-                      Faculty
-                    </label>
-                    <select
-                      name="faculty_id"
-                      className="form-control"
-                      id="faculties"
-                      onChange={handleChange}
-                      value={form.faculty_id}
-                    >
-                      {faculties.map((faculty) => (
-                        <option key={faculty.id} value={faculty.id}>
-                          {faculty.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="button-row d-flex mt-4">
-                    <button
-                      className="btn bg-gradient-dark ms-auto mb-0"
-                      type="submit"
-                      title="Send"
-                    >
-                      Submit
-                    </button>
-                  </div>
-                </form>
-              </div>
+            </div>
+            <div className="card-body">
+              <form onSubmit={onFinish}>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    type="text"
+                    className={`form-control ${
+                      errors["name"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Major Name"
+                    aria-label="Major Name"
+                    aria-describedby="basic-addon0"
+                  />
+                  <ErrorMessage field="name" errors={errors} />
+                </div>
+                <div className="input-group input-group-static mb-4">
+                  <label htmlFor="faculties" className="ms-0">
+                    Faculty
+                  </label>
+                  <select
+                    name="faculty_id"
+                    className="form-control"
+                    id="faculties"
+                    onChange={handleChange}
+                    value={form.faculty_id}
+                  >
+                    {faculties.map((faculty) => (
+                      <option key={faculty.id} value={faculty.id}>
+                        {faculty.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="button-row d-flex mt-4">
+                  <button
+                    className="btn bg-gradient-dark ms-auto mb-0"
+                    type="submit"
+                    title="Send"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

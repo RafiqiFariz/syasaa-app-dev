@@ -110,79 +110,79 @@ export const EditClassPage = () => {
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">Edit Class</h6>
               </div>
-              <div className="card-body">
-                <form onSubmit={onFinish}>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      type="text"
-                      className={`form-control ${
-                        errors["name"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Name"
-                      aria-label="Name"
-                    />
-                    <ErrorMessage field="name" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="lat"
-                      value={form.lat}
-                      onChange={handleChange}
-                      type="text"
-                      className={`form-control ${
-                        errors["lat"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Latitude"
-                      aria-label="Latitude"
-                    />
-                    <ErrorMessage field="lat" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="lng"
-                      value={form.lng}
-                      onChange={handleChange}
-                      type="text"
-                      className={`form-control ${
-                        errors["lng"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Longitude"
-                      aria-label="Longitude"
-                    />
-                    <ErrorMessage field="lng" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-static mb-4">
-                    <label htmlFor="majors" className="ms-0">
-                      Major
-                    </label>
-                    <select
-                      name="major_id"
-                      className="form-control"
-                      id="majors"
-                      value={form.major_id}
-                      onChange={handleChange}
-                    >
-                      {majors.map((major) => (
-                        <option key={major.id} value={major.id}>
-                          {major.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="button-row d-flex mt-4">
-                    <button
-                      className="btn bg-gradient-dark ms-auto mb-0"
-                      type="submit"
-                      title="Send"
-                    >
-                      Submit
-                    </button>
-                  </div>
-                </form>
-              </div>
+            </div>
+            <div className="card-body">
+              <form onSubmit={onFinish}>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    type="text"
+                    className={`form-control ${
+                      errors["name"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Name"
+                    aria-label="Name"
+                  />
+                  <ErrorMessage field="name" errors={errors} />
+                </div>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="lat"
+                    value={form.lat}
+                    onChange={handleChange}
+                    type="text"
+                    className={`form-control ${
+                      errors["lat"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Latitude"
+                    aria-label="Latitude"
+                  />
+                  <ErrorMessage field="lat" errors={errors} />
+                </div>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="lng"
+                    value={form.lng}
+                    onChange={handleChange}
+                    type="text"
+                    className={`form-control ${
+                      errors["lng"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Longitude"
+                    aria-label="Longitude"
+                  />
+                  <ErrorMessage field="lng" errors={errors} />
+                </div>
+                <div className="input-group input-group-static mb-4">
+                  <label htmlFor="majors" className="ms-0">
+                    Major
+                  </label>
+                  <select
+                    name="major_id"
+                    className="form-control"
+                    id="majors"
+                    onChange={handleChange}
+                    value={form.major_id}
+                  >
+                    {majors.map((major) => (
+                      <option key={major.id} value={major.id}>
+                        {major.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="button-row d-flex mt-4">
+                  <button
+                    className="btn bg-gradient-dark ms-auto mb-0"
+                    type="submit"
+                    title="Send"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

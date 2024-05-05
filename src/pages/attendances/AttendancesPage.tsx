@@ -68,7 +68,6 @@ export const AttendancesPage = () => {
     //   selector: "action",
     // },
   ];
-  console.log(columns, "columns");
 
   const getUser = async () => {
     try {
@@ -155,7 +154,7 @@ export const AttendancesPage = () => {
               label: item.name,
             };
           });
-        console.log(mappedData, "mappedData");
+        // console.log(mappedData, "mappedData");
         setOptionClass((prev: any) => {
           const filteredOptions = mappedData.filter((newOption: any) => {
             return !prev.some(
@@ -175,7 +174,7 @@ export const AttendancesPage = () => {
     setIsLoading(true);
     try {
       let url = `/api/v1/attendances?page=${currentPage}`;
-      console.log(user, "user");
+
       if (user.data.role_id === 4) {
         url = `/api/v1/attendances?page=${currentPage}&student_id=${user.data.student.id}`;
       }
@@ -235,7 +234,7 @@ export const AttendancesPage = () => {
     setCurrentPage(newPage);
   };
 
-  console.log(attendances, "attendances");
+  // console.log(attendances, "attendances");
 
   const handleClassChange = (e: any) => {
     if (e.value === 0) {
@@ -389,7 +388,7 @@ export const AttendancesPage = () => {
                       </tr>
                     ) : (
                       attendances.data?.map((item: any, index) => {
-                        console.log(item, "item");
+                        // console.log(item, "item");
                         return (
                           <tr key={index}>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">

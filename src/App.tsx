@@ -65,7 +65,7 @@ import { AttendancesPage } from "./pages/attendances/AttendancesPage";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { AttendanceRequestPage } from "./pages/attendance_request/AttendanceRequestPage";
 import { EditProfileRequestPage } from "./pages/profile/Edit/EditProfileRequestPage";
-import { AddAttandancesPage } from "./pages/attendances/Add/AddAttandancesPage";
+import { AddAttendancesPage } from "./pages/attendances/Add/AddAttendancesPage";
 import { useGeoLocation } from "./hooks/useGeoLocation";
 import { EditProfilePage } from "./pages/profile/Edit/EditProfilePage";
 import { AddAttandanceRequest } from "./pages/attendance_request/Add/AddAttandanceRequest";
@@ -86,12 +86,6 @@ const App: React.FC = () => {
       try {
         const response = await fetchAPI("/user", {
           method: "GET",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-          },
         });
 
         const data = await response.json();
@@ -362,7 +356,7 @@ const App: React.FC = () => {
               path="/attendances/add"
               render={() =>
                 isLogin.isLogin ? (
-                  <AddAttandancesPage />
+                  <AddAttendancesPage />
                 ) : (
                   <Redirect to="/login" />
                 )
