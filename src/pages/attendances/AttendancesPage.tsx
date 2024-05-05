@@ -63,10 +63,10 @@ export const AttendancesPage = () => {
       selector: "is_present",
       key: 3,
     },
-    UserLogin.role_id === 1 && {
-      name: "Action",
-      selector: "action",
-    },
+    // UserLogin.role_id === 1 && {
+    //   name: "Action",
+    //   selector: "action",
+    // },
   ];
 
   const getUser = async () => {
@@ -427,7 +427,7 @@ export const AttendancesPage = () => {
                               {item.is_present !== 0 ? "Present" : "Absent"}
                             </td>
 
-                            {UserLogin.role_id !== 1 ? (
+                            {/* {UserLogin.role_id !== 1 ? (
                               <></>
                             ) : (
                               <td className="align-middle">
@@ -448,7 +448,7 @@ export const AttendancesPage = () => {
                                   </button>
                                 </div>
                               </td>
-                            )}
+                            )} */}
                           </tr>
                         );
                       })

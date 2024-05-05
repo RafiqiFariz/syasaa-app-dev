@@ -67,6 +67,13 @@ import { AttendanceRequestPage } from "./pages/attendance_request/AttendanceRequ
 import { EditProfileRequestPage } from "./pages/profile/Edit/EditProfileRequestPage";
 import { AddAttendancesPage } from "./pages/attendances/Add/AddAttendancesPage";
 import { useGeoLocation } from "./hooks/useGeoLocation";
+import { EditProfilePage } from "./pages/profile/Edit/EditProfilePage";
+import { AddAttandanceRequest } from "./pages/attendance_request/Add/AddAttandanceRequest";
+import { AddCourseClassPage } from "./pages/courses_classes/Add/AddCourseClassPage";
+import { EditCourseClassPage } from "./pages/courses_classes/Edit/EditCourseClassPage";
+import { EditAttancanceRequest } from "./pages/attendance_request/Edit/EditAttandanceRequest";
+import { ProgileRequestsPage } from "./pages/profile_requests/ProfileRequestsPage";
+import { EditUserProfileRequestPage } from "./pages/profile_requests/Edit/EditUserProfileRequestPage";
 
 setupIonicReact();
 
@@ -317,6 +324,28 @@ const App: React.FC = () => {
             />
             <Route
               exact
+              path="/schedules/add"
+              render={() =>
+                isLogin.isLogin ? (
+                  <AddCourseClassPage />
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/schedules/edit/:id"
+              render={() =>
+                isLogin.isLogin ? (
+                  <EditCourseClassPage />
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+            <Route
+              exact
               path="/attendances"
               render={() =>
                 isLogin.isLogin ? <AttendancesPage /> : <Redirect to="/login" />
@@ -342,7 +371,7 @@ const App: React.FC = () => {
             />
             <Route
               exact
-              path="/profile/edit/:id"
+              path="/profile/edit-request/:id"
               render={() =>
                 isLogin.isLogin ? (
                   <EditProfileRequestPage />
@@ -353,10 +382,61 @@ const App: React.FC = () => {
             />
             <Route
               exact
+              path="/profile/edit/:id"
+              render={() =>
+                isLogin.isLogin ? <EditProfilePage /> : <Redirect to="/login" />
+              }
+            />
+            <Route
+              exact
               path="/attendance-requests"
               render={() =>
                 isLogin.isLogin ? (
                   <AttendanceRequestPage />
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/attendance-requests/add"
+              render={() =>
+                isLogin.isLogin ? (
+                  <AddAttandanceRequest />
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/attendance-requests/edit/:id"
+              render={() =>
+                isLogin.isLogin ? (
+                  <EditAttancanceRequest />
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/profile-requests"
+              render={() =>
+                isLogin.isLogin ? (
+                  <ProgileRequestsPage />
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/profile-requests/edit/:id"
+              render={() =>
+                isLogin.isLogin ? (
+                  <EditUserProfileRequestPage />
                 ) : (
                   <Redirect to="/login" />
                 )

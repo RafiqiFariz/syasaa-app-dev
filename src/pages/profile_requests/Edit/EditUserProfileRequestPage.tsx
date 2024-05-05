@@ -1,18 +1,25 @@
-import { useState } from "react";
-import { UserLayout } from "../../../components/Layout/Layout";
-import { useHistory } from "react-router";
+import { useEffect, useState } from "react";
 import { ErrorMessage } from "../../../components/ErrorMessage";
-import * as _ from "lodash";
+import { UserLayout } from "../../../components/Layout/Layout";
+import { useHistory, useParams } from "react-router";
 import fetchAPI from "../../../fetch";
+import _, { set } from "lodash";
 import Cookies from "js-cookie";
+import Alert from "../../../components/Alert";
 
-export const EditProfileRequestPage = () => {
+export const EditUserProfileRequestPage = () => {
   const [form, setForm] = useState({
     new_value: "",
     changeField: "name",
     description: "",
     image: null,
   });
+
+  const [old_value, setOldValue] = useState("");
+
+  const [student, setStudent] = useState<any>({});
+
+  const [user, setUser] = useState<any>({});
 
   const [errors, setErrors] = useState({});
 
@@ -25,8 +32,6 @@ export const EditProfileRequestPage = () => {
 
   const history = useHistory();
 
-  const UserLogin = JSON.parse(localStorage.getItem("user"));
-
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setForm({
@@ -35,7 +40,48 @@ export const EditProfileRequestPage = () => {
     });
   };
 
-  console.log(form, "form.changed_data");
+  const { id } = useParams<{ id: string }>();
+
+  const getData = async () => {
+    try {
+      const response = await fetchAPI(`/api/v1/update-profile-requests/${id}`, {
+        method: "GET",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data, "data");
+
+        setForm((prev) => {
+          return {
+            ...prev,
+            changeField: data.data.changed_data,
+            description: data.data.description,
+            new_value: data.data.new_value ?? "",
+          };
+        });
+        getUser(data.data.student.user_id);
+        setStudent(data.data.student);
+        setOldValue(data.data.old_value);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getUser = async (id) => {
+    try {
+      const response = await fetchAPI(`/api/v1/users/${id}?includeRole=1`, {
+        method: "GET",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setUser(data.data);
+        console.log(data, "dat12312312");
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const onFinish = async (e) => {
     e.preventDefault();
@@ -44,7 +90,8 @@ export const EditProfileRequestPage = () => {
     formData.append("changed_data", form.changeField);
     formData.append("description", form.description);
     formData.append("status", "pending");
-    formData.append("student_id", UserLogin.student.id);
+    formData.append("student_id", student.id);
+    formData.append("_method", "PUT");
 
     if (form.changeField === "image") {
       console.log("salah masuk sini");
@@ -53,14 +100,14 @@ export const EditProfileRequestPage = () => {
     } else {
       console.log("masuk sini");
       formData.append("new_value", form.new_value);
-      formData.append("old_value", UserLogin[form.changeField]);
+      formData.append("old_value", user[form.changeField]);
     }
 
     console.log("data form ", form);
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/v1/update-profile-requests",
+        `http://localhost:8000/api/v1/update-profile-requests/${id}`,
         {
           method: "POST",
           body: formData,
@@ -76,12 +123,17 @@ export const EditProfileRequestPage = () => {
       console.log(data, "response");
 
       if (response.ok) {
-        history.push("/profile");
+        Alert.success("Success", data.message);
+        history.push("/profile-requests");
       }
     } catch (error) {
       console.error("Error:", error);
     }
   };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <UserLayout>

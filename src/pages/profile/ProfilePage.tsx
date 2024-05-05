@@ -368,11 +368,14 @@ export const ProfilePage = () => {
                     <li className="list-group-item border-0 p-0 text-lg mb-2 d-flex justify-content-center">
                       {isLogin.data.email || "No email"}
                     </li>
-                    {isLogin.data.role_id === 3 || isLogin.data.role_id === 4 && (
-                      <li className="list-group-item border-0 p-0 text-lg mb-2 d-flex justify-content-center">
-                        {isLogin.data.role_id === 3 ? isLogin.data?.lecturer?.address : isLogin.data?.student?.class.name}
-                      </li>
-                    )}
+                    {isLogin.data.role_id === 3 ||
+                      (isLogin.data.role_id === 4 && (
+                        <li className="list-group-item border-0 p-0 text-lg mb-2 d-flex justify-content-center">
+                          {isLogin.data.role_id === 3
+                            ? isLogin.data?.lecturer?.address
+                            : isLogin.data?.student?.class.name}
+                        </li>
+                      ))}
                   </ul>
                 </div>
               </div>
@@ -388,9 +391,24 @@ export const ProfilePage = () => {
 
             <button
               className="btn btn-primary mb-0 rounded-pill"
-              onClick={() => history.push(`/profile/edit/${isLogin.data.id}`)}
+              style={{
+                height: "50px",
+              }}
+              onClick={() => {
+                if (isLogin.data.role_id === 3) {
+                  return history.push(`/profile/edit/${isLogin.data.id}`);
+                } else {
+                  return history.push(
+                    `/profile/edit-request/${isLogin.data.id}`
+                  );
+                }
+              }}
             >
-              <span className="p-1">Request Edit Profile</span>
+              <span className="p-1">
+                {isLogin.data.role_id === 3
+                  ? "Edit Profile"
+                  : "Edit Profile Request"}
+              </span>
             </button>
           </div>
         </div>
