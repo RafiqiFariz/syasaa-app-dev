@@ -148,119 +148,119 @@ export const AddUserPage = () => {
                 className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">Add User</h6>
               </div>
-              <div className="card-body">
-                <form onSubmit={onFinish}>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      type="text"
-                      className={`form-control ${
-                        errors["name"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Username"
-                      aria-label="Username"
-                      aria-describedby="basic-addon0"
-                    />
-                    <ErrorMessage field="name" errors={errors}/>
-                  </div>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      type="email"
-                      className={`form-control ${
-                        errors["email"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Email"
-                      aria-label="email"
-                    />
-                    <ErrorMessage field="email" errors={errors}/>
-                  </div>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleChange}
-                      type="tel"
-                      className={`form-control ${
-                        errors["phone"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Phone"
-                      aria-label="phone"
-                    />
-                    <ErrorMessage field="phone" errors={errors}/>
-                  </div>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="password"
-                      value={form.password}
-                      onChange={handleChange}
-                      type="password"
-                      className={`form-control ${
-                        errors["password"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Password"
-                      aria-label="Password"
-                      aria-describedby="password"
-                    />
-                    <ErrorMessage field="password" errors={errors}/>
-                  </div>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="password_confirmation"
-                      value={form.password_confirmation}
-                      onChange={handleChange}
-                      type="password"
-                      className={`form-control ${
-                        errors["confirm_password"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Confirm Password"
-                      aria-label="Confirm Password"
-                      aria-describedby="confirm-password"
-                    />
-                    <ErrorMessage field="confirm_password" errors={errors}/>
-                  </div>
-                  <div className="input-group input-group-static mb-4 has-validation">
-                    <label htmlFor="selectRoles" className="ms-0">
-                      Role
-                    </label>
-                    <select
-                      name="role_id"
-                      value={form.role_id}
-                      className={`form-control ${
-                        errors["role_id"] ? "is-invalid" : ""
-                      }`}
-                      id="selectRoles"
-                      onChange={handleChange}
-                    >
-                      {roles.map((role, i) => (
-                        <option key={i} value={role.id}>
-                          {formatRoleName(role.name)}
-                        </option>
-                      ))}
-                    </select>
-                    <ErrorMessage field="role_id" errors={errors}/>
-                  </div>
-                  <FilterRole
-                    role={form.role_id}
-                    onChange={handleRoleOptionsChange}
-                    value={rolesOptions}
-                    errors={errors}
+            </div>
+            <div className="card-body">
+              <form onSubmit={onFinish}>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    type="text"
+                    className={`form-control ${
+                      errors["name"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Username"
+                    aria-label="Username"
+                    aria-describedby="basic-addon0"
                   />
-                  <div className="button-row d-flex mt-4">
-                    <button
-                      className="btn bg-gradient-dark ms-auto mb-0"
-                      type="submit"
-                      title="Send"
-                    >
-                      Submit
-                    </button>
-                  </div>
-                </form>
-              </div>
+                  <ErrorMessage field="name" errors={errors}/>
+                </div>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    type="email"
+                    className={`form-control ${
+                      errors["email"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Email"
+                    aria-label="email"
+                  />
+                  <ErrorMessage field="email" errors={errors}/>
+                </div>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    type="tel"
+                    className={`form-control ${
+                      errors["phone"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Phone"
+                    aria-label="phone"
+                  />
+                  <ErrorMessage field="phone" errors={errors}/>
+                </div>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    type="password"
+                    className={`form-control ${
+                      errors["password"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Password"
+                    aria-label="Password"
+                    aria-describedby="password"
+                  />
+                  <ErrorMessage field="password" errors={errors}/>
+                </div>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="password_confirmation"
+                    value={form.password_confirmation}
+                    onChange={handleChange}
+                    type="password"
+                    className={`form-control ${
+                      errors["confirm_password"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Confirm Password"
+                    aria-label="Confirm Password"
+                    aria-describedby="confirm-password"
+                  />
+                  <ErrorMessage field="confirm_password" errors={errors}/>
+                </div>
+                <div className="input-group input-group-static mb-4 has-validation">
+                  <label htmlFor="selectRoles" className="ms-0">
+                    Role
+                  </label>
+                  <select
+                    name="role_id"
+                    value={form.role_id}
+                    className={`form-control ${
+                      errors["role_id"] ? "is-invalid" : ""
+                    }`}
+                    id="selectRoles"
+                    onChange={handleChange}
+                  >
+                    {roles.map((role, i) => (
+                      <option key={i} value={role.id}>
+                        {formatRoleName(role.name)}
+                      </option>
+                    ))}
+                  </select>
+                  <ErrorMessage field="role_id" errors={errors}/>
+                </div>
+                <FilterRole
+                  role={form.role_id}
+                  onChange={handleRoleOptionsChange}
+                  value={rolesOptions}
+                  errors={errors}
+                />
+                <div className="button-row d-flex mt-4">
+                  <button
+                    className="btn bg-gradient-dark ms-auto mb-0"
+                    type="submit"
+                    title="Send"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

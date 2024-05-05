@@ -1,12 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { Sidebar } from "../Sidebar";
 import { useHistory } from "react-router";
-import Cookies from "js-cookie";
-import _ from "lodash";
 import { AuthContext } from "../../context/Auth";
-import fetchAPI from "../../fetch";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import Swal from "sweetalert2";
+import fetchAPI from "../../fetch";
+import _ from "lodash";
 import { useGeoLocation } from "../../hooks/useGeoLocation";
 
 interface LayoutProps {
@@ -80,7 +79,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
     }
   }, [isLogin.data]);
 
-  console.log(user, "data");
+  // console.log(user, "data");
 
   return (
     <div

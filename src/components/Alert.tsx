@@ -66,12 +66,12 @@ class Alert extends React.Component {
     });
   }
 
-  static async confirm(title: string, text: string, confirmText: string = "Yes", cancelText: string =  "No"): Promise<boolean> {
+  static async confirm(title: string, text: string, confirmText: string = "Yes", cancelText: string =  "No", showCancelBtn: boolean = true): Promise<boolean> {
     const result = await Swal.fire({
       title,
       text,
       icon: "warning",
-      showCancelButton: true,
+      showCancelButton: showCancelBtn,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: confirmText,

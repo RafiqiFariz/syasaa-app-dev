@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../context/Auth";

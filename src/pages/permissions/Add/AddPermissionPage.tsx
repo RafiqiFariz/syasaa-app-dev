@@ -51,25 +51,25 @@ export const AddPermissionPage = () => {
                   Add Permission
                 </h6>
               </div>
-              <div className="card-body">
-                <form onSubmit={onFinish}>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      type="text"
-                      className={`form-control ${errors['name'] ? "is-invalid" : ""}`}
-                      placeholder="Permission Name"
-                      aria-label="Permissions Name"
-                    />
-                    <ErrorMessage field="name" errors={errors}/>
-                  </div>
-                  <div className="button-row d-flex mt-4">
-                    <button className="btn bg-gradient-dark ms-auto mb-0" type="submit" title="Send">Submit</button>
-                  </div>
-                </form>
-              </div>
+            </div>
+            <div className="card-body">
+              <form onSubmit={onFinish}>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    type="text"
+                    className={`form-control ${errors['name'] ? "is-invalid" : ""}`}
+                    placeholder="Permission Name"
+                    aria-label="Permissions Name"
+                  />
+                  <ErrorMessage field="name" errors={errors}/>
+                </div>
+                <div className="button-row d-flex mt-4">
+                  <button className="btn bg-gradient-dark ms-auto mb-0" type="submit" title="Send">Submit</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

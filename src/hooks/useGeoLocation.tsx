@@ -11,7 +11,7 @@ export const useGeoLocation = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const onSucces = (position: GeolocationPosition) => {
+  const onSuccess = (position: GeolocationPosition) => {
     setLocation(position.coords);
     setLoading(false);
   };
@@ -30,7 +30,7 @@ export const useGeoLocation = () => {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(onSucces, onError);
+    navigator.geolocation.getCurrentPosition(onSuccess, onError);
   }, []);
 
   return { location, error, loading };

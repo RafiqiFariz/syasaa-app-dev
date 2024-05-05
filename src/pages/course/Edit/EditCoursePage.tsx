@@ -5,6 +5,7 @@ import fetchAPI from "../../../fetch";
 import { useHistory, useParams } from "react-router";
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
+import Alert from "../../../components/Alert";
 
 export const EditCoursePage = () => {
   const [errors, setErrors] = useState({} as any);
@@ -66,40 +67,18 @@ export const EditCoursePage = () => {
         _method: "PUT",
       };
 
-      const result = await Swal.fire({
-        title: "Update Confirmation!",
-        text: "Are you sure you want to Update this course?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#1D24CA",
-        cancelButtonColor: "#F44335",
-        confirmButtonText: "Yes, Update it!",
-        customClass: {
-          confirmButton: "btn btn-primary btn-sm ",
-          cancelButton: "btn btn-danger btn-sm ",
-        },
-        heightAuto: false,
-      });
-
-      if (!result.isConfirmed) return;
-
       const response = await fetchAPI(`/api/v1/courses/${id}`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
         body: JSON.stringify(payload),
       });
+
       const data = await response.json();
-      console.log(response, "data");
-      if (!response.ok) {
-        setErrors(data.errors);
-      }
+
       if (response.ok) {
         history.goBack();
+        Alert.success("Success", data.message);
+      } else {
+        setErrors(data.errors);
       }
     } catch (error) {
       console.log(error, "error");
@@ -110,30 +89,32 @@ export const EditCoursePage = () => {
   return (
     <UserLayout>
       <div className="row">
-        <div className="col-12 col-lg-8 m-auto">
+        <div className="col-12 col-lg-6 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+              <div
+                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">Edit Course</h6>
               </div>
-              <div className="card-body">
-                <form onSubmit={onFinish}>
-                  <div className="input-group input-group-dynamic mb-4 has-validation">
-                    <input
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      type="text"
-                      className={`form-control ${
-                        errors["name"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="Course Name"
-                      aria-label="Course Name"
-                      aria-describedby="course name"
-                    />
-                    <ErrorMessage field="name" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-dynamic mt-3 mb-4 w-100">
+            </div>
+            <div className="card-body">
+              <form onSubmit={onFinish}>
+                <div className="input-group input-group-dynamic mb-4 has-validation">
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    type="text"
+                    className={`form-control ${
+                      errors["name"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="Course Name"
+                    aria-label="Course Name"
+                    aria-describedby="course name"
+                  />
+                  <ErrorMessage field="name" errors={errors}/>
+                </div>
+                <div className="input-group input-group-dynamic mt-3 mb-4 w-100">
                     <textarea
                       name="description"
                       className="form-control"
@@ -143,18 +124,17 @@ export const EditCoursePage = () => {
                       spellCheck="false"
                       onChange={handleChange}
                     />
-                  </div>
-                  <div className="button-row d-flex mt-4">
-                    <button
-                      className="btn bg-gradient-dark ms-auto mb-0"
-                      type="submit"
-                      title="Send"
-                    >
-                      Submit
-                    </button>
-                  </div>
-                </form>
-              </div>
+                </div>
+                <div className="button-row d-flex mt-4">
+                  <button
+                    className="btn bg-gradient-dark ms-auto mb-0"
+                    type="submit"
+                    title="Send"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
