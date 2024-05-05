@@ -244,7 +244,7 @@ export const DashboardPage = () => {
       });
 
       const data = await response.json();
-
+      console.log(data, "data");
       if (response.ok) {
         setSchedules(data.data);
         setIsLoading(false);

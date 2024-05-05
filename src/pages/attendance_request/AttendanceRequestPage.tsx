@@ -21,11 +21,11 @@ export const AttendanceRequestPage = () => {
       selector: "id",
       key: 1,
     },
-    // {
-    //   name: "Student",
-    //   selector: "student",
-    //   key: 2,
-    // },
+    {
+      name: "Student Name",
+      selector: "student",
+      key: 2,
+    },
     {
       name: "Student Image",
       selector: "student_image",
@@ -231,9 +231,9 @@ export const AttendanceRequestPage = () => {
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.id}
                             </td>
-                            {/* <td className="text-sm font-weight-normal px-4 py-3">
-                              {item.student.user_id}
-                            </td> */}
+                            <td className="text-sm font-weight-normal px-4 py-3">
+                              {item.student.user.name}
+                            </td>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               <div className="avatar avatar-xl position-relative">
                                 <img

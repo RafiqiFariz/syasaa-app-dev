@@ -435,24 +435,28 @@ export const CourseClass = () => {
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.end_time}
                             </td>
-                            <td className="align-middle">
-                              <div className="d-flex gap-2 justify-content-center">
-                                <button
-                                  className="btn btn-primary btn-sm mb-0"
-                                  onClick={() => {
-                                    history.push(`/schedules/edit/${item.id}`);
-                                  }}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  className="btn btn-danger btn-sm mb-0"
-                                  onClick={() => deleteSchedule(item.id)}
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            </td>
+                            {UserLogin.role_id === 1 && (
+                              <td className="align-middle">
+                                <div className="d-flex gap-2 justify-content-center">
+                                  <button
+                                    className="btn btn-primary btn-sm mb-0"
+                                    onClick={() => {
+                                      history.push(
+                                        `/schedules/edit/${item.id}`
+                                      );
+                                    }}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    className="btn btn-danger btn-sm mb-0"
+                                    onClick={() => deleteSchedule(item.id)}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            )}
                           </tr>
                         );
                       })

@@ -173,39 +173,47 @@ export const AddAttandanceRequest = () => {
   const onFinish = async (event: any) => {
     event.preventDefault();
     console.log(form, "form");
-    try {
-      const formData = new FormData();
-      formData.append("student_id", UserLogin.student.id);
-      formData.append("course_class_id", form.course_class_id);
-      formData.append("evidence", form.evidence);
-      formData.append("description", form.description);
-      formData.append("student_image", form.student_image);
-      console.log(formData.get("student_image"), "formdata");
+    const confirm = await Alert.confirm(
+      "Confirmation",
+      "Are you sure you want to submit this request?",
+      "Yes, Submit it!"
+    );
+    if (!confirm) return;
+    else {
+      try {
+        const formData = new FormData();
+        formData.append("student_id", UserLogin.student.id);
+        formData.append("course_class_id", form.course_class_id);
+        formData.append("evidence", form.evidence);
+        formData.append("description", form.description);
+        formData.append("student_image", form.student_image);
+        console.log(formData.get("student_image"), "formdata");
 
-      const response = await fetch(
-        "http://localhost:8000/api/v1/attendance-requests",
-        {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-          },
+        const response = await fetch(
+          "http://localhost:8000/api/v1/attendance-requests",
+          {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+            headers: {
+              Accept: "application/json",
+              "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          history.goBack();
+          Alert.success("Success", data.message);
+        } else {
+          console.log(data, "data");
+          setErrors(data.errors);
         }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        history.goBack();
-        Alert.success("Success", data.message);
-      } else {
-        console.log(data, "data");
-        setErrors(data.errors);
+      } catch (error) {
+        console.error(error, "Error");
       }
-    } catch (error) {
-      console.error(error, "Error");
     }
   };
 
@@ -225,7 +233,7 @@ export const AddAttandanceRequest = () => {
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">
-                  Add Attendance
+                  Add Attendance Requests
                 </h6>
               </div>
               <div className="card-body">

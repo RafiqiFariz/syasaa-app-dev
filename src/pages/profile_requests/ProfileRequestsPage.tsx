@@ -118,6 +118,16 @@ export const ProgileRequestsPage = () => {
     }
   };
 
+  const getUserProfilePhoto = (item) => {
+    // jika path gambarnya ada di folder img/,
+    // maka asumsinya adalah gambar tersebut digunakan untuk seeder
+    if (item?.includes("img/")) {
+      return item.replace("storage/", "");
+    }
+
+    return item;
+  };
+
   return (
     <UserLayout>
       <div className="row">
@@ -185,33 +195,53 @@ export const ProgileRequestsPage = () => {
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3">
                               <span className="d-flex justify-content-center">
-                                {item.student.user_id}
+                                {item.student.user.name}
                               </span>
                             </td>
-                            <td className="text-sm font-weight-normal px-4 py-3 ">
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.changed_data !== "image" ? (
                                 <span className="d-flex justify-content-center">
                                   {item.old_value}
                                 </span>
                               ) : (
-                                <img
-                                  src={item.old_value}
-                                  alt="profile"
-                                  style={{ width: "50px" }}
-                                />
+                                <div className="avatar avatar-xl position-relative">
+                                  <img
+                                    src={`http://localhost:8000/${getUserProfilePhoto(
+                                      item.old_value
+                                    )}`}
+                                    alt="profile"
+                                    style={{
+                                      width: "100px",
+                                      borderRadius: "10px",
+                                      display: "flex",
+                                      justifyContent: "center",
+                                      textAlign: "center",
+                                    }}
+                                    // className="w-100 border-radius-lg shadow-sm"
+                                  />
+                                </div>
                               )}
                             </td>
-                            <td className="text-sm font-weight-normal px-4 py-3 d-flex justify-content-center">
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.changed_data !== "image" ? (
                                 <span className="d-flex justify-content-center">
                                   {item.new_value}
                                 </span>
                               ) : (
-                                <img
-                                  src={item.new_value}
-                                  alt="profile"
-                                  style={{ width: "50px" }}
-                                />
+                                <div className="avatar avatar-xl position-relative">
+                                  <img
+                                    src={`http://localhost:8000/storage/${item.new_value}`}
+                                    alt="profile"
+                                    style={{
+                                      width: "100px",
+                                      borderRadius: "10px",
+                                      display: "flex",
+                                      justifyContent: "center",
+                                      textAlign: "center",
+                                    }}
+                                    // className="w-100 border-radius-lg shadow-sm"
+                                  />
+                                </div>
                               )}
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3">
@@ -229,12 +259,12 @@ export const ProgileRequestsPage = () => {
                                 </span>
                               )}
                             </td>
-                            <td className="align-middle d-flex justify-content-center">
-                              <div className="d-flex gap-2">
+                            <td className="w-full">
+                              <div className="d-flex gap-2 flex-wrap w-full justify-content-center">
                                 {userLogin.role_id === 1
                                   ? item.status === "pending" && (
-                                      <>
-                                        <button
+                                      <div className="d-flex gap-2 flex-wrap w-full">
+                                        {/* <button
                                           className="btn btn-primary btn-sm mb-0"
                                           onClick={() => {
                                             history.push(
@@ -243,7 +273,7 @@ export const ProgileRequestsPage = () => {
                                           }}
                                         >
                                           Edit
-                                        </button>
+                                        </button> */}
                                         <button
                                           className="btn btn-primary btn-sm mb-0"
                                           onClick={() => {
@@ -266,7 +296,7 @@ export const ProgileRequestsPage = () => {
                                         >
                                           Reject
                                         </button>
-                                      </>
+                                      </div>
                                     )
                                   : item.status === "pending" && (
                                       <>
