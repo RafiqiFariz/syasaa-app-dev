@@ -39,17 +39,16 @@ export const AddAttendancesPage = () => {
         longitude: parseFloat(user.student.class.lng),
       }
     );
-    if (distance >= 10) {
-      const confirmed = await Alert.confirm(
+
+    // distance harus diubah ketika di production
+    if (distance >= 1_000_000_000) {
+      const result = await Alert.confirmLocation(
         "Location Confirmation",
         "You are not in the class location, please change places or do attendance request!",
-        "Go Back to Attendances",
-        "",
-        false
+        "Go Back to Attendances"
       );
-
-      if (!confirmed) return
-      history.push("/attendances");
+      console.log(result, "result");
+      return history.push("/attendances");
     }
   };
 
@@ -200,7 +199,7 @@ export const AddAttendancesPage = () => {
     formData.append("course_class_id", form.course_class_id);
     formData.append("is_present", "1");
 
-    console.log(formData.get("course_class_id"), "form123");
+    console.log(form, "form123");
     try {
       const response = await fetch("http://localhost:8000/api/v1/attendances", {
         method: "POST",
@@ -208,7 +207,6 @@ export const AddAttendancesPage = () => {
         credentials: "include",
         headers: {
           Accept: "application/json",
-          "Content-Type": "multipart/form-data",
           "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
         },
       });
@@ -320,7 +318,7 @@ export const AddAttendancesPage = () => {
                   <label className="mb-1">Lecturer Image</label>
                   <input
                     className={`form-control form-control-sm ${
-                      errors["student_image"] ? "is-invalid" : ""
+                      errors["lecturer_image"] ? "is-invalid" : ""
                     }`}
                     id="formFileSm"
                     type="file"

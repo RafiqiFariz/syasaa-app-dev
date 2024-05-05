@@ -40,7 +40,6 @@
     "react-perfect-scrollbar": "^1.5.8",
     "react-router": "^5.3.4",
     "react-select": "^5.8.0",
-    "react-use": "^17.5.0",
     "smooth-scrollbar-react": "^2.4.1",
     "sweetalert2": "^11.10.6"
   },
