@@ -340,24 +340,6 @@ export const DashboardPage = () => {
       color_text: "text-info",
       desc: "Total Faculty",
     },
-    {
-      title: "Roles",
-      data: roles,
-      status: "active",
-      icon: "person",
-      gradient: "success",
-      color_text: "text-success",
-      desc: "Total Roles",
-    },
-    {
-      title: "Permissions",
-      data: permissions,
-      status: "active",
-      icon: "person",
-      gradient: "info",
-      color_text: "text-info",
-      desc: "Total Permissions",
-    },
   ];
 
   const StudentDashboard = [
