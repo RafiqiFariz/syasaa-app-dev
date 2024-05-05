@@ -20,6 +20,8 @@ export const UserLayout = ({ children }: LayoutProps) => {
 
   const [nav, setNav] = useState(false);
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   let pathname = window.location.pathname.split("/").join(" / ");
 
   const handleSignOut = async () => {
@@ -145,10 +147,11 @@ export const UserLayout = ({ children }: LayoutProps) => {
                   <li className="nav-item dropdown d-flex align-items-center">
                     <a
                       href="#"
-                      className="nav-link text-body p-0"
+                      className={`nav-link text-body p-0 show`}
                       id="dropdownMenuButton"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
+                      onClick={() => setDropdownOpen((prev) => !prev)}
                     >
                       <span className="d-flex align-items-center text-md text-bold gap-3">
                         <span>{user && user.name ? user.name : "Guest"}</span>
@@ -161,7 +164,9 @@ export const UserLayout = ({ children }: LayoutProps) => {
                       </span>
                     </a>
                     <ul
-                      className="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4"
+                      className={`dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4 ${
+                        dropdownOpen ? "show" : ""
+                      }`}
                       aria-labelledby="dropdownMenuButton"
                     >
                       {user.role_id === 3 ||
