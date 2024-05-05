@@ -56,7 +56,7 @@ export const EditMajorPage = () => {
 
       if (response.ok) {
         history.goBack();
-        Alert.success("Success", data.message)
+        Alert.success("Success", data.message);
       } else {
         setErrors(data.errors);
       }
@@ -67,7 +67,9 @@ export const EditMajorPage = () => {
 
   const getMajorData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/majors/${id}`, {method: "GET"});
+      const response = await fetchAPI(`/api/v1/majors/${id}`, {
+        method: "GET",
+      });
       const data = await response.json();
       if (response.ok) {
         setForm({
@@ -86,7 +88,7 @@ export const EditMajorPage = () => {
 
   const getFacultyData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/faculties", {method: "GET"});
+      const response = await fetchAPI("/api/v1/faculties", { method: "GET" });
       const data = await response.json();
       if (response.ok) {
         setFaculties(data.data);
@@ -135,6 +137,7 @@ export const EditMajorPage = () => {
                       className="form-control"
                       id="faculties"
                       onChange={handleChange}
+                      value={form.faculty_id}
                     >
                       {faculties.map((faculty) => (
                         <option key={faculty.id} value={faculty.id}>

@@ -20,12 +20,12 @@ export const EditClassPage = () => {
   const [errors, setErrors] = useState({});
   const [majors, setMajors] = useState<Array<OptionsData>>([]);
 
-  const {id} = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
 
   const history = useHistory();
 
   const handleChange = (event: any) => {
-    const {name, value} = event.target;
+    const { name, value } = event.target;
     setForm({
       ...form,
       [name]: value,
@@ -45,14 +45,14 @@ export const EditClassPage = () => {
 
       const response = await fetchAPI(`/api/v1/major-classes/${id}`, {
         method: "POST",
-        body: JSON.stringify({...form, _method: "PUT"}),
+        body: JSON.stringify({ ...form, _method: "PUT" }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         history.goBack();
-        Alert.success("Success", data.message)
+        Alert.success("Success", data.message);
       } else {
         setErrors(data.errors);
       }
@@ -63,9 +63,11 @@ export const EditClassPage = () => {
 
   const getClassData = async () => {
     try {
-      const response = await fetchAPI(`/api/v1/major-classes/${id}`, {method: "GET"});
+      const response = await fetchAPI(`/api/v1/major-classes/${id}`, {
+        method: "GET",
+      });
       const data = await response.json();
-      console.log('ini data', data)
+      console.log("ini data", data);
       if (response.ok) {
         setForm({
           name: data.data.name,
@@ -85,7 +87,7 @@ export const EditClassPage = () => {
 
   const getMajorsData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/majors", {method: "GET"});
+      const response = await fetchAPI("/api/v1/majors", { method: "GET" });
       const data = await response.json();
       if (response.ok) {
         setMajors(data.data);
@@ -105,8 +107,7 @@ export const EditClassPage = () => {
         <div className="col-12 col-lg-6 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div
-                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">Edit Class</h6>
               </div>
               <div className="card-body">
@@ -123,7 +124,7 @@ export const EditClassPage = () => {
                       placeholder="Name"
                       aria-label="Name"
                     />
-                    <ErrorMessage field="name" errors={errors}/>
+                    <ErrorMessage field="name" errors={errors} />
                   </div>
                   <div className="input-group input-group-dynamic mb-4 has-validation">
                     <input
@@ -137,7 +138,7 @@ export const EditClassPage = () => {
                       placeholder="Latitude"
                       aria-label="Latitude"
                     />
-                    <ErrorMessage field="lat" errors={errors}/>
+                    <ErrorMessage field="lat" errors={errors} />
                   </div>
                   <div className="input-group input-group-dynamic mb-4 has-validation">
                     <input
@@ -151,7 +152,7 @@ export const EditClassPage = () => {
                       placeholder="Longitude"
                       aria-label="Longitude"
                     />
-                    <ErrorMessage field="lng" errors={errors}/>
+                    <ErrorMessage field="lng" errors={errors} />
                   </div>
                   <div className="input-group input-group-static mb-4">
                     <label htmlFor="majors" className="ms-0">
@@ -161,6 +162,7 @@ export const EditClassPage = () => {
                       name="major_id"
                       className="form-control"
                       id="majors"
+                      value={form.major_id}
                       onChange={handleChange}
                     >
                       {majors.map((major) => (

@@ -33,6 +33,7 @@ export const AddAttandancesPage = () => {
         longitude: parseFloat(user.student.class.lng),
       }
     );
+    console.log(distance, "distance");
     if (distance >= 1000000000) {
       const result = await Alert.confirmLocation(
         "Location Confirmation",
