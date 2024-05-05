@@ -73,14 +73,18 @@ export const AddAttandanceRequest = () => {
         longitude: parseFloat(UserLogin.student.class.lng),
       }
     );
-    if (distance >= 1000000000) {
-      const result = await Alert.confirmLocation(
+
+    // distance harus diganti menjadi batas jarak yang diinginkan ketika di production
+    if (distance >= 10) {
+      const result = await Alert.confirm(
         "Location Confirmation",
         "You are not in the class location, please change places or do attendance request!",
-        "Go Back to Attendances"
+        "Go Back to Attendances",
+        "",
+        false
       );
       console.log(result, "result");
-      return history.push("/attendances-request");
+      // return history.push("/attendance-requests");
     }
   };
 
