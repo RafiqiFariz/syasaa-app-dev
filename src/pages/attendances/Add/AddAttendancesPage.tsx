@@ -132,8 +132,8 @@ export const AddAttendancesPage = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      // startVideo();
-      // videoRef && loadModels();
+      startVideo();
+      videoRef && loadModels();
     }, 2000);
 
     return () => {
@@ -216,11 +216,11 @@ export const AddAttendancesPage = () => {
       console.log(data, "data");
       console.log(response, "response");
       if (response.ok) {
-        // history.push("/attendances");
-        // Alert.success("Success", data.message);
+        history.push("/attendances");
+        Alert.success("Success", data.message);
       } else {
         Alert.error("Error", data.message);
-        // setErrors(data.errors);
+        setErrors(data.errors);
       }
     } catch (error) {
       // setErrors(error.errors);
