@@ -55,11 +55,11 @@ export const DashboardPage = () => {
           (item) => item.status === "pending"
         );
 
-        if (UserLogin.role_id === 1) {
+        if (isLogin.data.role_id === 1) {
           setProfileRequest(filteredData);
-        } else if (UserLogin.role_id === 4) {
+        } else if (isLogin.data.role_id === 4) {
           const userFilter = filteredData.filter(
-            (item) => item.student.user_id === UserLogin.id
+            (item) => item.student.user_id === isLogin.data.id
           );
           setProfileRequest(userFilter);
         }
@@ -80,12 +80,12 @@ export const DashboardPage = () => {
 
       if (response.ok) {
         console.log(data, "data");
-        if (UserLogin.role_id === 1) {
+        if (isLogin.data.role_id === 1) {
           return setUsers(data.data);
-        } else if (UserLogin.role_id === 2) {
+        } else if (isLogin.data.role_id === 2) {
           const userFilter = data.data.filter((item) => item.role_id === 3);
           return setUsers(userFilter);
-        } else if (UserLogin.role_id === 3) {
+        } else if (isLogin.data.role_id === 3) {
           const userFilter = data.data.filter((item) => item.role_id === 4);
           return setUsers(userFilter);
         }
@@ -118,16 +118,16 @@ export const DashboardPage = () => {
         let reject;
         let present;
 
-        if (UserLogin.role_id === 1) {
+        if (isLogin.data.role_id === 1) {
           setAttendanceRequest(filteredData);
-        } else if (UserLogin.role_id === 3) {
+        } else if (isLogin.data.role_id === 3) {
           userFilter = filteredData.filter(
-            (item) => item.course_class.lecturer_id === UserLogin.lecturer.id
+            (item) => item.course_class.lecturer_id === isLogin.data.lecturer.id
           );
           setAttendanceRequest(userFilter);
-        } else if (UserLogin.role_id === 4) {
+        } else if (isLogin.data.role_id === 4) {
           userFilter = filteredData.filter(
-            (item) => item.student.user_id === UserLogin.id
+            (item) => item.student.user_id === isLogin.data.id
           );
           sick = data.data.filter((item) => item.evidence === "sick");
           late = data.data.filter((item) => item.evidence === "late");
@@ -196,9 +196,9 @@ export const DashboardPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        if (UserLogin.role_id === 2) {
+        if (isLogin.data.role_id === 2) {
           const userFilter = data.data.filter(
-            (item) => item.faculty_id === UserLogin.faculty_staff.faculty_id
+            (item) => item.faculty_id === isLogin.data.faculty_staff.faculty_id
           );
           return setMajors(userFilter);
         }
@@ -219,10 +219,10 @@ export const DashboardPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        if (UserLogin.role_id === 2) {
+        if (isLogin.data.role_id === 2) {
           const userFilter = data.data.filter(
             (item) =>
-              item.major.faculty_id === UserLogin.faculty_staff.faculty_id
+              item.major.faculty_id === isLogin.data.faculty_staff.faculty_id
           );
           return setClasses(userFilter);
         }
@@ -236,8 +236,8 @@ export const DashboardPage = () => {
   const getCourseClass = async () => {
     try {
       let url;
-      if (UserLogin.role_id === 3) {
-        url = `/api/v1/course-classes?lecturer_id=${UserLogin.lecturer.id}&paginate=false`;
+      if (isLogin.data.role_id === 3) {
+        url = `/api/v1/course-classes?lecturer_id=${isLogin.data.lecturer.id}&paginate=false`;
       }
       const response = await fetchAPI(url, {
         method: "GET",
@@ -257,8 +257,8 @@ export const DashboardPage = () => {
   const getAttandance = async () => {
     try {
       let url;
-      if (UserLogin.role_id === 3) {
-        url = `/api/v1/attendances?includeCourseClass=1&paginate=false&lecturer_id=${UserLogin.lecturer.id}`;
+      if (isLogin.data.role_id === 3) {
+        url = `/api/v1/attendances?includeCourseClass=1&paginate=false&lecturer_id=${isLogin.data.lecturer.id}`;
       }
       const response = await fetchAPI(url, {
         method: "GET",
@@ -276,38 +276,32 @@ export const DashboardPage = () => {
   };
 
   useEffect(() => {
-    getProfileRequest();
-    getAttandanceRequest();
-    getUsers();
-    getFacultyData();
-    getRolesData();
-    getPermissionsData();
-    getMajorData();
-    getClassesData();
-    getAttandance();
-    getCourseClass();
-  }, []);
+    if (!isLogin.data) {
+      setIsLoading(true);
+      return;
+    } else {
+      setIsLoading(false);
+      getProfileRequest();
+      getAttandanceRequest();
+      getUsers();
+      getFacultyData();
+      getRolesData();
+      getPermissionsData();
+      getMajorData();
+      getClassesData();
+      getAttandance();
+      getCourseClass();
+    }
+  }, [isLogin.data]);
 
-  // useEffect(() => {
-  //   if (!isLogin.data) {
-  //     return;
-  //   }
-
-  //   const fetchData = async () => {
-  //     await Promise.all([
-  //       getProfileRequest(),
-  //       getAttandanceRequest(),
-  //       getUsers(),
-  //       getFacultyData(),
-  //       getRolesData(),
-  //       getPermissionsData(),
-  //     ]);
-
-  //     getListDashboard(isLogin.data.role_id);
-  //   };
-
-  //   fetchData();
-  // }, [isLogin.data]);
+  if (!isLogin.data?.role_id || isLoading)
+    return (
+      <div className="d-flex absolute justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="sr-only"></span>
+        </div>
+      </div>
+    );
 
   const AdminDashboard = [
     {
@@ -323,7 +317,7 @@ export const DashboardPage = () => {
       title: "Information",
       status: "pending",
       data: profileRequest,
-      icon: "weekend",
+      icon: "person",
       desc: "Profile Request",
       gradient: "warning",
       color_text: "text-warning",
@@ -341,7 +335,7 @@ export const DashboardPage = () => {
       title: "Faculty",
       data: faculty,
       status: "active",
-      icon: "weekend",
+      icon: "person",
       gradient: "info",
       color_text: "text-info",
       desc: "Total Faculty",
@@ -359,7 +353,7 @@ export const DashboardPage = () => {
       title: "Permissions",
       data: permissions,
       status: "active",
-      icon: "weekend",
+      icon: "person",
       gradient: "info",
       color_text: "text-info",
       desc: "Total Permissions",
@@ -380,7 +374,7 @@ export const DashboardPage = () => {
       title: "Information",
       status: "Pending",
       data: profileRequest,
-      icon: "weekend",
+      icon: "person",
       gradient: "warning",
       color_text: "text-warning",
       desc: "Profile Request",
@@ -455,7 +449,7 @@ export const DashboardPage = () => {
       title: "Faculty Majors",
       data: majors,
       status: "active",
-      icon: "weekend",
+      icon: "person",
       gradient: "info",
       color_text: "text-info",
       desc: "Total Majors",
@@ -464,7 +458,7 @@ export const DashboardPage = () => {
       title: "Faculty Classes",
       data: classes,
       status: "active",
-      icon: "weekend",
+      icon: "person",
       gradient: "info",
       color_text: "text-info",
       desc: "Total Classes",
@@ -503,7 +497,7 @@ export const DashboardPage = () => {
       title: "Schedules",
       data: Schedules,
       status: "active",
-      icon: "weekend",
+      icon: "person",
       gradient: "info",
       color_text: "text-info",
       desc: "Total Schedules",
@@ -515,7 +509,7 @@ export const DashboardPage = () => {
   return (
     <UserLayout>
       <div className="row">
-        {UserLogin.role_id === 1
+        {isLogin.data.role_id === 1
           ? AdminDashboard.map((item, index) => (
               <div className=" col-sm-6 mb-xl-0 mb-4 my-4" key={index}>
                 <div className="card">
@@ -548,7 +542,7 @@ export const DashboardPage = () => {
                 </div>
               </div>
             ))
-          : UserLogin.role_id === 4
+          : isLogin.data.role_id === 4
           ? StudentDashboard.map((item, index) => (
               <div className="col-sm-6 mb-xl-0 mb-4 my-4" key={index}>
                 <div className="card">
@@ -581,7 +575,7 @@ export const DashboardPage = () => {
                 </div>
               </div>
             ))
-          : UserLogin.role_id === 2
+          : isLogin.data.role_id === 2
           ? FacultyDashboard.map((item, index) => (
               <div className="col-sm-6 mb-xl-0 mb-4 my-4" key={index}>
                 <div className="card">
