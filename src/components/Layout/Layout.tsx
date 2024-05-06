@@ -78,6 +78,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
       setUser(isLogin.data);
     }
   }, [isLogin.data]);
+  console.log(pathname.split("/")[1] == "users", "pathname");
 
   return (
     <div
@@ -104,7 +105,15 @@ export const UserLayout = ({ children }: LayoutProps) => {
               <nav aria-label="breadcrumb">
                 <ol className="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
                   {pathname.split("/").map((item, index) => {
-                    const submenu = _.startCase(_.camelCase(item)) || item;
+                    let subname = item;
+                    if (item == " users" && user.role_id === 3) {
+                      subname = "students";
+                    } else if (item == " users" && user.role_id === 2) {
+                      subname = "lecturers";
+                    }
+
+                    const submenu =
+                      _.startCase(_.camelCase(subname)) || subname;
                     if (index === 0) {
                       return (
                         <li
@@ -129,7 +138,22 @@ export const UserLayout = ({ children }: LayoutProps) => {
                   })}
                 </ol>
                 <h6 className="font-weight-bolder mb-0">
-                  {_.startCase(_.camelCase(pathname.split("/").toString()))}
+                  {_.startCase(
+                    _.camelCase(
+                      pathname
+                        .split("/")
+                        .map((item) => {
+                          if (item == " users" && user.role_id === 3) {
+                            return "Students";
+                          } else if (item == " users" && user.role_id === 2) {
+                            return "Lecturers";
+                          } else {
+                            return item;
+                          }
+                        })
+                        .toString()
+                    )
+                  )}
                 </h6>
               </nav>
               <div
@@ -162,12 +186,13 @@ export const UserLayout = ({ children }: LayoutProps) => {
                     >
                       <span className="d-flex align-items-center text-md text-bold gap-3">
                         <span>{user && user.name ? user.name : "Guest"}</span>
-
-                        <img
-                          src={getUserProfilePhoto()}
-                          alt="profile"
-                          className="avatar shadow"
-                        />
+                        {user.role_id === 3 || user.role_id === 4 ? (
+                          <img
+                            src={getUserProfilePhoto()}
+                            alt="profile"
+                            className="avatar shadow"
+                          />
+                        ) : null}
                       </span>
                     </a>
                     <ul

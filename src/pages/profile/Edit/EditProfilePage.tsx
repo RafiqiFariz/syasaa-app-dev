@@ -91,6 +91,7 @@ export const EditProfilePage = () => {
         if (response.ok) {
           Alert.success("Success", data.message);
           history.push("/profile");
+          // location.href = "/profile";
         } else {
           setErrors(data.errors);
         }
@@ -116,6 +117,15 @@ export const EditProfilePage = () => {
   }, []);
   return (
     <UserLayout>
+      <button
+        onClick={() => history.push("/profile")}
+        className="ms-auto mb-0 p-0 px-4 text-bold"
+        title="Go Back"
+      >
+        <h2 className="text-bold">
+          <i className="bi bi-arrow-left col-5 text-bold"></i>
+        </h2>
+      </button>
       <div className="row">
         <div className="col-12 col-lg-6 m-auto">
           <div className="card my-4">

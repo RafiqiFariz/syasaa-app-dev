@@ -28,8 +28,8 @@ export const CourseClass = () => {
       key: 3,
     },
     {
-      name: "Lecture",
-      selector: "lecture",
+      name: "Lecturer",
+      selector: "lecturer",
       key: 4,
     },
     {

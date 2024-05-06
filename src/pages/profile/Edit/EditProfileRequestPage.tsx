@@ -5,6 +5,7 @@ import { ErrorMessage } from "../../../components/ErrorMessage";
 import * as _ from "lodash";
 import fetchAPI from "../../../fetch";
 import Cookies from "js-cookie";
+import Alert from "../../../components/Alert";
 
 export const EditProfileRequestPage = () => {
   const [form, setForm] = useState({
@@ -76,7 +77,10 @@ export const EditProfileRequestPage = () => {
       console.log(data, "response");
 
       if (response.ok) {
+        await Alert.success("Success", data.message);
         history.push("/profile");
+      } else {
+        await Alert.error("Error", data.message);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -85,6 +89,15 @@ export const EditProfileRequestPage = () => {
 
   return (
     <UserLayout>
+      <button
+        onClick={() => history.push("/profile")}
+        className="ms-auto mb-0 p-0 px-4 text-bold"
+        title="Go Back"
+      >
+        <h2 className="text-bold">
+          <i className="bi bi-arrow-left col-5 text-bold"></i>
+        </h2>
+      </button>
       <div className="row">
         <div className="col-12 col-lg-6 m-auto">
           <div className="card my-4">

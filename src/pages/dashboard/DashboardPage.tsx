@@ -359,7 +359,7 @@ export const DashboardPage = () => {
             ? users.filter((item) => item.role_id === 3)
             : 0,
           status: "active",
-          icon: "person",
+          icon: "bi bi-person-video3",
           gradient: "success",
           color_text: "text-success",
           desc: "Total Lecturers",
@@ -368,7 +368,7 @@ export const DashboardPage = () => {
           title: "Majors",
           data: majors,
           status: "active",
-          icon: "person",
+          icon: "bi bi-mortarboard-fill",
           gradient: "info",
           color_text: "text-info",
           desc: "Total Majors",
@@ -377,19 +377,19 @@ export const DashboardPage = () => {
           title: "Classes",
           data: classes,
           status: "active",
-          icon: "person",
-          gradient: "info",
-          color_text: "text-info",
+          icon: "bi bi-door-open-fill",
+          gradient: "warning",
+          color_text: "text-warning",
           desc: "Total Classes",
         },
         {
-          title: "Attendance ",
+          title: "Attendances ",
           data: Attendance,
-          status: "Total",
-          icon: "person",
-          gradient: "warning",
-          color_text: "text-warning",
-          desc: "Total Attendance",
+          status: "Active",
+          icon: "bi bi-person-fill-check",
+          gradient: "danger",
+          color_text: "text-danger",
+          desc: "Total Attendances",
         },
       ],
     },
@@ -402,37 +402,37 @@ export const DashboardPage = () => {
         {
           title: "Schedules",
           data: Schedules,
-          status: "Total",
+          status: "Active",
           icon: "person",
           gradient: "warning",
           color_text: "text-warning",
           desc: "Total Schedules",
         },
         {
-          title: "attendance",
+          title: "attendances",
           data: Attendance,
-          status: "Total",
-          icon: "person",
+          status: "Active",
+          icon: "bi bi-person-fill-check",
           gradient: "info",
           color_text: "text-info",
-          desc: "Total attendance",
+          desc: "Total attendances",
         },
         {
           title: "Attendance Requests",
           data: attendanceRequest,
-          status: "Total",
-          icon: "person",
-          gradient: "info",
-          color_text: "text-info",
+          status: "Active",
+          icon: "bi bi-person-fill-check",
+          gradient: "success",
+          color_text: "text-success",
           desc: "Total attendance Requests",
         },
         {
           title: "Profile Request",
           data: profileRequest,
-          status: "Total",
-          icon: "person",
-          gradient: "info",
-          color_text: "text-info",
+          status: "Active",
+          icon: "bi bi-person-circle",
+          gradient: "danger",
+          color_text: "text-danger",
           desc: "Total Profile Request",
         },
       ],
@@ -504,7 +504,7 @@ export const DashboardPage = () => {
               color: "text-danger",
             },
           ],
-          desc: "Summary of attendance Requests Evidence",
+          desc: "Summary of Attendance Requests Evidence",
         },
         {
           title: "Attendance Requests Status",
@@ -547,7 +547,7 @@ export const DashboardPage = () => {
               color: "text-warning",
             },
           ],
-          desc: "Summary of attendance Requests Status",
+          desc: "Summary of Attendance Requests Status",
         },
         {
           title: "Profile Request",
@@ -601,10 +601,10 @@ export const DashboardPage = () => {
       id: "smallCard",
       cardSmall: [
         {
-          title: "Information",
+          title: "Profile Requests",
           status: "pending",
           data: profileRequest,
-          icon: "person",
+          icon: "bi bi-person-circle",
           desc: "Profile Request",
           gradient: "warning",
           color_text: "text-warning",
@@ -616,7 +616,7 @@ export const DashboardPage = () => {
             ? users.filter((item) => item.role_id === 2)
             : 0,
           status: "active",
-          icon: "person",
+          icon: "bi bi-person-workspace",
           gradient: "success",
           color_text: "text-success",
           desc: "Total Staff - Faculty",
@@ -627,9 +627,9 @@ export const DashboardPage = () => {
             ? users.filter((item) => item.role_id === 3)
             : 0,
           status: "active",
-          icon: "person",
-          gradient: "success",
-          color_text: "text-success",
+          icon: "bi bi-person-video3",
+          gradient: "info",
+          color_text: "text-info",
           desc: "Total Lecturers",
         },
         {
@@ -638,81 +638,81 @@ export const DashboardPage = () => {
             ? users.filter((item) => item.role_id === 4)
             : 0,
           status: "active",
-          icon: "person",
-          gradient: "success",
-          color_text: "text-success",
+          icon: "bi bi-person-fill",
+          gradient: "danger",
+          color_text: "text-danger",
           desc: "Total Students",
         },
         {
           title: "Faculties",
           data: faculty,
           status: "active",
-          icon: "person",
-          gradient: "info",
-          color_text: "text-info",
+          icon: "bi bi-building-fill",
+          gradient: "dark",
+          color_text: "text-dark",
           desc: "Total Faculties",
         },
         {
           title: "Majors",
           data: majors,
           status: "active",
-          icon: "person",
-          gradient: "info",
-          color_text: "text-info",
+          icon: "bi bi-mortarboard-fill",
+          gradient: "primary",
+          color_text: "text-primary",
           desc: "Total Majors",
         },
         {
           title: "Classes",
           data: classes,
           status: "active",
-          icon: "person",
-          gradient: "info",
-          color_text: "text-info",
+          icon: "bi bi-door-open-fill",
+          gradient: "secondary",
+          color_text: "text-secondary",
           desc: "Total Classes",
         },
         {
-          title: "Attendance ",
+          title: "Attendances",
           data: Attendance,
           status: "active",
-          icon: "person",
+          icon: "bi bi-person-fill-check",
           gradient: "warning",
           color_text: "text-warning",
-          desc: "Total Attendance",
+          desc: "Total Attendances",
         },
         {
           title: "Schedules",
           data: Schedules,
           status: "active",
-          icon: "person",
-          gradient: "warning",
-          color_text: "text-warning",
+          icon: "bi bi-calendar-fill",
+          gradient: "info",
+          color_text: "text-info",
           desc: "Total Schedules",
         },
         {
           title: "Permissions",
           data: permissions,
           status: "active",
-          icon: "person",
-          gradient: "info",
-          color_text: "text-info",
+          icon: "bi bi-universal-access",
+          gradient: "success",
+          color_text: "text-success",
           desc: "Total Permissions",
         },
         {
           title: "Roles",
           data: roles,
           status: "active",
-          icon: "person",
-          gradient: "info",
-          color_text: "text-info",
+          icon: "bi bi-person-fill-gear",
+          gradient: "danger",
+          color_text: "text-danger",
           desc: "Total Roles",
         },
         {
           title: "Courses",
           data: courses,
           status: "active",
-          icon: "person",
-          gradient: "info",
-          color_text: "text-info",
+          icon: "bi bi-book-fill",
+          gradient: "dark",
+          color_text: "text-dark",
           desc: "Total Courses",
         },
       ],
@@ -784,7 +784,7 @@ export const DashboardPage = () => {
               color: "text-danger",
             },
           ],
-          desc: "Summary of attendance Requests Evidence",
+          desc: "Summary of Attendance Requests Evidence",
         },
         {
           title: "Attendance Requests Status",
@@ -827,7 +827,7 @@ export const DashboardPage = () => {
               color: "text-warning",
             },
           ],
-          desc: "Summary of attendance Requests Status",
+          desc: "Summary of Attendance Requests Status",
         },
         {
           title: "Profile Request",
@@ -886,36 +886,36 @@ export const DashboardPage = () => {
             ? users.filter((item) => item.role_id === 4)
             : 0,
           status: "active",
-          icon: "person",
+          icon: "bi bi-person-fill",
           gradient: "success",
           color_text: "text-success",
-          desc: "Total Lecturers",
+          desc: "Total Students",
         },
         {
-          title: "Attendance ",
+          title: "Attendances",
           data: Attendance,
           status: "Total",
-          icon: "person",
+          icon: "bi bi-person-fill-check",
           gradient: "warning",
           color_text: "text-warning",
-          desc: "Total Attendance",
+          desc: "Total Attendances",
         },
         {
           title: "Schedules",
           data: Schedules,
           status: "Total",
           icon: "person",
-          gradient: "warning",
-          color_text: "text-warning",
+          gradient: "info",
+          color_text: "text-info",
           desc: "Total Schedules",
         },
         {
           title: "Attendance Requests",
           data: attendanceRequest,
           status: "Total",
-          icon: "person",
-          gradient: "warning",
-          color_text: "text-warning",
+          icon: "bi bi-person-fill-check",
+          gradient: "danger",
+          color_text: "text-danger",
           desc: "Total Attendance Requests",
         },
       ],
@@ -987,13 +987,13 @@ export const DashboardPage = () => {
               color: "text-danger",
             },
           ],
-          desc: "Summary of attendance Requests Evidence",
+          desc: "Summary of Attendance Requests Evidence",
         },
         {
           title: "Attendance Requests Status",
           subtitle: "Information",
           color: "bg-gradient-info",
-          desc: "Summary of attendance Requests Status",
+          desc: "Summary of Attendance Requests Status",
           columns: [
             {
               title: "Accepted",
@@ -1055,11 +1055,9 @@ export const DashboardPage = () => {
                           <div className="card">
                             <div className="card-header p-3 pt-2">
                               <div
-                                className={`icon icon-lg icon-shape bg-gradient-${item.gradient} shadow-${item.gradient} text-center border-radius-xl mt-n4 position-absolute`}
+                                className={`d-flex justify-content-center align-items-center icon-lg text-white  bg-gradient-${item.gradient} shadow-${item.gradient} text-center border-radius-xl mt-n4 position-absolute `}
                               >
-                                <i className="material-icons opacity-10">
-                                  {item.icon}
-                                </i>
+                                <i className={item.icon}></i>
                               </div>
                               <div className="text-end pt-1">
                                 <p className="text-sm mb-0 text-capitalize text-bold">
@@ -1073,7 +1071,7 @@ export const DashboardPage = () => {
                                   </p>
                                 )}
                                 <h4 className={`mb-0 ${item.color_text}`}>
-                                  {item.data.length}
+                                  {item.data?.length || 0}
                                 </h4>
                               </div>
                             </div>
@@ -1126,7 +1124,7 @@ export const DashboardPage = () => {
                                 {item.data.map((item, index) => (
                                   <td className="align-middle text-center">
                                     <h4 className={`mb-0 ${item.color}`}>
-                                      {item.count}
+                                      {item.count || 0}
                                     </h4>
                                   </td>
                                 ))}
@@ -1160,11 +1158,9 @@ export const DashboardPage = () => {
                           <div className="card">
                             <div className="card-header p-3 pt-2">
                               <div
-                                className={`icon icon-lg icon-shape bg-gradient-${item.gradient} shadow-${item.gradient} text-center border-radius-xl mt-n4 position-absolute`}
+                                className={`d-flex justify-content-center align-items-center icon-lg text-white  bg-gradient-${item.gradient} shadow-${item.gradient} text-center border-radius-xl mt-n4 position-absolute `}
                               >
-                                <i className="material-icons opacity-10">
-                                  {item.icon}
-                                </i>
+                                <i className={item.icon}></i>
                               </div>
                               <div className="text-end pt-1">
                                 <p className="text-sm mb-0 text-capitalize text-bold">
@@ -1178,7 +1174,7 @@ export const DashboardPage = () => {
                                   </p>
                                 )}
                                 <h4 className={`mb-0 ${item.color_text}`}>
-                                  {item.data.length}
+                                  {item.data.length || 0}
                                 </h4>
                               </div>
                             </div>
@@ -1221,7 +1217,9 @@ export const DashboardPage = () => {
                                     key={index}
                                     className={`text-uppercase text-sm text-center ${item.color}`}
                                   >
-                                    {item.title}
+                                    <span className="text-center">
+                                      {item.title}
+                                    </span>
                                   </th>
                                 ))}
                               </tr>
@@ -1230,8 +1228,10 @@ export const DashboardPage = () => {
                               <tr>
                                 {item.data.map((item, index) => (
                                   <td className="align-middle text-center">
-                                    <h4 className={`mb-0 ${item.color}`}>
-                                      {item.count}
+                                    <h4
+                                      className={`${item.color} d-flex justify-content-center align-items-center`}
+                                    >
+                                      {item.count || 0}
                                     </h4>
                                   </td>
                                 ))}
@@ -1262,11 +1262,9 @@ export const DashboardPage = () => {
                           <div className="card">
                             <div className="card-header p-3 pt-2">
                               <div
-                                className={`icon icon-lg icon-shape bg-gradient-${item.gradient} shadow-${item.gradient} text-center border-radius-xl mt-n4 position-absolute`}
+                                className={`d-flex justify-content-center align-items-center icon-lg text-white  bg-gradient-${item.gradient} shadow-${item.gradient} text-center border-radius-xl mt-n4 position-absolute `}
                               >
-                                <i className="material-icons opacity-10">
-                                  {item.icon}
-                                </i>
+                                <i className={item.icon}></i>
                               </div>
                               <div className="text-end pt-1">
                                 <p className="text-sm mb-0 text-capitalize text-bold">
@@ -1280,7 +1278,7 @@ export const DashboardPage = () => {
                                   </p>
                                 )}
                                 <h4 className={`mb-0 ${item.color_text}`}>
-                                  {item.data.length}
+                                  {item.data.length || 0}
                                 </h4>
                               </div>
                             </div>
@@ -1333,7 +1331,7 @@ export const DashboardPage = () => {
                                 {item.data.map((item, index) => (
                                   <td className="align-middle text-center">
                                     <h4 className={`mb-0 ${item.color}`}>
-                                      {item.count}
+                                      {item.count || 0}
                                     </h4>
                                   </td>
                                 ))}
@@ -1363,11 +1361,9 @@ export const DashboardPage = () => {
                           <div className="card">
                             <div className="card-header p-3 pt-2">
                               <div
-                                className={`icon icon-lg icon-shape bg-gradient-${item.gradient} shadow-${item.gradient} text-center border-radius-xl mt-n4 position-absolute`}
+                                className={`d-flex justify-content-center align-items-center icon-lg text-white  bg-gradient-${item.gradient} shadow-${item.gradient} text-center border-radius-xl mt-n4 position-absolute `}
                               >
-                                <i className="material-icons opacity-10">
-                                  {item.icon}
-                                </i>
+                                <i className={item.icon}></i>
                               </div>
                               <div className="text-end pt-1">
                                 <p className="text-sm mb-0 text-capitalize text-bold">
@@ -1381,7 +1377,7 @@ export const DashboardPage = () => {
                                   </p>
                                 )}
                                 <h4 className={`mb-0 ${item.color_text}`}>
-                                  {item.data.length}
+                                  {item.data.length || 0}
                                 </h4>
                               </div>
                             </div>
@@ -1434,7 +1430,7 @@ export const DashboardPage = () => {
                                 {item.data.map((item, index) => (
                                   <td className="align-middle text-center">
                                     <h4 className={`mb-0 ${item.color}`}>
-                                      {item.count}
+                                      {item.count || 0}
                                     </h4>
                                   </td>
                                 ))}

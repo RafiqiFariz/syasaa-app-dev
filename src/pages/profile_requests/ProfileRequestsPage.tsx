@@ -60,7 +60,25 @@ export const ProgileRequestsPage = () => {
       const data = await response.json();
       console.log(data, "data");
       if (response.ok) {
-        setProfileRequest(data);
+        let filter;
+        if (userLogin.role_id === 1) {
+          filter = data.data;
+          setProfileRequest({
+            data: filter,
+            meta: data.meta,
+            links: data.links,
+          });
+        } else if (userLogin.role_id === 4) {
+          filter = data.data.filter(
+            (item) => item.student_id === userLogin.student.id
+          );
+          setProfileRequest({
+            data: filter,
+            meta: data.meta,
+            links: data.links,
+          });
+        }
+        // setProfileRequest(data);
         setIsLoading(false);
       }
     } catch (error) {

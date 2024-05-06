@@ -58,7 +58,7 @@ export const Sidebar = () => {
           link: "/attendance-requests",
         },
         {
-          name: "Profile Request",
+          name: "Profile Requests",
           link: "/profile-requests",
         },
       ];
@@ -70,7 +70,7 @@ export const Sidebar = () => {
           link: "/dashboard",
         },
         {
-          name: "Lectures",
+          name: "Lecturers",
           link: "/users",
         },
         {
@@ -128,6 +128,10 @@ export const Sidebar = () => {
         {
           name: "Attendance Requests",
           link: "/attendance-requests",
+        },
+        {
+          name: "Profile Requests",
+          link: "/profile-requests",
         },
       ];
       setList(list);
