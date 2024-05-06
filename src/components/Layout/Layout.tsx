@@ -87,7 +87,14 @@ export const UserLayout = ({ children }: LayoutProps) => {
     >
       <Sidebar />
       <PerfectScrollbar>
-        <main className="main-content position-relative max-height-vh-100 h-100">
+        <main
+          className="main-content position-relative max-height-vh-100 h-100"
+          onClick={() => {
+            if (dropdownOpen) {
+              setDropdownOpen(false);
+            }
+          }}
+        >
           <nav
             className="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
             id="navbarBlur"
@@ -169,17 +176,16 @@ export const UserLayout = ({ children }: LayoutProps) => {
                       }`}
                       aria-labelledby="dropdownMenuButton"
                     >
-                      {user.role_id === 3 ||
-                        (user.role_id === 4 && (
-                          <li className="mb-2">
-                            <button
-                              className="dropdown-item"
-                              onClick={() => history.push("/profile")}
-                            >
-                              Profile
-                            </button>
-                          </li>
-                        ))}
+                      {user.role_id === 3 || user.role_id === 4 ? (
+                        <li className="mb-2">
+                          <button
+                            className="dropdown-item"
+                            onClick={() => history.push("/profile")}
+                          >
+                            Profile
+                          </button>
+                        </li>
+                      ) : null}
                       <li>
                         <button
                           className="dropdown-item"

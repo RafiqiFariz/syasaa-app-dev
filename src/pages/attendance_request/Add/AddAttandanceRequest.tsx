@@ -61,29 +61,6 @@ export const AddAttandanceRequest = () => {
 
   const [selectedOption, setSelectedOption] = useState("upload");
 
-  const getLocation = async () => {
-    console.log(getUserLocation, "location");
-    const distance = getDistance(
-      {
-        latitude: getUserLocation.location?.latitude,
-        longitude: getUserLocation.location?.longitude,
-      },
-      {
-        latitude: parseFloat(UserLogin.student.class.lat),
-        longitude: parseFloat(UserLogin.student.class.lng),
-      }
-    );
-    if (distance >= 1000000000) {
-      const result = await Alert.confirmLocation(
-        "Location Confirmation",
-        "You are not in the class location, please change places or do attendance request!",
-        "Go Back to Attendances"
-      );
-      console.log(result, "result");
-      return history.push("/attendances-request");
-    }
-  };
-
   const getCourseClass = async () => {
     setLoading(true);
     try {
@@ -131,24 +108,10 @@ export const AddAttandanceRequest = () => {
   };
 
   useEffect(() => {
-    if (!getUserLocation.loading) {
-      getLocation();
-      getCourseClass();
+    getCourseClass();
 
-      // enableCamera();
-
-      return () => {
-        if (videoRef.current && videoRef.current.srcObject) {
-          const tracks = videoRef.current.srcObject.getTracks();
-          tracks.forEach((track) => track.stop());
-        }
-      };
-    }
-  }, [getUserLocation.location]);
-
-  if (getUserLocation.loading) {
-    return <div>Loading...</div>;
-  }
+    // enableCamera();
+  }, []);
 
   const handleChange = (event: any) => {
     const { name, value } = event.target;
@@ -220,7 +183,12 @@ export const AddAttandanceRequest = () => {
   const handleChangeOptions = (e) => {
     setSelectedOption(e.target.value);
     if (e.target.value === "capture") {
-      enableCamera();
+      enableCamera(); // Jika opsi yang dipilih adalah "capture", aktifkan kamera
+    } else {
+      // Jika opsi yang dipilih adalah "upload", matikan kamera
+      if (videoRef.current && videoRef.current.srcObject) {
+        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+      }
     }
   };
   console.log(form, "form");

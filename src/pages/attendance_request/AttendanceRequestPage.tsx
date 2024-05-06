@@ -67,7 +67,20 @@ export const AttendanceRequestPage = () => {
       console.log(data, "data123");
       if (response.ok) {
         // console.log(data, "data123");
-        setAttendanceReq(data);
+
+        setAttendanceReq({
+          data: data.data.filter((item: any) => {
+            if (UserLogin.role_id === 4) {
+              return item.student_id === UserLogin.student.id;
+            } else if (UserLogin.role_id === 3) {
+              return item.course_class.lecturer_id === UserLogin.lecturer.id;
+            } else {
+              return item;
+            }
+          }),
+          meta: data.meta,
+          links: data.links,
+        });
         setIsLoading(false);
       }
     } catch (error) {
@@ -151,32 +164,7 @@ export const AttendanceRequestPage = () => {
               </div>
             </div>
             <div className="card-body px-0 pb-2">
-              <div className="d-flex mx-4 justify-content-start gap-2 col-6">
-                {/* {UserLogin.role_id !== 1 && (
-                  <>
-                    {UserLogin.role_id === 2 && (
-                      <ReactSelect
-                        className="col-6"
-                        options={optionMajor}
-                        value={selectedMajor}
-                        name="Major"
-                        placeholder={"Select Major"}
-                        onChange={handleMajorChange}
-                        isLoading={isLoading}
-                      />
-                    )}
-                    <ReactSelect
-                      className="col-6"
-                      options={optionClass}
-                      name={"Class"}
-                      value={selectedClass}
-                      placeholder={"Select Class"}
-                      isLoading={isLoading}
-                      onChange={handleClassChange}
-                    />
-                  </>
-                )} */}
-              </div>
+              <div className="d-flex mx-4 justify-content-start gap-2 col-6"></div>
               <div className="table-responsive">
                 <table className="table align-items-center mb-0">
                   <thead>

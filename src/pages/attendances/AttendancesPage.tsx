@@ -177,6 +177,8 @@ export const AttendancesPage = () => {
 
       if (user.data.role_id === 4) {
         url = `/api/v1/attendances?page=${currentPage}&student_id=${user.data.student.id}`;
+      } else if (user.data.role_id === 2) {
+        url = `/api/v1/attendances?page=${currentPage}&faculty_id=${user.data.faculty_staff.faculty_id}`;
       }
 
       if (classId !== 0 && majorId !== 0) {
