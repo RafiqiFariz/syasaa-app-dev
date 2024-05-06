@@ -14,8 +14,8 @@ export const AddAttendancesPage = () => {
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
     course_class_id: "",
-    student_image: "",
-    lecturer_image: "",
+    student_image: null,
+    lecturer_image: null,
   });
   const [errors, setErrors] = useState({});
   const user = JSON.parse(localStorage.getItem("user"));
@@ -26,6 +26,8 @@ export const AddAttendancesPage = () => {
   const streamRef = useRef(null);
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
   const [facingMode, setFacingMode] = useState("user");
+  const [instructions, setInstructions] = useState<String | JSX.Element>("Detecting your face...");
+  const [prediction, setPrediction] = useState(null);
 
   const getLocation = async () => {
     console.log(getUserLocation, "location");
@@ -41,14 +43,16 @@ export const AddAttendancesPage = () => {
     );
 
     // distance harus diubah ketika di production
-    if (distance >= 1_000_000_000) {
-      const result = await Alert.confirmLocation(
+    if (distance >= 20) {
+      const result = await Alert.confirm(
         "Location Confirmation",
         "You are not in the class location, please change places or do attendance request!",
-        "Go Back to Attendances"
+        "Go Back to Attendances",
+        "",
+        false
       );
       console.log(result, "result");
-      return history.push("/attendances");
+      // return history.push("/attendances");
     }
   };
 
@@ -68,6 +72,15 @@ export const AddAttendancesPage = () => {
     }).catch((error) => {
       console.error(error, "Error getting video stream");
     });
+  }
+
+  const stopVideo = () => {
+    if (streamRef.current) {
+      const tracks = streamRef.current.getTracks();
+      tracks.forEach((track) => {
+        track.stop();
+      });
+    }
   }
 
   const handleChangeCamera = () => {
@@ -91,6 +104,31 @@ export const AddAttendancesPage = () => {
     });
   }
 
+  const predictFace = async () => {
+    const API_ML_URL = import.meta.env.VITE_API_ML_URL;
+    const formData = new FormData();
+    formData.append('image', form.student_image);
+    return await fetch(`${API_ML_URL}/predict`, {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  const captureImage = async (canvas: any) => {
+    if (prediction) return;
+
+    canvas.toBlob((blob) => {
+      const timestamp = new Date().getTime();
+      const file = new File([blob], `${timestamp}.jpg`, {
+        type: "image/jpeg",
+      });
+      setForm({
+        ...form,
+        student_image: file,
+      });
+    }, "image/jpeg");
+  };
+
   const loadModels = async () => {
     await faceapi.loadFaceDetectionModel(import.meta.env.VITE_API_URL + '/models');
     await detectFace();
@@ -107,8 +145,11 @@ export const AddAttendancesPage = () => {
       if (displaySize.width && displaySize.height && detections) {
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
         canvas.getContext('2d').clearRect(0, 0, dimensions.width, dimensions.height);
-        canvas.innerHTML = faceapi.createCanvasFromMedia(video);
         faceapi.draw.drawDetections(canvas, resizedDetections);
+
+        setTimeout(async () => {
+          await captureImage(canvas);
+        }, 3000);
       }
     }, 500);
   }
@@ -130,21 +171,35 @@ export const AddAttendancesPage = () => {
   }, [videoRef.current]);
 
   useEffect(() => {
+    // tunggu selama 2 deik baru kemudian nyalakan kameranya
     setTimeout(() => {
       startVideo();
       videoRef && loadModels();
     }, 2000);
 
     return () => {
-      // Clean up camera stream
-      if (streamRef.current) {
-        const tracks = streamRef.current.getTracks();
-        tracks.forEach((track) => {
-          track.stop();
-        });
-      }
+      stopVideo();
     };
   }, [dimensions]);
+
+  const handleInstruction = () => {
+    return <>
+      <p className="mb-0">Now, take a picture of your lecturer!</p>
+      <p className="mb-0">Change your camera first!</p>
+    </>
+  }
+
+  useEffect(() => {
+    if (form.student_image && !prediction) {
+      predictFace().then((result) => result.json()).then((data) => {
+        setPrediction(data);
+        setInstructions(`Face detected, ${data[0][0]}`)
+        setTimeout(() => {
+          setInstructions(handleInstruction)
+        }, 2000);
+      });
+    }
+  }, [form]);
 
   const getCourseClass = async () => {
     try {
@@ -257,6 +312,14 @@ export const AddAttendancesPage = () => {
               </div>
             </div>
             <div className="card-body">
+              <div className="alert alert-info text-white d-flex">
+                <span className="alert-icon align-middle me-2">
+                  <i className="bi bi-info-circle-fill"></i>
+                </span>
+                <span className="alert-text">
+                  {instructions}
+                </span>
+              </div>
               <form onSubmit={onFinish}>
                 <div className="d-flex align-items-center position-relative ratio ratio-16x9 mb-3">
                   <video src="" crossOrigin="anonymous" ref={videoRef} autoPlay={true} width="100%"
@@ -265,14 +328,20 @@ export const AddAttendancesPage = () => {
                           className="position-absolute top-50 start-50 translate-middle"></canvas>
                 </div>
                 <div className="btn-group w-100" role="group" aria-label="Basic checkbox toggle button group">
-                  <input type="checkbox" className="btn-check" id="btncheck1" autoComplete="off" onClick={handleFlashlight}/>
-                  <label className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle" htmlFor="btncheck1">
+                  <input type="checkbox" className="btn-check" id="btncheck1" autoComplete="off"
+                         onClick={handleFlashlight}/>
+                  <label
+                    className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle"
+                    htmlFor="btncheck1">
                     <i className="bi bi-lightning-fill me-1 fs-6"></i>
                     <span>Flashlight</span>
                   </label>
 
-                  <input type="checkbox" className="btn-check" id="btncheck2" autoComplete="off" onClick={handleChangeCamera}/>
-                  <label className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle" htmlFor="btncheck2">
+                  <input type="checkbox" className="btn-check" id="btncheck2" autoComplete="off"
+                         onClick={handleChangeCamera}/>
+                  <label
+                    className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle"
+                    htmlFor="btncheck2">
                     <i className="bi bi-arrow-repeat me-2 fs-6"></i>
                     <span className="change-camera-text">Change Camera</span>
                   </label>
@@ -300,7 +369,7 @@ export const AddAttendancesPage = () => {
                   </select>
                   <ErrorMessage field="course_class_id" errors={errors}/>
                 </div>
-                <div className="has-validation mb-3">
+                <div className="has-validation mb-3 d-none">
                   <label className="mb-1">Student Image</label>
                   <input
                     name="student_image"

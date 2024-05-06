@@ -8,8 +8,6 @@ import * as faceapi from "face-api.js";
 import { WithFaceLandmarks } from "face-api.js";
 import './profile.css';
 import Alert from "../../components/Alert";
-import fetchAPI from "../../fetch";
-import Cookies from "js-cookie";
 
 export const ProfilePage = () => {
   const {isLogin, setIsLogin} = useContext(AuthContext);
@@ -49,10 +47,6 @@ export const ProfilePage = () => {
     }
 
     return user.image;
-  };
-
-  const formatUserName = (name: string) => {
-    return _.snakeCase(name);
   };
 
   const startVideo = async () => {
@@ -102,7 +96,7 @@ export const ProfilePage = () => {
       const videoBlob = new Blob(videoChunks, {type: mimeType});
       const videoFile = new File(
         [videoBlob],
-        `${_.toLower(isLogin.data.name)}_face_data.webm`,
+        `${_.snakeCase(isLogin.data.name)}_face_data.webm`,
         {type: mimeType}
       );
 
@@ -211,36 +205,37 @@ export const ProfilePage = () => {
   const uploadFaceData = async (video: any) => {
     const formData = new FormData();
     formData.append("video", video);
-    formData.append("name", formatUserName(isLogin.data.name));
+    formData.append("name", _.snakeCase(isLogin.data.name));
+
+    setLoadingText("Generating face data...");
 
     const generate = await fetch(`${import.meta.env.VITE_API_ML_URL}/generate-dataset`, {
       method: "POST",
       body: formData,
     });
 
-    setLoadingText("Generating face data...");
-
-    if (!generate.ok) return
+    if (!generate.ok) return false;
 
     const generateData = await generate.json();
+
+    setLoadingText("Training model...");
     const training = await fetch(`${import.meta.env.VITE_API_ML_URL}/training`, {
       method: "POST",
     });
 
-    setLoadingText("Training model...");
-
-    if (!training.ok) return
-
+    if (!training.ok) return false;
     const trainingData = await training.json();
+
+    return true;
   }
 
   const checkFacialData = async () => {
-    const username = formatUserName(isLogin.data.name);
+    const username = _.snakeCase(isLogin.data.name);
     const response = await fetch(`${import.meta.env.VITE_API_ML_URL}/check-facial-data/${username}`, {
       method: "GET",
     });
 
-    if (!response.ok) {
+    if (response.status === 409) {
       console.log('nice')
       setIsFacialDataExist(true);
       console.log(isFacialDataExist, 'nice bro')
@@ -298,17 +293,16 @@ export const ProfilePage = () => {
   }, [dimensions, faceDetectionRunning, recordingStatus]);
 
   useEffect(() => {
-    if (isDetectingDone) {
-      setTimeout(async () => {
-        console.log(recordedVideo, 'recorded video')
-        if (recordedVideo) {
-          await uploadFaceData(recordedVideo);
+    if (isDetectingDone && recordedVideo) {
+      uploadFaceData(recordedVideo).then((onFulfilled) => {
+        if (onFulfilled) {
           handleCloseModal();
+          setRecordedVideo(null);
           Alert.success("Success", "Face data added successfully");
         }
-      }, 1500);
+      });
     }
-  }, [isDetectingDone, recordedVideo, loadingText]);
+  }, [recordedVideo]);
 
   useEffect(() => {
     setModal(
@@ -318,7 +312,7 @@ export const ProfilePage = () => {
 
   useEffect(() => {
     checkFacialData();
-  }, []);
+  }, [recordedVideo]);
 
   return (
     <UserLayout>
@@ -427,10 +421,10 @@ export const ProfilePage = () => {
                   <p className="text-center">{instructions}</p>
                 ) : (
                   <>
-                    {loadingText ? (
-                      <p className="text-center">{loadingText}</p>
-                    ) : (
+                    {!loadingText ? (
                       <p className="text-center">Face detection done</p>
+                    ) : (
+                      <p className="text-center">{loadingText}</p>
                     )}
                   </>
                 )}
@@ -442,7 +436,9 @@ export const ProfilePage = () => {
                           className="position-absolute top-50 start-50 translate-middle"></canvas>
                 </div>
                 {recordingStatus === "inactive" ? (
-                  <button type="button" className="btn bg-gradient-primary w-100 mt-3" onClick={startRecording}>
+                  <button type="button"
+                          className={`btn bg-gradient-primary w-100 mt-3 ${isDetectingDone ? 'disabled' : ''}`}
+                          onClick={startRecording}>
                     Start
                   </button>
                 ) : null}

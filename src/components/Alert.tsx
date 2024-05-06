@@ -80,25 +80,6 @@ class Alert extends React.Component {
     });
     return result.isConfirmed;
   }
-  static async confirmLocation(
-    title: string,
-    text: string,
-    confirmText: string = "Yes",
-    cancelText: string = "No"
-  ): Promise<boolean> {
-    const result = await Swal.fire({
-      title,
-      text,
-      icon: "warning",
-      showCancelButton: false,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: confirmText,
-      cancelButtonText: cancelText,
-      heightAuto: false,
-    });
-    return result.isConfirmed;
-  }
 
   render() {
     return null; // Since this is not a visible component
