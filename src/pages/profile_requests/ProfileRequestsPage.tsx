@@ -7,16 +7,22 @@ import fetchAPI from "../../fetch";
 import Alert from "../../components/Alert";
 
 export const ProgileRequestsPage = () => {
+  const userLogin = JSON.parse(localStorage.getItem("user") || "{}");
   const columns = [
     {
       name: "ID",
       selector: "id",
       key: 1,
     },
-    {
-      name: "Name",
-      selector: "name",
+    userLogin.role_id === 1 && {
+      name: "Student",
+      selector: "student.user.name",
       key: 2,
+    },
+    {
+      name: "Field",
+      selector: "changed_data",
+      key: 3,
     },
     {
       name: "Before",
@@ -36,6 +42,7 @@ export const ProgileRequestsPage = () => {
     {
       name: "Action",
       selector: "action",
+      key: 7,
     },
   ];
 
@@ -45,8 +52,6 @@ export const ProgileRequestsPage = () => {
   >({});
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const userLogin = JSON.parse(localStorage.getItem("user") || "{}");
 
   const getProfileRequestData = async () => {
     setIsLoading(true);
@@ -171,6 +176,9 @@ export const ProgileRequestsPage = () => {
                   <thead>
                     <tr>
                       {columns.map((item, index) => {
+                        if (!item) {
+                          return null;
+                        }
                         return (
                           <th
                             key={index}
@@ -211,9 +219,16 @@ export const ProgileRequestsPage = () => {
                                 {item.id}
                               </span>
                             </td>
+                            {userLogin.role_id === 1 && (
+                              <td className="text-sm font-weight-normal px-4 py-3">
+                                <span className="d-flex justify-content-center">
+                                  {item.student.user.name}
+                                </span>
+                              </td>
+                            )}
                             <td className="text-sm font-weight-normal px-4 py-3">
                               <span className="d-flex justify-content-center">
-                                {item.student.user.name}
+                                {item.changed_data}
                               </span>
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
@@ -279,34 +294,45 @@ export const ProgileRequestsPage = () => {
                             </td>
                             <td className="w-full">
                               <div className="d-flex gap-2 flex-wrap w-full justify-content-center">
-                                {userLogin.role_id === 1
-                                  ? item.status === "pending" && (
-                                      <div className="d-flex gap-2 flex-wrap w-full">
-                                        <button
-                                          className="btn btn-primary btn-sm mb-0"
-                                          onClick={() => {
-                                            handleStatusChange(
-                                              item.id,
-                                              "accepted"
-                                            );
-                                          }}
-                                        >
-                                          Accept
-                                        </button>
-                                        <button
-                                          className="btn btn-danger btn-sm mb-0"
-                                          onClick={() => {
-                                            handleStatusChange(
-                                              item.id,
-                                              "rejected"
-                                            );
-                                          }}
-                                        >
-                                          Reject
-                                        </button>
-                                      </div>
-                                    )
-                                  : null}
+                                {userLogin.role_id === 1 ? (
+                                  item.status === "pending" && (
+                                    <div className="d-flex gap-2 flex-wrap w-full">
+                                      <button
+                                        className="btn btn-primary btn-sm mb-0"
+                                        onClick={() => {
+                                          handleStatusChange(
+                                            item.id,
+                                            "accepted"
+                                          );
+                                        }}
+                                      >
+                                        Accept
+                                      </button>
+                                      <button
+                                        className="btn btn-danger btn-sm mb-0"
+                                        onClick={() => {
+                                          handleStatusChange(
+                                            item.id,
+                                            "rejected"
+                                          );
+                                        }}
+                                      >
+                                        Reject
+                                      </button>
+                                    </div>
+                                  )
+                                ) : (
+                                  <div className="d-flex gap-2 flex-wrap w-full">
+                                    <button
+                                      className="btn btn-primary btn-sm mb-0"
+                                      onClick={() => {
+                                        // history.push(`/profile/edit/${item.id}`);
+                                      }}
+                                    >
+                                      Detail
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </td>
                           </tr>
