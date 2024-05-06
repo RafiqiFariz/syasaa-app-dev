@@ -282,16 +282,6 @@ export const ProgileRequestsPage = () => {
                                 {userLogin.role_id === 1
                                   ? item.status === "pending" && (
                                       <div className="d-flex gap-2 flex-wrap w-full">
-                                        {/* <button
-                                          className="btn btn-primary btn-sm mb-0"
-                                          onClick={() => {
-                                            history.push(
-                                              `/profile-requests/edit/${item.id}`
-                                            );
-                                          }}
-                                        >
-                                          Edit
-                                        </button> */}
                                         <button
                                           className="btn btn-primary btn-sm mb-0"
                                           onClick={() => {
@@ -316,32 +306,7 @@ export const ProgileRequestsPage = () => {
                                         </button>
                                       </div>
                                     )
-                                  : item.status === "pending" && (
-                                      <>
-                                        <button
-                                          className="btn btn-primary btn-sm mb-0"
-                                          onClick={() => {
-                                            handleStatusChange(
-                                              item.id,
-                                              "accepted"
-                                            );
-                                          }}
-                                        >
-                                          Accept
-                                        </button>
-                                        <button
-                                          className="btn btn-danger btn-sm mb-0"
-                                          onClick={() => {
-                                            handleStatusChange(
-                                              item.id,
-                                              "rejected"
-                                            );
-                                          }}
-                                        >
-                                          Reject
-                                        </button>
-                                      </>
-                                    )}
+                                  : null}
                               </div>
                             </td>
                           </tr>
