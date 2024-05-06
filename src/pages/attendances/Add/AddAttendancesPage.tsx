@@ -1,16 +1,19 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useGeoLocation } from "../../../hooks/useGeoLocation";
 import { useHistory } from "react-router";
 import { getDistance } from "geolib";
 import { ErrorMessage } from "../../../components/ErrorMessage";
+import { AuthContext } from "../../../context/Auth";
 import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
 import * as faceapi from 'face-api.js';
 import Alert from "../../../components/Alert";
 import '../attendance.css';
+import _ from "lodash";
 
 export const AddAttendancesPage = () => {
+  const {isLogin, setIsLogin} = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
     course_class_id: "",
@@ -18,7 +21,6 @@ export const AddAttendancesPage = () => {
     lecturer_image: null,
   });
   const [errors, setErrors] = useState({});
-  const user = JSON.parse(localStorage.getItem("user"));
   const getUserLocation = useGeoLocation();
   const history = useHistory();
   const videoRef = useRef(null);
@@ -26,8 +28,22 @@ export const AddAttendancesPage = () => {
   const streamRef = useRef(null);
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
   const [facingMode, setFacingMode] = useState("user");
-  const [instructions, setInstructions] = useState<String | JSX.Element>("Detecting your face...");
   const [prediction, setPrediction] = useState(null);
+  const [isPredictionDone, setIsPredictionDone] = useState({student: false, lecturer: false});
+  const [isPresent, setIsPresent] = useState(false);
+  const [step, setStep] = useState(1);
+  const [distance, setDistance] = useState(0);
+  const user = isLogin.data;
+  const ALLOWED_DISTANCE = 20;
+
+  const defaultInstructions = () => {
+    return <>
+      <p className="mb-0">Detecting your face...</p>
+      <p className="mb-0">Make sure you are in a well-lit environment.</p>
+    </>
+  }
+
+  const [instructions, setInstructions] = useState<String | JSX.Element>(defaultInstructions);
 
   const getLocation = async () => {
     console.log(getUserLocation, "location");
@@ -43,7 +59,7 @@ export const AddAttendancesPage = () => {
     );
 
     // distance harus diubah ketika di production
-    if (distance >= 20) {
+    if (distance >= ALLOWED_DISTANCE) {
       const result = await Alert.confirm(
         "Location Confirmation",
         "You are not in the class location, please change places or do attendance request!",
@@ -54,6 +70,8 @@ export const AddAttendancesPage = () => {
       console.log(result, "result");
       // return history.push("/attendances");
     }
+
+    setDistance(distance);
   };
 
   const startVideo = async () => {
@@ -115,17 +133,25 @@ export const AddAttendancesPage = () => {
   }
 
   const captureImage = async (canvas: any) => {
-    if (prediction) return;
+    if (isPredictionDone.student && isPredictionDone.lecturer) return;
 
     canvas.toBlob((blob) => {
       const timestamp = new Date().getTime();
       const file = new File([blob], `${timestamp}.jpg`, {
         type: "image/jpeg",
       });
-      setForm({
-        ...form,
-        student_image: file,
-      });
+
+      if (!isPredictionDone.student) {
+        setForm({
+          ...form,
+          student_image: file,
+        });
+      } else {
+        // setForm({
+        //   ...form,
+        //   lecturer_image: file,
+        // });
+      }
     }, "image/jpeg");
   };
 
@@ -142,7 +168,9 @@ export const AddAttendancesPage = () => {
 
     setInterval(async () => {
       const detections = await faceapi.detectSingleFace(video);
-      if (displaySize.width && displaySize.height && detections) {
+      if (!displaySize.width && !displaySize.height) return;
+
+      if (detections) {
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
         canvas.getContext('2d').clearRect(0, 0, dimensions.width, dimensions.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
@@ -150,6 +178,8 @@ export const AddAttendancesPage = () => {
         setTimeout(async () => {
           await captureImage(canvas);
         }, 3000);
+      } else {
+        canvas.getContext('2d').clearRect(0, 0, dimensions.width, dimensions.height);
       }
     }, 500);
   }
@@ -182,24 +212,66 @@ export const AddAttendancesPage = () => {
     };
   }, [dimensions]);
 
-  const handleInstruction = () => {
-    return <>
-      <p className="mb-0">Now, take a picture of your lecturer!</p>
-      <p className="mb-0">Change your camera first!</p>
-    </>
+  const handleInstruction = (isStudentAccSufficient: boolean, isLecturerAccSufficient: boolean) => {
+    if (isStudentAccSufficient && !isLecturerAccSufficient) {
+      setStep(2);
+      return <>
+        <p className="mb-0">Now, take a picture of your lecturer!</p>
+        <p className="mb-0">Change your camera first!</p>
+      </>
+    } else if (isStudentAccSufficient && isLecturerAccSufficient) {
+      return "Attendance was successful";
+    } else {
+      return defaultInstructions();
+    }
+  }
+
+  const handlePredictFace = async (isStudentAccSufficient: boolean, isLecturerAccSufficient: boolean) => {
+    try {
+      if (step === 1 || (step === 2 && facingMode === "environment")) {
+        const response = await predictFace();
+        const data = await response.json();
+
+        if (_.isArray(data) && !_.isEmpty(data)) {
+          setPrediction(data);
+
+          const predictionName = _.replace(data[0][0], '_', ' ');
+          const currentName = _.toLower(user.name);
+          setIsPredictionDone({
+            student: isStudentAccSufficient && predictionName === currentName,
+            lecturer: isLecturerAccSufficient,
+          });
+
+          if (predictionName !== currentName) {
+            Alert.error("Error", "Oops! It looks like there was a mismatch between the predicted face and the expected face. Please ensure that your camera is clear and well-positioned, then try again. If the issue persists, please contact our support team for further assistance.");
+            return;
+          }
+
+          if (step === 1) setInstructions(`Face detected, ${data[0][0]}`);
+        }
+
+        setTimeout(() => {
+          setInstructions(handleInstruction(isStudentAccSufficient, isLecturerAccSufficient));
+        }, 2000);
+      }
+    } catch (e) {
+      console.error(e, 'error');
+    }
   }
 
   useEffect(() => {
-    if (form.student_image && !prediction) {
-      predictFace().then((result) => result.json()).then((data) => {
-        setPrediction(data);
-        setInstructions(`Face detected, ${data[0][0]}`)
-        setTimeout(() => {
-          setInstructions(handleInstruction)
-        }, 2000);
-      });
+    const isStudentAccSufficient = form.student_image && prediction && prediction[0][1] >= 75;
+    const isLecturerAccSufficient = form.lecturer_image && prediction && prediction[0][1] >= 75;
+    // console.log(isStudentAccSufficient, 'student acc is enough')
+    if ((form.student_image && !prediction) ||
+      !isStudentAccSufficient
+    ) {
+      handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
+    } else if (form.lecturer_image && !prediction || !isLecturerAccSufficient) {
+      handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
     }
-  }, [form]);
+    // console.log(isPredictionDone, 'is prediction done');
+  }, [form, step]);
 
   const getCourseClass = async () => {
     try {
@@ -232,29 +304,29 @@ export const AddAttendancesPage = () => {
         ...form,
         [name]: files[0],
       });
-    } else if (name === "present") {
-      setForm({
-        ...form,
-        [name]: e.target.checked,
-      });
     } else {
       setForm({
         ...form,
         [name]: value,
       });
     }
+    console.log(files[0], 'file 0 bro');
   };
 
   const onFinish = async (e: any) => {
     e.preventDefault();
     const formData = new FormData();
+
+    const present = (distance <= ALLOWED_DISTANCE) &&
+      isPredictionDone.student &&
+      isPredictionDone.lecturer;
     formData.append("student_image", form.student_image);
     formData.append("lecturer_image", form.lecturer_image);
-    formData.append("student_id", user.student.id);
     formData.append("course_class_id", form.course_class_id);
-    formData.append("is_present", "1");
-
+    formData.append("student_id", user.student.id);
+    formData.append("is_present", present ? "1" : "0");
     console.log(form, "form123");
+
     try {
       const response = await fetch("http://localhost:8000/api/v1/attendances", {
         method: "POST",
@@ -354,7 +426,7 @@ export const AddAttendancesPage = () => {
                     className={`form-control ${
                       errors["course_class_id"] ? "is-invalid" : ""
                     }`}
-                    value={form.course_class_id}
+                    // value={form.course_class_id}
                     onChange={handleChange}
                     disabled={courses.length === 0}
                   >
@@ -376,7 +448,7 @@ export const AddAttendancesPage = () => {
                     className={`form-control form-control-sm ${
                       errors["student_image"] ? "is-invalid" : ""
                     }`}
-                    id="formFilesm"
+                    id="studentImage"
                     type="file"
                     accept="image/*"
                     onChange={handleChange}
@@ -386,13 +458,13 @@ export const AddAttendancesPage = () => {
                 <div className="has-validation mb-3">
                   <label className="mb-1">Lecturer Image</label>
                   <input
+                    name="lecturer_image"
                     className={`form-control form-control-sm ${
                       errors["lecturer_image"] ? "is-invalid" : ""
                     }`}
-                    id="formFileSm"
+                    id="lecturerImage"
                     type="file"
                     accept="image/*"
-                    name="lecturer_image"
                     onChange={handleChange}
                   />
                   <ErrorMessage field="lecturer_image" errors={errors}/>
