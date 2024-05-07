@@ -6,7 +6,8 @@ import { AuthContext } from "../context/Auth";
 export const Sidebar = () => {
   const [list, setList] = useState<any>([]);
   const location = useLocation();
-  const { isLogin, setIsLogin } = useContext(AuthContext);
+  // const { isLogin, setIsLogin } = useContext(AuthContext);
+  const [user, setUser] = useState();
 
   const getList = (user) => {
     let list = [];
@@ -141,10 +142,11 @@ export const Sidebar = () => {
   };
 
   useEffect(() => {
-    if (isLogin.data) {
-      getList(isLogin.data);
+    const getuser = JSON.parse(localStorage.getItem("user") || "{}");
+    if (getuser) {
+      getList(getuser);
     }
-  }, [isLogin.data]);
+  }, []);
 
   const appName = import.meta.env.VITE_APP_NAME;
 
