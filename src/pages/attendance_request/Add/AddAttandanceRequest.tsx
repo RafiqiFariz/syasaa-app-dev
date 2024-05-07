@@ -115,6 +115,7 @@ export const AddAttandanceRequest = () => {
 
   const handleChange = (event: any) => {
     const { name, value } = event.target;
+
     if (name === "student_image") {
       setForm({
         ...form,

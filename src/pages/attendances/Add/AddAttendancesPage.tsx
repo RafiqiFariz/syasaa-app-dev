@@ -1,4 +1,10 @@
-import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useGeoLocation } from "../../../hooks/useGeoLocation";
 import { useHistory } from "react-router";
@@ -7,13 +13,13 @@ import { ErrorMessage } from "../../../components/ErrorMessage";
 import { AuthContext } from "../../../context/Auth";
 import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
-import * as faceapi from 'face-api.js';
+import * as faceapi from "face-api.js";
 import Alert from "../../../components/Alert";
-import '../attendance.css';
+import "../attendance.css";
 import _ from "lodash";
 
 export const AddAttendancesPage = () => {
-  const {isLogin, setIsLogin} = useContext(AuthContext);
+  const { isLogin, setIsLogin } = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
     course_class_id: "",
@@ -26,10 +32,13 @@ export const AddAttendancesPage = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
-  const [dimensions, setDimensions] = useState({width: 0, height: 0});
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [facingMode, setFacingMode] = useState("user");
   const [prediction, setPrediction] = useState(null);
-  const [isPredictionDone, setIsPredictionDone] = useState({student: false, lecturer: false});
+  const [isPredictionDone, setIsPredictionDone] = useState({
+    student: false,
+    lecturer: false,
+  });
   const [isPresent, setIsPresent] = useState(false);
   const [step, setStep] = useState(1);
   const [distance, setDistance] = useState(0);
@@ -37,13 +46,17 @@ export const AddAttendancesPage = () => {
   const ALLOWED_DISTANCE = 20;
 
   const defaultInstructions = () => {
-    return <>
-      <p className="mb-0">Detecting your face...</p>
-      <p className="mb-0">Make sure you are in a well-lit environment.</p>
-    </>
-  }
+    return (
+      <>
+        <p className="mb-0">Detecting your face...</p>
+        <p className="mb-0">Make sure you are in a well-lit environment.</p>
+      </>
+    );
+  };
 
-  const [instructions, setInstructions] = useState<String | JSX.Element>(defaultInstructions);
+  const [instructions, setInstructions] = useState<String | JSX.Element>(
+    defaultInstructions
+  );
 
   const getLocation = async () => {
     console.log(getUserLocation, "location");
@@ -79,18 +92,21 @@ export const AddAttendancesPage = () => {
       video: {
         zoom: true,
         facingMode: facingMode,
-        width: {min: 1024, ideal: 1280, max: 1920},
-        height: {min: 576, ideal: 720, max: 1080},
+        width: { min: 1024, ideal: 1280, max: 1920 },
+        height: { min: 576, ideal: 720, max: 1080 },
       },
     };
 
-    navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-      videoRef.current.srcObject = stream;
-      streamRef.current = stream;
-    }).catch((error) => {
-      console.error(error, "Error getting video stream");
-    });
-  }
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then((stream) => {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+      })
+      .catch((error) => {
+        console.error(error, "Error getting video stream");
+      });
+  };
 
   const stopVideo = () => {
     if (streamRef.current) {
@@ -99,11 +115,11 @@ export const AddAttendancesPage = () => {
         track.stop();
       });
     }
-  }
+  };
 
   const handleChangeCamera = () => {
-    setFacingMode(facingMode === 'user' ? 'environment' : 'user');
-  }
+    setFacingMode(facingMode === "user" ? "environment" : "user");
+  };
 
   const handleFlashlight = () => {
     const video = videoRef.current;
@@ -111,26 +127,26 @@ export const AddAttendancesPage = () => {
     const imageCapture = new ImageCapture(track);
     imageCapture.getPhotoCapabilities().then(async () => {
       const photoCapabilities = await imageCapture.getPhotoCapabilities();
-      if (photoCapabilities.fillLightMode.includes('flash')) {
+      if (photoCapabilities.fillLightMode.includes("flash")) {
         const fillLightMode = track.getCapabilities().fillLightMode;
         if (fillLightMode) {
           await track.applyConstraints({
-            advanced: [{fillLightMode: 'flash'}]
+            advanced: [{ fillLightMode: "flash" }],
           });
         }
       }
     });
-  }
+  };
 
   const predictFace = async () => {
     const API_ML_URL = import.meta.env.VITE_API_ML_URL;
     const formData = new FormData();
-    formData.append('image', form.student_image);
+    formData.append("image", form.student_image);
     return await fetch(`${API_ML_URL}/predict`, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     });
-  }
+  };
 
   const captureImage = async (canvas: any) => {
     if (isPredictionDone.student && isPredictionDone.lecturer) return;
@@ -156,14 +172,16 @@ export const AddAttendancesPage = () => {
   };
 
   const loadModels = async () => {
-    await faceapi.loadFaceDetectionModel(import.meta.env.VITE_API_URL + '/models');
+    await faceapi.loadFaceDetectionModel(
+      import.meta.env.VITE_API_URL + "/models"
+    );
     await detectFace();
-  }
+  };
 
   const detectFace = async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const displaySize = {width: dimensions.width, height: dimensions.height};
+    const displaySize = { width: dimensions.width, height: dimensions.height };
     faceapi.matchDimensions(canvas, displaySize);
 
     setInterval(async () => {
@@ -171,25 +189,32 @@ export const AddAttendancesPage = () => {
       if (!displaySize.width && !displaySize.height) return;
 
       if (detections) {
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-        canvas.getContext('2d').clearRect(0, 0, dimensions.width, dimensions.height);
+        const resizedDetections = faceapi.resizeResults(
+          detections,
+          displaySize
+        );
+        canvas
+          .getContext("2d")
+          .clearRect(0, 0, dimensions.width, dimensions.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
 
         setTimeout(async () => {
           await captureImage(canvas);
         }, 3000);
       } else {
-        canvas.getContext('2d').clearRect(0, 0, dimensions.width, dimensions.height);
+        canvas
+          .getContext("2d")
+          .clearRect(0, 0, dimensions.width, dimensions.height);
       }
     }, 500);
-  }
+  };
 
   useLayoutEffect(() => {
     if (videoRef.current) {
       let width = window.getComputedStyle(videoRef.current).width;
       let height = window.getComputedStyle(videoRef.current).height;
-      width = width.replace('px', '');
-      height = height.replace('px', '');
+      width = width.replace("px", "");
+      height = height.replace("px", "");
 
       setDimensions({
         width: +width,
@@ -212,21 +237,29 @@ export const AddAttendancesPage = () => {
     };
   }, [dimensions]);
 
-  const handleInstruction = (isStudentAccSufficient: boolean, isLecturerAccSufficient: boolean) => {
+  const handleInstruction = (
+    isStudentAccSufficient: boolean,
+    isLecturerAccSufficient: boolean
+  ) => {
     if (isStudentAccSufficient && !isLecturerAccSufficient) {
       setStep(2);
-      return <>
-        <p className="mb-0">Now, take a picture of your lecturer!</p>
-        <p className="mb-0">Change your camera first!</p>
-      </>
+      return (
+        <>
+          <p className="mb-0">Now, take a picture of your lecturer!</p>
+          <p className="mb-0">Change your camera first!</p>
+        </>
+      );
     } else if (isStudentAccSufficient && isLecturerAccSufficient) {
       return "Attendance was successful";
     } else {
       return defaultInstructions();
     }
-  }
+  };
 
-  const handlePredictFace = async (isStudentAccSufficient: boolean, isLecturerAccSufficient: boolean) => {
+  const handlePredictFace = async (
+    isStudentAccSufficient: boolean,
+    isLecturerAccSufficient: boolean
+  ) => {
     try {
       if (step === 1 || (step === 2 && facingMode === "environment")) {
         const response = await predictFace();
@@ -235,7 +268,7 @@ export const AddAttendancesPage = () => {
         if (_.isArray(data) && !_.isEmpty(data)) {
           setPrediction(data);
 
-          const predictionName = _.replace(data[0][0], '_', ' ');
+          const predictionName = _.replace(data[0][0], "_", " ");
           const currentName = _.toLower(user.name);
           setIsPredictionDone({
             student: isStudentAccSufficient && predictionName === currentName,
@@ -243,7 +276,10 @@ export const AddAttendancesPage = () => {
           });
 
           if (predictionName !== currentName) {
-            Alert.error("Error", "Oops! It looks like there was a mismatch between the predicted face and the expected face. Please ensure that your camera is clear and well-positioned, then try again. If the issue persists, please contact our support team for further assistance.");
+            Alert.error(
+              "Error",
+              "Oops! It looks like there was a mismatch between the predicted face and the expected face. Please ensure that your camera is clear and well-positioned, then try again. If the issue persists, please contact our support team for further assistance."
+            );
             return;
           }
 
@@ -251,23 +287,28 @@ export const AddAttendancesPage = () => {
         }
 
         setTimeout(() => {
-          setInstructions(handleInstruction(isStudentAccSufficient, isLecturerAccSufficient));
+          setInstructions(
+            handleInstruction(isStudentAccSufficient, isLecturerAccSufficient)
+          );
         }, 2000);
       }
     } catch (e) {
-      console.error(e, 'error');
+      console.error(e, "error");
     }
-  }
+  };
 
   useEffect(() => {
-    const isStudentAccSufficient = form.student_image && prediction && prediction[0][1] >= 75;
-    const isLecturerAccSufficient = form.lecturer_image && prediction && prediction[0][1] >= 75;
+    const isStudentAccSufficient =
+      form.student_image && prediction && prediction[0][1] >= 75;
+    const isLecturerAccSufficient =
+      form.lecturer_image && prediction && prediction[0][1] >= 75;
     // console.log(isStudentAccSufficient, 'student acc is enough')
-    if ((form.student_image && !prediction) ||
-      !isStudentAccSufficient
-    ) {
+    if ((form.student_image && !prediction) || !isStudentAccSufficient) {
       handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
-    } else if (form.lecturer_image && !prediction || !isLecturerAccSufficient) {
+    } else if (
+      (form.lecturer_image && !prediction) ||
+      !isLecturerAccSufficient
+    ) {
       handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
     }
     // console.log(isPredictionDone, 'is prediction done');
@@ -298,7 +339,7 @@ export const AddAttendancesPage = () => {
   };
 
   const handleChange = (e: any) => {
-    const {name, value, files} = e.target;
+    const { name, value, files } = e.target;
     if (files) {
       setForm({
         ...form,
@@ -310,14 +351,15 @@ export const AddAttendancesPage = () => {
         [name]: value,
       });
     }
-    console.log(files[0], 'file 0 bro');
+    console.log(files[0], "file 0 bro");
   };
-
+  console.log(form, "form12321312");
   const onFinish = async (e: any) => {
     e.preventDefault();
     const formData = new FormData();
 
-    const present = (distance <= ALLOWED_DISTANCE) &&
+    const present =
+      distance <= ALLOWED_DISTANCE &&
       isPredictionDone.student &&
       isPredictionDone.lecturer;
     formData.append("student_image", form.student_image);
@@ -376,11 +418,8 @@ export const AddAttendancesPage = () => {
         <div className="col-12 col-lg-6 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div
-                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                <h6 className="text-white text-capitalize ps-3">
-                  Clock In
-                </h6>
+              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                <h6 className="text-white text-capitalize ps-3">Clock In</h6>
               </div>
             </div>
             <div className="card-body">
@@ -388,32 +427,55 @@ export const AddAttendancesPage = () => {
                 <span className="alert-icon align-middle me-2">
                   <i className="bi bi-info-circle-fill"></i>
                 </span>
-                <span className="alert-text">
-                  {instructions}
-                </span>
+                <span className="alert-text">{instructions}</span>
               </div>
               <form onSubmit={onFinish}>
                 <div className="d-flex align-items-center position-relative ratio ratio-16x9 mb-3">
-                  <video src="" crossOrigin="anonymous" ref={videoRef} autoPlay={true} width="100%"
-                         height="100%"></video>
-                  <canvas ref={canvasRef} width="100%"
-                          className="position-absolute top-50 start-50 translate-middle"></canvas>
+                  <video
+                    src=""
+                    crossOrigin="anonymous"
+                    ref={videoRef}
+                    autoPlay={true}
+                    width="100%"
+                    height="100%"
+                  ></video>
+                  <canvas
+                    ref={canvasRef}
+                    width="100%"
+                    className="position-absolute top-50 start-50 translate-middle"
+                  ></canvas>
                 </div>
-                <div className="btn-group w-100" role="group" aria-label="Basic checkbox toggle button group">
-                  <input type="checkbox" className="btn-check" id="btncheck1" autoComplete="off"
-                         onClick={handleFlashlight}/>
+                <div
+                  className="btn-group w-100"
+                  role="group"
+                  aria-label="Basic checkbox toggle button group"
+                >
+                  <input
+                    type="checkbox"
+                    className="btn-check"
+                    id="btncheck1"
+                    autoComplete="off"
+                    onClick={handleFlashlight}
+                  />
                   <label
                     className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle"
-                    htmlFor="btncheck1">
+                    htmlFor="btncheck1"
+                  >
                     <i className="bi bi-lightning-fill me-1 fs-6"></i>
                     <span>Flashlight</span>
                   </label>
 
-                  <input type="checkbox" className="btn-check" id="btncheck2" autoComplete="off"
-                         onClick={handleChangeCamera}/>
+                  <input
+                    type="checkbox"
+                    className="btn-check"
+                    id="btncheck2"
+                    autoComplete="off"
+                    onClick={handleChangeCamera}
+                  />
                   <label
                     className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle"
-                    htmlFor="btncheck2">
+                    htmlFor="btncheck2"
+                  >
                     <i className="bi bi-arrow-repeat me-2 fs-6"></i>
                     <span className="change-camera-text">Change Camera</span>
                   </label>
@@ -439,7 +501,7 @@ export const AddAttendancesPage = () => {
                       );
                     })}
                   </select>
-                  <ErrorMessage field="course_class_id" errors={errors}/>
+                  <ErrorMessage field="course_class_id" errors={errors} />
                 </div>
                 <div className="has-validation mb-3 d-none">
                   <label className="mb-1">Student Image</label>
@@ -453,7 +515,7 @@ export const AddAttendancesPage = () => {
                     accept="image/*"
                     onChange={handleChange}
                   />
-                  <ErrorMessage field="student_image" errors={errors}/>
+                  <ErrorMessage field="student_image" errors={errors} />
                 </div>
                 <div className="has-validation mb-3">
                   <label className="mb-1">Lecturer Image</label>
@@ -467,7 +529,7 @@ export const AddAttendancesPage = () => {
                     accept="image/*"
                     onChange={handleChange}
                   />
-                  <ErrorMessage field="lecturer_image" errors={errors}/>
+                  <ErrorMessage field="lecturer_image" errors={errors} />
                 </div>
                 <div className="button-row d-flex mt-4">
                   <button
