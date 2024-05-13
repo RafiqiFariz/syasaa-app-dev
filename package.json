@@ -2,6 +2,7 @@
   "name": "syasaa-app",
   "private": true,
   "version": "0.0.1",
+  "homepage": "https://attendance-web.site/",
   "type": "module",
   "scripts": {
     "dev": "vite",
