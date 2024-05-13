@@ -16,7 +16,7 @@ import fetchAPI from "../../../fetch";
 import * as faceapi from "face-api.js";
 import Alert from "../../../components/Alert";
 import "../attendance.css";
-import _ from "lodash";
+import _, { set } from "lodash";
 
 export const AddAttendancesPage = () => {
   const { isLogin, setIsLogin } = useContext(AuthContext);
@@ -44,6 +44,7 @@ export const AddAttendancesPage = () => {
   const [distance, setDistance] = useState(0);
   const user = isLogin.data;
   const ALLOWED_DISTANCE = 20;
+  const [flashlight, setFlashlight] = useState(true);
 
   const defaultInstructions = () => {
     return (
@@ -122,21 +123,22 @@ export const AddAttendancesPage = () => {
   };
 
   const handleFlashlight = () => {
+    console.log("flashmasuk");
     const video = videoRef.current;
     const track = video.srcObject.getVideoTracks()[0];
     const imageCapture = new ImageCapture(track);
     imageCapture.getPhotoCapabilities().then(async () => {
       const photoCapabilities = await imageCapture.getPhotoCapabilities();
       if (photoCapabilities.fillLightMode.includes("flash")) {
-        const fillLightMode = track.getCapabilities().fillLightMode;
-        if (fillLightMode) {
-          await track.applyConstraints({
-            advanced: [{ fillLightMode: "flash" }],
-          });
-        }
+        console.log(flashlight, "flashlight1");
+        await track.applyConstraints({
+          advanced: [{ torch: !flashlight }],
+        });
+        setFlashlight((prev) => !prev);
       }
     });
   };
+  console.log(flashlight, "flashlight2");
 
   const predictFace = async () => {
     const API_ML_URL = import.meta.env.VITE_API_ML_URL;
@@ -235,7 +237,8 @@ export const AddAttendancesPage = () => {
     return () => {
       stopVideo();
     };
-  }, [dimensions]);
+  }, [dimensions, facingMode]);
+  console.log(facingMode, "facing mode");
 
   const handleInstruction = (
     isStudentAccSufficient: boolean,
@@ -312,7 +315,7 @@ export const AddAttendancesPage = () => {
       handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
     }
     // console.log(isPredictionDone, 'is prediction done');
-  }, [form, step]);
+  }, [form, step, facingMode]);
 
   const getCourseClass = async () => {
     try {
