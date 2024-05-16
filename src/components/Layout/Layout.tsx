@@ -78,7 +78,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
       setUser(isLogin.data);
     }
   }, [isLogin.data]);
-  console.log(pathname.split("/")[1] == "users", "pathname");
+  // console.log(pathname.split("/")[1] == "users", "pathname");
 
   return (
     <div

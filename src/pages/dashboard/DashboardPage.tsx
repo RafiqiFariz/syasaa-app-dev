@@ -1122,7 +1122,7 @@ export const DashboardPage = () => {
                             <tbody>
                               <tr>
                                 {item.data.map((item, index) => (
-                                  <td className="align-middle text-center">
+                                  <td className="align-middle text-center" key={index}>
                                     <h4 className={`mb-0 ${item.color}`}>
                                       {item.count || 0}
                                     </h4>
@@ -1227,7 +1227,7 @@ export const DashboardPage = () => {
                             <tbody>
                               <tr>
                                 {item.data.map((item, index) => (
-                                  <td className="align-middle text-center">
+                                  <td className="align-middle text-center" key={index}>
                                     <h4
                                       className={`${item.color} d-flex justify-content-center align-items-center`}
                                     >

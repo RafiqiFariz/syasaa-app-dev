@@ -48,7 +48,7 @@ export const CourseClass = () => {
     },
   ];
 
-  console.log(columns, "UserLogin");
+  // console.log(columns, "UserLogin");
 
   const [courseClasses, setCourseClasses] = useState<
     DefaultPaginatedResponse<any>

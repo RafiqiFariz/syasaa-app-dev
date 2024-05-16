@@ -132,6 +132,31 @@ export const ProfilePage = () => {
     setFaceDetectionRunning(false);
   };
 
+  const handleDeleteFacialData = async () => {
+    const username = _.snakeCase(isLogin.data.name);
+    const response = await fetch(
+      `${import.meta.env.VITE_API_ML_URL}/delete-facial-data/${username}`,
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await response.json();
+
+    if (data) {
+      const confirm = await Alert.confirm(
+        "Confirmation",
+        "Are you sure you want to delete this facial data?",
+        "Yes"
+      );
+
+      if (confirm) {
+        Alert.success("Success", data);
+        setIsFacialDataExist(false);
+      }
+    }
+  };
+
   function getTop(l) {
     return l.map((a) => a.y).reduce((a, b) => Math.min(a, b));
   }
@@ -285,9 +310,7 @@ export const ProfilePage = () => {
     );
 
     if (response.status === 409) {
-      console.log("nice");
       setIsFacialDataExist(true);
-      console.log(isFacialDataExist, "nice bro");
     }
   };
 
@@ -362,7 +385,7 @@ export const ProfilePage = () => {
 
   useEffect(() => {
     checkFacialData();
-  }, [recordedVideo]);
+  }, [recordedVideo, isFacialDataExist]);
 
   return (
     <UserLayout>
@@ -430,7 +453,9 @@ export const ProfilePage = () => {
               className={`btn mb-0 rounded-pill ${
                 isFacialDataExist ? "bg-gradient-danger" : "bg-gradient-dark"
               }`}
-              onClick={!isFacialDataExist ? handleLaunchModal : null}
+              onClick={
+                !isFacialDataExist ? handleLaunchModal : handleDeleteFacialData
+              }
             >
               <span className="p-1">
                 {isFacialDataExist ? "Delete Facial Data" : "Add Facial Data"}

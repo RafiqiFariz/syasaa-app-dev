@@ -97,13 +97,13 @@ export const AttendanceRequestPage = () => {
     if (status === "accepted") {
       confirm = await Alert.confirm(
         "Accepted Confirmation!",
-        "Are you sure you want to accepted this Attandance?",
+        "Are you sure you want to accepted this Attendance?",
         "Yes, accepted it!"
       );
     } else {
       confirm = await Alert.confirm(
         "Reject Confirmation!",
-        "Are you sure you want to reject this Attandance?",
+        "Are you sure you want to reject this Attendance?",
         "Yes, reject it!"
       );
     }
