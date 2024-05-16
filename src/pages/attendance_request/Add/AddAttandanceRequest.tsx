@@ -110,7 +110,7 @@ export const AddAttandanceRequest = () => {
   useEffect(() => {
     getCourseClass();
 
-    // enableCamera();
+    enableCamera();
   }, []);
 
   const handleChange = (event: any) => {
@@ -181,17 +181,17 @@ export const AddAttandanceRequest = () => {
     }
   };
 
-  const handleChangeOptions = (e) => {
-    setSelectedOption(e.target.value);
-    if (e.target.value === "capture") {
-      enableCamera(); // Jika opsi yang dipilih adalah "capture", aktifkan kamera
-    } else {
-      // Jika opsi yang dipilih adalah "upload", matikan kamera
-      if (videoRef.current && videoRef.current.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
-      }
-    }
-  };
+  // const handleChangeOptions = (e) => {
+  //   setSelectedOption(e.target.value);
+  //   if (e.target.value === "capture") {
+  //     enableCamera(); // Jika opsi yang dipilih adalah "capture", aktifkan kamera
+  //   } else {
+  //     // Jika opsi yang dipilih adalah "upload", matikan kamera
+  //     if (videoRef.current && videoRef.current.srcObject) {
+  //       videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+  //     }
+  //   }
+  // };
   console.log(form, "form");
 
   return (
@@ -229,7 +229,7 @@ export const AddAttandanceRequest = () => {
                     </select>
                     <ErrorMessage field="course_class_id" errors={errors} />
                   </div>
-                  <div className="input-group input-group-static mb-4 has-validation">
+                  {/* <div className="input-group input-group-static mb-4 has-validation">
                     <label>Option Image</label>
                     <select
                       name="changeField"
@@ -243,106 +243,90 @@ export const AddAttandanceRequest = () => {
                         </option>
                       ))}
                     </select>
-                  </div>
-                  {selectedOption == "upload" ? (
-                    <div className="input-group input-group-static has-validation mb-3">
-                      <label className="mb-2">Student Image</label>
-                      <input
-                        name="student_image"
-                        className={`form-control form-control-sm ${
-                          errors["student_image"] ? "is-invalid" : ""
-                        }`}
-                        id="formFilesm"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleChange}
-                      />
-                      <ErrorMessage field="student_image" errors={errors} />
-                    </div>
-                  ) : (
-                    <div className="input-group input-group-static has-validation mb-3 d-flex justify-content-center">
-                      <div className="d-flex flex-column">
-                        {form.student_image == "" ? (
-                          <video
-                            ref={videoRef}
-                            autoPlay
-                            muted
-                            width={350}
-                            height={350}
-                          />
-                        ) : (
-                          <img
-                            src={`${
-                              form.student_image
-                                ? URL.createObjectURL(form.student_image as any)
-                                : "https://via.placeholder.com/150"
-                            }`}
-                            width={380}
-                            height={300}
-                            className="rounded-3 my-2"
-                            alt="none"
-                          />
-                        )}
+                  </div> */}
 
-                        <canvas ref={canvasRef} style={{ display: "none" }} />
+                  <div className="input-group input-group-static has-validation mb-3 d-flex justify-content-center">
+                    <div className="d-flex flex-column">
+                      {form.student_image == "" ? (
+                        <video
+                          ref={videoRef}
+                          autoPlay
+                          muted
+                          width={350}
+                          height={350}
+                        />
+                      ) : (
+                        <img
+                          src={`${
+                            form.student_image
+                              ? URL.createObjectURL(form.student_image as any)
+                              : "https://via.placeholder.com/150"
+                          }`}
+                          width={380}
+                          height={300}
+                          className="rounded-3 my-2"
+                          alt="none"
+                        />
+                      )}
 
-                        <div className="d-flex justify-content-center">
-                          <button
-                            className="btn bg-gradient-dark ms-auto mb-0 mx-auto"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              const video = videoRef.current;
-                              const canvas = canvasRef.current;
-                              canvas.width = video.videoWidth;
-                              canvas.height = video.videoHeight;
-                              canvas
-                                .getContext("2d")
-                                .drawImage(
-                                  video,
-                                  0,
-                                  0,
-                                  canvas.width,
-                                  canvas.height
-                                );
-                              canvas.toBlob((blob) => {
-                                const file = new File(
-                                  [blob],
-                                  "captured_image.jpg",
-                                  {
-                                    type: "image/jpeg",
-                                  }
-                                );
+                      <canvas ref={canvasRef} style={{ display: "none" }} />
 
-                                setForm((prev: any) => {
-                                  return {
-                                    ...prev,
-                                    student_image: file,
-                                  };
-                                });
-                              }, "image/jpeg");
-                            }}
-                          >
-                            Take a Picture
-                          </button>
-                          <button
-                            className="btn bg-gradient-dark ms-auto mb-0 mx-auto"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              enableCamera();
+                      <div className="d-flex justify-content-center">
+                        <button
+                          className="btn bg-gradient-dark ms-auto mb-0 mx-auto"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const video = videoRef.current;
+                            const canvas = canvasRef.current;
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            canvas
+                              .getContext("2d")
+                              .drawImage(
+                                video,
+                                0,
+                                0,
+                                canvas.width,
+                                canvas.height
+                              );
+                            canvas.toBlob((blob) => {
+                              const file = new File(
+                                [blob],
+                                "captured_image.jpg",
+                                {
+                                  type: "image/jpeg",
+                                }
+                              );
+
                               setForm((prev: any) => {
                                 return {
                                   ...prev,
-                                  student_image: "",
+                                  student_image: file,
                                 };
                               });
-                            }}
-                          >
-                            Enable Camera
-                          </button>
-                        </div>
+                            }, "image/jpeg");
+                          }}
+                        >
+                          Take a Picture
+                        </button>
+                        <button
+                          className="btn bg-gradient-dark ms-auto mb-0 mx-auto"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            enableCamera();
+                            setForm((prev: any) => {
+                              return {
+                                ...prev,
+                                student_image: "",
+                              };
+                            });
+                          }}
+                        >
+                          Enable Camera
+                        </button>
                       </div>
                     </div>
-                  )}
+                  </div>
 
                   <div className="input-group input-group-static has-validation mb-3">
                     <label>Evidence</label>

@@ -2,22 +2,24 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { UserLayout } from "../../components/Layout/Layout";
 import { AuthContext } from "../../context/Auth";
 import { useHistory } from "react-router";
-import { Modal } from 'bootstrap'
-import _ from "lodash";
+import { Modal } from "bootstrap";
+import _, { get } from "lodash";
 import * as faceapi from "face-api.js";
 import { WithFaceLandmarks } from "face-api.js";
-import './profile.css';
+import "./profile.css";
 import Alert from "../../components/Alert";
+import Cookies from "js-cookie";
+import fetchAPI from "../../fetch";
 
 export const ProfilePage = () => {
-  const {isLogin, setIsLogin} = useContext(AuthContext);
+  const { isLogin, setIsLogin } = useContext(AuthContext);
   const history = useHistory();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const modalAddFaceData = useRef(null);
   const [modal, setModal] = useState(null);
-  const [dimensions, setDimensions] = useState({width: 0, height: 0});
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [videoStarted, setVideoStarted] = useState(false);
   const [faceDetectionRunning, setFaceDetectionRunning] = useState(false);
   const [faceDirection, setFaceDirection] = useState({
@@ -50,16 +52,19 @@ export const ProfilePage = () => {
   };
 
   const startVideo = async () => {
-    const constraints = {video: true};
+    const constraints = { video: true };
 
-    navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-      videoRef.current.srcObject = stream;
-      streamRef.current = stream;
-      setStream(stream);
-    }).catch((error) => {
-      console.error(error, "Error getting video stream");
-    });
-  }
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then((stream) => {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+        setStream(stream);
+      })
+      .catch((error) => {
+        console.error(error, "Error getting video stream");
+      });
+  };
 
   const stopVideo = () => {
     if (streamRef.current) {
@@ -68,12 +73,12 @@ export const ProfilePage = () => {
         track.stop();
       });
     }
-  }
+  };
 
   const startRecording = async () => {
     setRecordingStatus("recording");
 
-    mediaRecorder.current = new MediaRecorder(stream, {mimeType});
+    mediaRecorder.current = new MediaRecorder(stream, { mimeType });
 
     mediaRecorder.current.start();
 
@@ -93,11 +98,11 @@ export const ProfilePage = () => {
     mediaRecorder.current.stop();
 
     mediaRecorder.current.onstop = () => {
-      const videoBlob = new Blob(videoChunks, {type: mimeType});
+      const videoBlob = new Blob(videoChunks, { type: mimeType });
       const videoFile = new File(
         [videoBlob],
         `${_.snakeCase(isLogin.data.name)}_face_data.webm`,
-        {type: mimeType}
+        { type: mimeType }
       );
 
       setRecordedVideo(videoFile);
@@ -106,44 +111,56 @@ export const ProfilePage = () => {
   };
 
   const loadModels = async () => {
-    await faceapi.loadFaceDetectionModel(import.meta.env.VITE_API_URL + '/models');
-    await faceapi.loadFaceLandmarkModel(import.meta.env.VITE_API_URL + '/models');
-  }
+    await faceapi.loadFaceDetectionModel(
+      import.meta.env.VITE_API_URL + "/models"
+    );
+    await faceapi.loadFaceLandmarkModel(
+      import.meta.env.VITE_API_URL + "/models"
+    );
+  };
 
   const handleLaunchModal = async () => {
     modal.show();
     setVideoStarted(true);
     await startVideo();
-  }
+  };
 
   const handleCloseModal = () => {
     modal.hide();
     setVideoStarted(false);
     stopVideo();
     setFaceDetectionRunning(false);
-  }
+  };
 
   function getTop(l) {
     return l.map((a) => a.y).reduce((a, b) => Math.min(a, b));
   }
 
   function getMeanPosition(l) {
-    return l.map((a) => [a.x, a.y]).reduce((a, b) => [a[0] + b[0], a[1] + b[1]]).map((a) => a / l.length);
+    return l
+      .map((a) => [a.x, a.y])
+      .reduce((a, b) => [a[0] + b[0], a[1] + b[1]])
+      .map((a) => a / l.length);
   }
 
-  const detectFaceDirection = async (detections: WithFaceLandmarks<any>, lastDirection: any) => {
+  const detectFaceDirection = async (
+    detections: WithFaceLandmarks<any>,
+    lastDirection: any
+  ) => {
     let right_eye = getMeanPosition(detections["landmarks"].getRightEye());
     let left_eye = getMeanPosition(detections["landmarks"].getLeftEye());
     let nose = getMeanPosition(detections["landmarks"].getNose());
     let mouth = getMeanPosition(detections["landmarks"].getMouth());
     let jaw = getTop(detections["landmarks"].getJawOutline());
 
-    let rx = (jaw - mouth) / detections['detection']["_box"]["_height"];
-    let ry = (left_eye[0] + (right_eye[0] - left_eye[0]) / 2 - nose[0]) / detections['detection']["_box"]["_width"];
+    let rx = (jaw - mouth) / detections["detection"]["_box"]["_height"];
+    let ry =
+      (left_eye[0] + (right_eye[0] - left_eye[0]) / 2 - nose[0]) /
+      detections["detection"]["_box"]["_width"];
 
     let face_val = +ry.toFixed(2);
 
-    console.log(lastDirection, 'last direction')
+    console.log(lastDirection, "last direction");
 
     if (face_val < -0.06 && !lastDirection.left) {
       lastDirection = {
@@ -171,27 +188,37 @@ export const ProfilePage = () => {
 
     setFaceDirection(lastDirection);
     return lastDirection;
-  }
+  };
 
   const detectFace = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const displaySize = {width: dimensions.width, height: dimensions.height};
+    const displaySize = { width: dimensions.width, height: dimensions.height };
     faceapi.matchDimensions(canvas, displaySize);
-    console.log(displaySize, 'displaySize');
+    console.log(displaySize, "displaySize");
 
-    let lastDirection = {left: false, right: false, forward: false};
+    let lastDirection = { left: false, right: false, forward: false };
 
     const intervalId = setInterval(async () => {
-      const detections = await faceapi.detectSingleFace(video).withFaceLandmarks();
+      const detections = await faceapi
+        .detectSingleFace(video)
+        .withFaceLandmarks();
       if (displaySize.width && displaySize.height && detections) {
         const resizedDetections = faceapi.resizeResults(detections, dimensions);
-        canvas.getContext('2d').clearRect(0, 0, dimensions.width, dimensions.height);
+        canvas
+          .getContext("2d")
+          .clearRect(0, 0, dimensions.width, dimensions.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
 
         // Jika user sudah mengikuti arahan, maka hentikan deteksi
-        if (lastDirection.left && lastDirection.right && lastDirection.forward) {
-          canvas.getContext('2d').clearRect(0, 0, dimensions.width, dimensions.height);
+        if (
+          lastDirection.left &&
+          lastDirection.right &&
+          lastDirection.forward
+        ) {
+          canvas
+            .getContext("2d")
+            .clearRect(0, 0, dimensions.width, dimensions.height);
           stopRecording();
           setIsDetectingDone(true);
           clearInterval(intervalId);
@@ -200,7 +227,7 @@ export const ProfilePage = () => {
         lastDirection = await detectFaceDirection(detections, lastDirection);
       }
     }, 1000);
-  }
+  };
 
   const uploadFaceData = async (video: any) => {
     const formData = new FormData();
@@ -209,38 +236,60 @@ export const ProfilePage = () => {
 
     setLoadingText("Generating face data...");
 
-    const generate = await fetch(`${import.meta.env.VITE_API_ML_URL}/generate-dataset`, {
-      method: "POST",
-      body: formData,
-    });
+    // const generate = await fetch(
+    //   `${import.meta.env.VITE_API_ML_URL}/generate-dataset`,
+    //   {
+    //     method: "POST",
+    //     body: formData,
+    //     credentials: "include",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN"),
+    //     },
+    //   }
+    // );
+
+    const generate = await fetchAPI(
+      `${import.meta.env.VITE_API_ML_URL}/generate-dataset`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
     if (!generate.ok) return false;
 
     const generateData = await generate.json();
 
     setLoadingText("Training model...");
-    const training = await fetch(`${import.meta.env.VITE_API_ML_URL}/training`, {
-      method: "POST",
-    });
+    const training = await fetch(
+      `${import.meta.env.VITE_API_ML_URL}/training`,
+      {
+        method: "POST",
+      }
+    );
 
     if (!training.ok) return false;
     const trainingData = await training.json();
 
     return true;
-  }
+  };
 
   const checkFacialData = async () => {
     const username = _.snakeCase(isLogin.data.name);
-    const response = await fetch(`${import.meta.env.VITE_API_ML_URL}/check-facial-data/${username}`, {
-      method: "GET",
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_API_ML_URL}/check-facial-data/${username}`,
+      {
+        method: "GET",
+      }
+    );
 
     if (response.status === 409) {
-      console.log('nice')
+      console.log("nice");
       setIsFacialDataExist(true);
-      console.log(isFacialDataExist, 'nice bro')
+      console.log(isFacialDataExist, "nice bro");
     }
-  }
+  };
 
   useEffect(() => {
     let timeout: string | number | NodeJS.Timeout;
@@ -262,13 +311,16 @@ export const ProfilePage = () => {
     };
 
     if (videoRef.current) {
-      videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+      videoRef.current.addEventListener("loadedmetadata", handleLoadedMetadata);
     }
 
     return () => {
       clearTimeout(timeout);
       if (videoRef.current) {
-        videoRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        videoRef.current.removeEventListener(
+          "loadedmetadata",
+          handleLoadedMetadata
+        );
       }
     };
   }, [videoStarted]);
@@ -305,9 +357,7 @@ export const ProfilePage = () => {
   }, [recordedVideo]);
 
   useEffect(() => {
-    setModal(
-      new Modal(modalAddFaceData.current)
-    );
+    setModal(new Modal(modalAddFaceData.current));
   }, []);
 
   useEffect(() => {
@@ -377,10 +427,14 @@ export const ProfilePage = () => {
           </div>
           <div className="d-flex justify-content-center gap-3">
             <button
-              className={`btn mb-0 rounded-pill ${isFacialDataExist ? 'bg-gradient-danger' : 'bg-gradient-dark'}`}
+              className={`btn mb-0 rounded-pill ${
+                isFacialDataExist ? "bg-gradient-danger" : "bg-gradient-dark"
+              }`}
               onClick={!isFacialDataExist ? handleLaunchModal : null}
             >
-              <span className="p-1">{isFacialDataExist ? "Delete Facial Data" : "Add Facial Data"}</span>
+              <span className="p-1">
+                {isFacialDataExist ? "Delete Facial Data" : "Add Facial Data"}
+              </span>
             </button>
 
             <button
@@ -411,8 +465,18 @@ export const ProfilePage = () => {
           <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title font-weight-normal" id="exampleModalLabel">Add Facial Data</h5>
-                <button type="button" className="btn-close text-dark" onClick={handleCloseModal} aria-label="Close">
+                <h5
+                  className="modal-title font-weight-normal"
+                  id="exampleModalLabel"
+                >
+                  Add Facial Data
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close text-dark"
+                  onClick={handleCloseModal}
+                  aria-label="Close"
+                >
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
@@ -430,22 +494,37 @@ export const ProfilePage = () => {
                 )}
 
                 <div className="d-flex align-items-center position-relative">
-                  <video src="" crossOrigin="anonymous" ref={videoRef} autoPlay={true} width="100%"
-                         height="100%"></video>
-                  <canvas ref={canvasRef} width="100%"
-                          className="position-absolute top-50 start-50 translate-middle"></canvas>
+                  <video
+                    src=""
+                    crossOrigin="anonymous"
+                    ref={videoRef}
+                    autoPlay={true}
+                    width="100%"
+                    height="100%"
+                  ></video>
+                  <canvas
+                    ref={canvasRef}
+                    width="100%"
+                    className="position-absolute top-50 start-50 translate-middle"
+                  ></canvas>
                 </div>
                 {recordingStatus === "inactive" ? (
-                  <button type="button"
-                          className={`btn bg-gradient-primary w-100 mt-3 ${isDetectingDone ? 'disabled' : ''}`}
-                          onClick={startRecording}>
+                  <button
+                    type="button"
+                    className={`btn bg-gradient-primary w-100 mt-3 ${
+                      isDetectingDone ? "disabled" : ""
+                    }`}
+                    onClick={startRecording}
+                  >
                     Start
                   </button>
                 ) : null}
 
                 {recordingStatus === "recording" ? (
-                  <button type="button"
-                          className="btn bg-gradient-danger w-100 mt-3 d-flex justify-content-center align-items-center">
+                  <button
+                    type="button"
+                    className="btn bg-gradient-danger w-100 mt-3 d-flex justify-content-center align-items-center"
+                  >
                     <span className="blinking-icon me-2"></span>
                     <span>Recording</span>
                   </button>

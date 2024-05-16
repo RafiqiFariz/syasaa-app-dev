@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/Auth";
+import PerfectScrollbar from "react-perfect-scrollbar";
 
 export const Sidebar = () => {
   const [list, setList] = useState<any>([]);
@@ -158,28 +159,28 @@ export const Sidebar = () => {
       <div className="sidenav-header d-flex justify-content-center align-items-center">
         <span className="ms-1 font-weight-bold text-white">{appName}</span>
       </div>
-      <div
-        className="collapse navbar-collapse h-100"
-        id="sidenav-collapse-main"
-      >
-        <ul className="navbar-nav">
-          {list.map((item: any, index: number) => {
-            return (
-              <li key={index} className="nav-item">
-                <Link
-                  to={item.link}
-                  className={`nav-link text-white ${
-                    location.pathname.includes(item.link)
-                      ? "active bg-primary bg-opacity-25"
-                      : ""
-                  }`}
-                >
-                  <span className="nav-link-text ms-1">{item.name}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+
+      <div className="collapse navbar-collapse" id="sidenav-collapse-main">
+        <PerfectScrollbar>
+          <ul className="navbar-nav">
+            {list.map((item: any, index: number) => {
+              return (
+                <li key={index} className="nav-item">
+                  <Link
+                    to={item.link}
+                    className={`nav-link text-white ${
+                      location.pathname.includes(item.link)
+                        ? "active bg-primary bg-opacity-25"
+                        : ""
+                    }`}
+                  >
+                    <span className="nav-link-text ms-1">{item.name}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </PerfectScrollbar>
       </div>
     </aside>
   );

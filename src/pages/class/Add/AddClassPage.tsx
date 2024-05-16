@@ -4,6 +4,7 @@ import { UserLayout } from "../../../components/Layout/Layout";
 import fetchAPI from "../../../fetch";
 import { useHistory } from "react-router";
 import Alert from "../../../components/Alert";
+import { useGeoLocation } from "../../../hooks/useGeoLocation";
 
 interface OptionsData {
   id: number;
@@ -19,6 +20,8 @@ export const AddClassPage = () => {
   });
   const [errors, setErrors] = useState({});
   const [majors, setMajors] = useState<Array<OptionsData>>([]);
+  const getUserLocation = useGeoLocation();
+  console.log(getUserLocation, "User Location");
 
   const history = useHistory();
 
@@ -53,7 +56,7 @@ export const AddClassPage = () => {
 
   const getMajorsData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/majors", {method: "GET"});
+      const response = await fetchAPI("/api/v1/majors", { method: "GET" });
       const data = await response.json();
       if (response.ok) {
         setMajors(data.data);
@@ -73,9 +76,24 @@ export const AddClassPage = () => {
         <div className="col-12 col-lg-6 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div
-                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
-                <h6 className="text-white text-capitalize ps-3">Add Class</h6>
+              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+                <h6 className="text-white text-capitalize mx-4 my-auto">
+                  Add Class
+                </h6>
+                <button
+                  className="btn btn-info btn-md mx-4 mb-0"
+                  onClick={() => {
+                    if (getUserLocation) {
+                      setForm({
+                        ...form,
+                        lat: getUserLocation.location.latitude.toString(),
+                        lng: getUserLocation.location.longitude.toString(),
+                      });
+                    }
+                  }}
+                >
+                  Set Current Location
+                </button>
               </div>
             </div>
             <div className="card-body">
@@ -92,7 +110,7 @@ export const AddClassPage = () => {
                     placeholder="Name"
                     aria-label="Name"
                   />
-                  <ErrorMessage field="name" errors={errors}/>
+                  <ErrorMessage field="name" errors={errors} />
                 </div>
                 <div className="input-group input-group-dynamic mb-4 has-validation">
                   <input
@@ -106,7 +124,7 @@ export const AddClassPage = () => {
                     placeholder="Latitude"
                     aria-label="Latitude"
                   />
-                  <ErrorMessage field="lat" errors={errors}/>
+                  <ErrorMessage field="lat" errors={errors} />
                 </div>
                 <div className="input-group input-group-dynamic mb-4 has-validation">
                   <input
@@ -120,7 +138,7 @@ export const AddClassPage = () => {
                     placeholder="Longitude"
                     aria-label="Longitude"
                   />
-                  <ErrorMessage field="lng" errors={errors}/>
+                  <ErrorMessage field="lng" errors={errors} />
                 </div>
                 <div className="input-group input-group-static mb-4">
                   <label htmlFor="majors" className="ms-0">

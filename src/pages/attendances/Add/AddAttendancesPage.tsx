@@ -26,6 +26,10 @@ export const AddAttendancesPage = () => {
     student_image: null,
     lecturer_image: null,
   });
+  const [isStudent, setIsStudent] = useState({
+    student: true,
+    lecturer: false,
+  });
   const [errors, setErrors] = useState({});
   const getUserLocation = useGeoLocation();
   const history = useHistory();
@@ -45,6 +49,16 @@ export const AddAttendancesPage = () => {
   const user = isLogin.data;
   const ALLOWED_DISTANCE = 20;
   const [flashlight, setFlashlight] = useState(true);
+  const list = [
+    {
+      name: "Student",
+      value: "student",
+    },
+    {
+      name: "Lecturer",
+      value: "lecturer",
+    },
+  ];
 
   const defaultInstructions = () => {
     return (
@@ -158,20 +172,24 @@ export const AddAttendancesPage = () => {
       const file = new File([blob], `${timestamp}.jpg`, {
         type: "image/jpeg",
       });
+      console.log(file, "file123123");
 
-      if (!isPredictionDone.student) {
+      if (isStudent.student) {
+        if (!isPredictionDone.student) {
+          setForm({
+            ...form,
+            student_image: file,
+          });
+        }
+      } else {
         setForm({
           ...form,
-          student_image: file,
+          lecturer_image: file,
         });
-      } else {
-        // setForm({
-        //   ...form,
-        //   lecturer_image: file,
-        // });
       }
     }, "image/jpeg");
   };
+  console.log(form, "form123123");
 
   const loadModels = async () => {
     await faceapi.loadFaceDetectionModel(
@@ -229,15 +247,26 @@ export const AddAttendancesPage = () => {
 
   useEffect(() => {
     // tunggu selama 2 deik baru kemudian nyalakan kameranya
-    if (videoRef.current && videoRef.current.srcObject) {
-      console.log("video ref", videoRef.current.srcObject);
-      startVideo();
-      videoRef && loadModels();
-    } else {
-      setTimeout(() => {
+    if (isStudent.student) {
+      if (videoRef.current && videoRef.current.srcObject) {
+        console.log("video ref", videoRef.current.srcObject);
         startVideo();
         videoRef && loadModels();
-      }, 2000);
+      } else {
+        setTimeout(() => {
+          startVideo();
+          videoRef && loadModels();
+        }, 2000);
+      }
+    } else {
+      if (videoRef.current && videoRef.current.srcObject) {
+        console.log("video ref", videoRef.current.srcObject);
+        startVideo();
+      } else {
+        setTimeout(() => {
+          startVideo();
+        }, 2000);
+      }
     }
 
     return () => {
@@ -312,13 +341,15 @@ export const AddAttendancesPage = () => {
     const isLecturerAccSufficient =
       form.lecturer_image && prediction && prediction[0][1] >= 75;
     // console.log(isStudentAccSufficient, 'student acc is enough')
-    if ((form.student_image && !prediction) || !isStudentAccSufficient) {
-      handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
-    } else if (
-      (form.lecturer_image && !prediction) ||
-      !isLecturerAccSufficient
-    ) {
-      handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
+    if (isStudent.student) {
+      if ((form.student_image && !prediction) || !isStudentAccSufficient) {
+        handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
+      } else if (
+        (form.lecturer_image && !prediction) ||
+        !isLecturerAccSufficient
+      ) {
+        handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
+      }
     }
     // console.log(isPredictionDone, 'is prediction done');
   }, [form, step, facingMode]);
@@ -420,7 +451,12 @@ export const AddAttendancesPage = () => {
       </div>
     );
   }
-  console.log(facingMode, "video ref");
+  console.log(isStudent, "studenet12312313");
+  // console.log(
+  //   URL.createObjectURL(form?.lecturer_image as any) || "",
+  //   form.lecturer_image,
+  //   "form123123123"
+  // );
 
   return (
     <UserLayout>
@@ -433,26 +469,78 @@ export const AddAttendancesPage = () => {
               </div>
             </div>
             <div className="card-body">
-              <div className="alert alert-info text-white d-flex">
-                <span className="alert-icon align-middle me-2">
-                  <i className="bi bi-info-circle-fill"></i>
-                </span>
-                <span className="alert-text">{instructions}</span>
+              <div className="input-group input-group-static has-validation mb-3">
+                <label>Select Camera For</label>
+                <select
+                  name="is_student"
+                  className={`form-control`}
+                  value={isStudent.student ? "student" : "lecturer"}
+                  onChange={(e) => {
+                    setIsStudent({
+                      student: e.target.value === "student",
+                      lecturer: e.target.value === "lecturer",
+                    });
+                  }}
+                >
+                  {list.map((item, i) => {
+                    // console.log(item, "item");
+                    return (
+                      <option key={i} value={item.value}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </select>
+                <ErrorMessage field="course_class_id" errors={errors} />
               </div>
+              {isStudent.student === true ? (
+                <div className="alert alert-info text-white d-flex">
+                  <span className="alert-icon align-middle me-2">
+                    <i className="bi bi-info-circle-fill"></i>
+                  </span>
+                  <span className="alert-text">{instructions}</span>
+                </div>
+              ) : null}
               <form onSubmit={onFinish}>
                 <div className="d-flex align-items-center position-relative ratio ratio-16x9 mb-3">
-                  <video
-                    src=""
-                    crossOrigin="anonymous"
-                    ref={videoRef}
-                    autoPlay={true}
-                    width="100%"
-                    height="100%"
-                  ></video>
+                  {isStudent.lecturer ? (
+                    form.lecturer_image !== null ? (
+                      <img
+                        src={`${
+                          form.lecturer_image
+                            ? URL.createObjectURL(form.lecturer_image as any)
+                            : "https://via.placeholder.com/150"
+                        }`}
+                        alt="lecturer"
+                        className="position-absolute top-0 start-0 w-100 h-100 object-cover"
+                      />
+                    ) : (
+                      <video
+                        src=""
+                        crossOrigin="anonymous"
+                        ref={videoRef}
+                        autoPlay={true}
+                        width="100%"
+                        height="100%"
+                      ></video>
+                    )
+                  ) : (
+                    <video
+                      src=""
+                      crossOrigin="anonymous"
+                      ref={videoRef}
+                      autoPlay={true}
+                      width="100%"
+                      height="100%"
+                    ></video>
+                  )}
                   <canvas
                     ref={canvasRef}
                     width="100%"
                     className="position-absolute top-50 start-50 translate-middle"
+                    style={{
+                      display: "none",
+                    }}
                   ></canvas>
                 </div>
                 <div
@@ -491,6 +579,70 @@ export const AddAttendancesPage = () => {
                     <span className="change-camera-text">Change Camera</span>
                   </label>
                 </div>
+                {isStudent.lecturer ? (
+                  <>
+                    <input
+                      type="checkbox"
+                      className="btn-check"
+                      id="btncheck3"
+                      autoComplete="off"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (
+                          form.lecturer_image === null &&
+                          isStudent.lecturer
+                        ) {
+                          const video = videoRef.current;
+                          const canvas = canvasRef.current;
+                          canvas.width = video.videoWidth;
+                          canvas.height = video.videoHeight;
+                          canvas
+                            .getContext("2d")
+                            .drawImage(
+                              video,
+                              0,
+                              0,
+                              canvas.width,
+                              canvas.height
+                            );
+                          // canvas.toBlob((blob) => {
+                          //   const file = new File([blob], "captured_image.jpg", {
+                          //     type: "image/jpeg",
+                          //   });
+
+                          //   setForm((prev: any) => {
+                          //     return {
+                          //       ...prev,
+                          //       lecturer_image: file,
+                          //     };
+                          //   });
+                          // }, "image/jpeg");
+                          captureImage(canvas);
+                          stopVideo();
+                        } else {
+                          setForm((prev: any) => {
+                            return {
+                              ...prev,
+                              lecturer_image: null,
+                            };
+                          });
+                          startVideo();
+                        }
+                      }}
+                    />
+                    <label
+                      className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle"
+                      htmlFor="btncheck3"
+                    >
+                      <i className="bi bi-arrow-repeat me-2 fs-6"></i>
+                      <span className="change-camera-text">
+                        {form.lecturer_image !== null
+                          ? "Retake Image"
+                          : "Capture Image"}
+                      </span>
+                    </label>
+                  </>
+                ) : null}
 
                 <div className="input-group input-group-static has-validation mb-3">
                   <label>Course Class</label>
@@ -527,20 +679,6 @@ export const AddAttendancesPage = () => {
                     onChange={handleChange}
                   />
                   <ErrorMessage field="student_image" errors={errors} />
-                </div>
-                <div className="has-validation mb-3">
-                  <label className="mb-1">Lecturer Image</label>
-                  <input
-                    name="lecturer_image"
-                    className={`form-control form-control-sm ${
-                      errors["lecturer_image"] ? "is-invalid" : ""
-                    }`}
-                    id="lecturerImage"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleChange}
-                  />
-                  <ErrorMessage field="lecturer_image" errors={errors} />
                 </div>
                 <div className="button-row d-flex mt-4">
                   <button
