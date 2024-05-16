@@ -132,7 +132,7 @@ export const AddAttendancesPage = () => {
       if (photoCapabilities.fillLightMode.includes("flash")) {
         console.log(flashlight, "flashlight1");
         await track.applyConstraints({
-          advanced: [{ torch: !flashlight }],
+          advanced: [{ torch: flashlight }],
         });
         setFlashlight((prev) => !prev);
       }
@@ -229,10 +229,16 @@ export const AddAttendancesPage = () => {
 
   useEffect(() => {
     // tunggu selama 2 deik baru kemudian nyalakan kameranya
-    setTimeout(() => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      console.log("video ref", videoRef.current.srcObject);
       startVideo();
       videoRef && loadModels();
-    }, 2000);
+    } else {
+      setTimeout(() => {
+        startVideo();
+        videoRef && loadModels();
+      }, 2000);
+    }
 
     return () => {
       stopVideo();
@@ -414,6 +420,7 @@ export const AddAttendancesPage = () => {
       </div>
     );
   }
+  console.log(facingMode, "video ref");
 
   return (
     <UserLayout>
@@ -455,9 +462,10 @@ export const AddAttendancesPage = () => {
                 >
                   <input
                     type="checkbox"
-                    className="btn-check"
+                    className="btn-check "
                     id="btncheck1"
                     autoComplete="off"
+                    disabled={facingMode !== "environment"}
                     onClick={handleFlashlight}
                   />
                   <label
