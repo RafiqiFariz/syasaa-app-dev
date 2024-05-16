@@ -11,12 +11,12 @@ import { useHistory } from "react-router";
 import { getDistance } from "geolib";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import { AuthContext } from "../../../context/Auth";
-import Cookies from "js-cookie";
 import fetchAPI from "../../../fetch";
 import * as faceapi from "face-api.js";
 import Alert from "../../../components/Alert";
 import "../attendance.css";
-import _, { set } from "lodash";
+import _ from "lodash";
+import Cookies from "js-cookie";
 
 export const AddAttendancesPage = () => {
   const { isLogin, setIsLogin } = useContext(AuthContext);
@@ -95,8 +95,17 @@ export const AddAttendancesPage = () => {
         "",
         false
       );
-      console.log(result, "result");
-      // return history.push("/attendances");
+
+      const response = await fetchAPI("/api/v1/attendances", {
+        method: "POST",
+        body: JSON.stringify({
+          student_id: user.student.id,
+          is_present: 0
+        }),
+      });
+
+      const data = response.json();
+      if (data) return history.push("/attendances");
     }
 
     setDistance(distance);
@@ -137,14 +146,13 @@ export const AddAttendancesPage = () => {
   };
 
   const handleFlashlight = () => {
-    console.log("flashmasuk");
     const video = videoRef.current;
     const track = video.srcObject.getVideoTracks()[0];
     const imageCapture = new ImageCapture(track);
+
     imageCapture.getPhotoCapabilities().then(async () => {
       const photoCapabilities = await imageCapture.getPhotoCapabilities();
       if (photoCapabilities.fillLightMode.includes("flash")) {
-        console.log(flashlight, "flashlight1");
         await track.applyConstraints({
           advanced: [{ torch: flashlight }],
         });
@@ -152,7 +160,6 @@ export const AddAttendancesPage = () => {
       }
     });
   };
-  console.log(flashlight, "flashlight2");
 
   const predictFace = async () => {
     const API_ML_URL = import.meta.env.VITE_API_ML_URL;
@@ -217,10 +224,6 @@ export const AddAttendancesPage = () => {
           .getContext("2d")
           .clearRect(0, 0, dimensions.width, dimensions.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
-
-        setTimeout(async () => {
-          await captureImage(canvas);
-        }, 3000);
       } else {
         canvas
           .getContext("2d")
@@ -273,11 +276,10 @@ export const AddAttendancesPage = () => {
       stopVideo();
     };
   }, [dimensions, facingMode]);
-  console.log(facingMode, "facing mode");
 
   const handleInstruction = (
     isStudentAccSufficient: boolean,
-    isLecturerAccSufficient: boolean
+    isLecturerAccSufficient: boolean,
   ) => {
     if (isStudentAccSufficient && !isLecturerAccSufficient) {
       setStep(2);
@@ -296,9 +298,11 @@ export const AddAttendancesPage = () => {
 
   const handlePredictFace = async (
     isStudentAccSufficient: boolean,
-    isLecturerAccSufficient: boolean
+    isLecturerAccSufficient: boolean,
   ) => {
     try {
+      if (isPredictionDone.student) return;
+
       if (step === 1 || (step === 2 && facingMode === "environment")) {
         const response = await predictFace();
         const data = await response.json();
@@ -308,10 +312,6 @@ export const AddAttendancesPage = () => {
 
           const predictionName = _.replace(data[0][0], "_", " ");
           const currentName = _.toLower(user.name);
-          setIsPredictionDone({
-            student: isStudentAccSufficient && predictionName === currentName,
-            lecturer: isLecturerAccSufficient,
-          });
 
           if (predictionName !== currentName) {
             Alert.error(
@@ -322,13 +322,18 @@ export const AddAttendancesPage = () => {
           }
 
           if (step === 1) setInstructions(`Face detected, ${data[0][0]}`);
-        }
 
-        setTimeout(() => {
-          setInstructions(
-            handleInstruction(isStudentAccSufficient, isLecturerAccSufficient)
-          );
-        }, 2000);
+          setIsPredictionDone({
+            student: isStudentAccSufficient && predictionName === currentName,
+            lecturer: isLecturerAccSufficient,
+          });
+
+          setTimeout(() => {
+            setInstructions(
+              handleInstruction(isStudentAccSufficient, isLecturerAccSufficient)
+            );
+          }, 2000);
+        }
       }
     } catch (e) {
       console.error(e, "error");
@@ -336,11 +341,26 @@ export const AddAttendancesPage = () => {
   };
 
   useEffect(() => {
+    // console.log(isStudentAccSufficient, 'student acc is enough')
+    const intervalId = setInterval(async () => {
+      if (dimensions.width && dimensions.height && !isPredictionDone.student) {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+
+        canvas.getContext("2d").drawImage(video, 0, 0, dimensions.width, dimensions.height);
+        await captureImage(canvas);
+      }
+    }, 3000)
+    // console.log(isPredictionDone, 'is prediction done');
+    return () => clearInterval(intervalId);
+  });
+
+  useEffect(() => {
     const isStudentAccSufficient =
       form.student_image && prediction && prediction[0][1] >= 75;
     const isLecturerAccSufficient =
       form.lecturer_image && prediction && prediction[0][1] >= 75;
-    // console.log(isStudentAccSufficient, 'student acc is enough')
+
     if (isStudent.student) {
       if ((form.student_image && !prediction) || !isStudentAccSufficient) {
         handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
@@ -351,8 +371,7 @@ export const AddAttendancesPage = () => {
         handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
       }
     }
-    // console.log(isPredictionDone, 'is prediction done');
-  }, [form, step, facingMode]);
+  }, [form, step, facingMode, isPredictionDone])
 
   const getCourseClass = async () => {
     try {
@@ -391,8 +410,8 @@ export const AddAttendancesPage = () => {
         [name]: value,
       });
     }
-    console.log(files[0], "file 0 bro");
   };
+
   console.log(form, "form12321312");
   const onFinish = async (e: any) => {
     e.preventDefault();
@@ -451,12 +470,7 @@ export const AddAttendancesPage = () => {
       </div>
     );
   }
-  console.log(isStudent, "studenet12312313");
-  // console.log(
-  //   URL.createObjectURL(form?.lecturer_image as any) || "",
-  //   form.lecturer_image,
-  //   "form123123123"
-  // );
+  console.log(isStudent, "student12312313");
 
   return (
     <UserLayout>
@@ -506,11 +520,10 @@ export const AddAttendancesPage = () => {
                   {isStudent.lecturer ? (
                     form.lecturer_image !== null ? (
                       <img
-                        src={`${
-                          form.lecturer_image
-                            ? URL.createObjectURL(form.lecturer_image as any)
-                            : "https://via.placeholder.com/150"
-                        }`}
+                        src={`${form.lecturer_image
+                          ? URL.createObjectURL(form.lecturer_image as any)
+                          : "https://via.placeholder.com/150"
+                          }`}
                         alt="lecturer"
                         className="position-absolute top-0 start-0 w-100 h-100 object-cover"
                       />
@@ -605,18 +618,6 @@ export const AddAttendancesPage = () => {
                               canvas.width,
                               canvas.height
                             );
-                          // canvas.toBlob((blob) => {
-                          //   const file = new File([blob], "captured_image.jpg", {
-                          //     type: "image/jpeg",
-                          //   });
-
-                          //   setForm((prev: any) => {
-                          //     return {
-                          //       ...prev,
-                          //       lecturer_image: file,
-                          //     };
-                          //   });
-                          // }, "image/jpeg");
                           captureImage(canvas);
                           stopVideo();
                         } else {
@@ -648,9 +649,8 @@ export const AddAttendancesPage = () => {
                   <label>Course Class</label>
                   <select
                     name="course_class_id"
-                    className={`form-control ${
-                      errors["course_class_id"] ? "is-invalid" : ""
-                    }`}
+                    className={`form-control ${errors["course_class_id"] ? "is-invalid" : ""
+                      }`}
                     // value={form.course_class_id}
                     onChange={handleChange}
                     disabled={courses.length === 0}
@@ -670,9 +670,8 @@ export const AddAttendancesPage = () => {
                   <label className="mb-1">Student Image</label>
                   <input
                     name="student_image"
-                    className={`form-control form-control-sm ${
-                      errors["student_image"] ? "is-invalid" : ""
-                    }`}
+                    className={`form-control form-control-sm ${errors["student_image"] ? "is-invalid" : ""
+                      }`}
                     id="studentImage"
                     type="file"
                     accept="image/*"

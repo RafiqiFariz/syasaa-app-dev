@@ -126,7 +126,7 @@ export const ProgileRequestsPage = () => {
         const response = await fetchAPI(
           `/api/v1/update-profile-requests/${id}/status`,
           {
-            method: "PUT",
+            method: "POST",
             body: JSON.stringify(payload),
           }
         );

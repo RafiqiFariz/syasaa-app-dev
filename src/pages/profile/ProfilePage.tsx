@@ -261,20 +261,7 @@ export const ProfilePage = () => {
 
     setLoadingText("Generating face data...");
 
-    // const generate = await fetch(
-    //   `${import.meta.env.VITE_API_ML_URL}/generate-dataset`,
-    //   {
-    //     method: "POST",
-    //     body: formData,
-    //     credentials: "include",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN"),
-    //     },
-    //   }
-    // );
-
-    const generate = await fetchAPI(
+    const generate = await fetch(
       `${import.meta.env.VITE_API_ML_URL}/generate-dataset`,
       {
         method: "POST",

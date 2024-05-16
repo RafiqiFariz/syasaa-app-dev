@@ -106,7 +106,7 @@ export const DashboardPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log(data, "data");
+        // console.log(data, "data");
         if (isLogin.data.role_id === 1) {
           return setUsers(data.data);
         } else if (isLogin.data.role_id === 2) {
@@ -264,7 +264,7 @@ export const DashboardPage = () => {
       });
 
       const data = await response.json();
-      console.log(data, "data");
+      // console.log(data, "data");
       if (response.ok) {
         setSchedules(data.data);
         setIsLoading(false);
@@ -1036,7 +1036,7 @@ export const DashboardPage = () => {
     },
   ];
 
-  console.log(LecturerDashboard, "Dashboard");
+  // console.log(LecturerDashboard, "Dashboard");
 
   return (
     <UserLayout>
