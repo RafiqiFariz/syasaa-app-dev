@@ -425,7 +425,7 @@ export const AddAttendancesPage = () => {
     formData.append("lecturer_image", form.lecturer_image);
     formData.append("course_class_id", form.course_class_id);
     formData.append("student_id", user.student.id);
-    formData.append("is_present", present ? "1" : "0");
+    formData.append("is_present", "1");
     console.log(form, "form123");
 
     try {
@@ -447,6 +447,7 @@ export const AddAttendancesPage = () => {
       } else {
         Alert.error("Error", data.message);
         setErrors(data.errors);
+        history.push("/attendances");
       }
     } catch (error) {
       // setErrors(error.errors);
