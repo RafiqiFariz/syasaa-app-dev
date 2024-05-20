@@ -7,7 +7,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "material-dashboard/assets/css/nucleo-icons.css";
 import "material-dashboard/assets/css/nucleo-svg.css";
-import "./public/assets/css/style.css";
+import "../public/assets/css/style.css";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import "material-dashboard/assets/js/core/popper.min.js";
 import "material-dashboard/assets/js/core/bootstrap.min.js";

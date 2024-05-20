@@ -3,7 +3,7 @@ import { UserLayout } from "../../components/Layout/Layout";
 import { AuthContext } from "../../context/Auth";
 import { useHistory } from "react-router";
 import { Modal } from "bootstrap";
-import _, { get } from "lodash";
+import _ from "lodash";
 import * as faceapi from "face-api.js";
 import { WithFaceLandmarks } from "face-api.js";
 import "./profile.css";
@@ -112,10 +112,10 @@ export const ProfilePage = () => {
 
   const loadModels = async () => {
     await faceapi.loadFaceDetectionModel(
-      import.meta.env.VITE_API_URL + "/models"
+      "./models"
     );
     await faceapi.loadFaceLandmarkModel(
-      import.meta.env.VITE_API_URL + "/models"
+      "./models"
     );
   };
 

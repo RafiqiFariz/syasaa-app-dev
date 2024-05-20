@@ -200,7 +200,7 @@ export const AddAttendancesPage = () => {
 
   const loadModels = async () => {
     await faceapi.loadFaceDetectionModel(
-      import.meta.env.VITE_API_URL + "/models"
+      "./models"
     );
     await detectFace();
   };
