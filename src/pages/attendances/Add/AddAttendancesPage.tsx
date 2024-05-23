@@ -100,7 +100,7 @@ export const AddAttendancesPage = () => {
         method: "POST",
         body: JSON.stringify({
           student_id: user.student.id,
-          is_present: 0
+          is_present: 0,
         }),
       });
 
@@ -199,9 +199,7 @@ export const AddAttendancesPage = () => {
   console.log(form, "form123123");
 
   const loadModels = async () => {
-    await faceapi.loadFaceDetectionModel(
-      "./models"
-    );
+    await faceapi.loadFaceDetectionModel("./models");
     await detectFace();
   };
 
@@ -263,7 +261,7 @@ export const AddAttendancesPage = () => {
       }
     } else {
       if (videoRef.current && videoRef.current.srcObject) {
-        console.log("video ref", videoRef.current.srcObject);
+        // console.log("video ref", videoRef.current.srcObject);
         startVideo();
       } else {
         setTimeout(() => {
@@ -275,11 +273,11 @@ export const AddAttendancesPage = () => {
     return () => {
       stopVideo();
     };
-  }, [dimensions, facingMode]);
+  }, [dimensions, facingMode, isStudent.student]);
 
   const handleInstruction = (
     isStudentAccSufficient: boolean,
-    isLecturerAccSufficient: boolean,
+    isLecturerAccSufficient: boolean
   ) => {
     if (isStudentAccSufficient && !isLecturerAccSufficient) {
       setStep(2);
@@ -298,7 +296,7 @@ export const AddAttendancesPage = () => {
 
   const handlePredictFace = async (
     isStudentAccSufficient: boolean,
-    isLecturerAccSufficient: boolean,
+    isLecturerAccSufficient: boolean
   ) => {
     try {
       if (isPredictionDone.student) return;
@@ -347,10 +345,12 @@ export const AddAttendancesPage = () => {
         const video = videoRef.current;
         const canvas = canvasRef.current;
 
-        canvas.getContext("2d").drawImage(video, 0, 0, dimensions.width, dimensions.height);
+        canvas
+          .getContext("2d")
+          .drawImage(video, 0, 0, dimensions.width, dimensions.height);
         await captureImage(canvas);
       }
-    }, 3000)
+    }, 3000);
     // console.log(isPredictionDone, 'is prediction done');
     return () => clearInterval(intervalId);
   });
@@ -363,15 +363,17 @@ export const AddAttendancesPage = () => {
 
     if (isStudent.student) {
       if ((form.student_image && !prediction) || !isStudentAccSufficient) {
+        console.log("masuk student");
         handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
       } else if (
         (form.lecturer_image && !prediction) ||
         !isLecturerAccSufficient
       ) {
+        console.log("masuk lecturer");
         handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
       }
     }
-  }, [form, step, facingMode, isPredictionDone])
+  }, [form, step, facingMode, isPredictionDone]);
 
   const getCourseClass = async () => {
     try {
@@ -521,10 +523,11 @@ export const AddAttendancesPage = () => {
                   {isStudent.lecturer ? (
                     form.lecturer_image !== null ? (
                       <img
-                        src={`${form.lecturer_image
-                          ? URL.createObjectURL(form.lecturer_image as any)
-                          : "https://via.placeholder.com/150"
-                          }`}
+                        src={`${
+                          form.lecturer_image
+                            ? URL.createObjectURL(form.lecturer_image as any)
+                            : "https://via.placeholder.com/150"
+                        }`}
                         alt="lecturer"
                         className="position-absolute top-0 start-0 w-100 h-100 object-cover"
                       />
@@ -650,8 +653,9 @@ export const AddAttendancesPage = () => {
                   <label>Course Class</label>
                   <select
                     name="course_class_id"
-                    className={`form-control ${errors["course_class_id"] ? "is-invalid" : ""
-                      }`}
+                    className={`form-control ${
+                      errors["course_class_id"] ? "is-invalid" : ""
+                    }`}
                     // value={form.course_class_id}
                     onChange={handleChange}
                     disabled={courses.length === 0}
@@ -671,8 +675,9 @@ export const AddAttendancesPage = () => {
                   <label className="mb-1">Student Image</label>
                   <input
                     name="student_image"
-                    className={`form-control form-control-sm ${errors["student_image"] ? "is-invalid" : ""
-                      }`}
+                    className={`form-control form-control-sm ${
+                      errors["student_image"] ? "is-invalid" : ""
+                    }`}
                     id="studentImage"
                     type="file"
                     accept="image/*"

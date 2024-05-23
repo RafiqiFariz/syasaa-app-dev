@@ -405,7 +405,11 @@ export const AttendancesPage = () => {
                                   <img
                                     src={formatImage(item.student_image)}
                                     alt="profile_image"
-                                    className="w-100 border-radius-lg shadow-sm"
+                                    className="border-radius-lg shadow-sm"
+                                    style={{
+                                      width: "object-fit",
+                                      height: "object-fit",
+                                    }}
                                   />
                                 ) : (
                                   <>-</>
@@ -418,7 +422,11 @@ export const AttendancesPage = () => {
                                   <img
                                     src={formatImage(item.lecturer_image)}
                                     alt="profile_image"
-                                    className="w-100 border-radius-lg shadow-sm"
+                                    className="border-radius-lg shadow-sm"
+                                    style={{
+                                      width: "object-fit",
+                                      height: "object-fit",
+                                    }}
                                   />
                                 ) : (
                                   <>-</>

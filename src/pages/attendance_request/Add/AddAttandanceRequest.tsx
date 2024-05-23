@@ -262,8 +262,6 @@ export const AddAttandanceRequest = () => {
                               ? URL.createObjectURL(form.student_image as any)
                               : "https://via.placeholder.com/150"
                           }`}
-                          width={380}
-                          height={300}
                           className="rounded-3 my-2"
                           alt="none"
                         />

@@ -46,12 +46,10 @@ export const AttendanceRequestPage = () => {
       selector: "status",
       key: 5,
     },
-    UserLogin.role_id === 1 || UserLogin.role_id === 3
-      ? {
-          name: "Action",
-          selector: "action",
-        }
-      : null,
+    {
+      name: "Action",
+      selector: "action",
+    },
   ];
   const getData = async () => {
     try {
@@ -227,7 +225,11 @@ export const AttendanceRequestPage = () => {
                                 <img
                                   src={item.student_image}
                                   alt="profile_image"
-                                  className="w-100 border-radius-lg shadow-sm"
+                                  className="border-radius-lg shadow-sm"
+                                  style={{
+                                    width: "object-fit",
+                                    height: "object-fit",
+                                  }}
                                 />
                               </div>
                             </td>
@@ -261,44 +263,53 @@ export const AttendanceRequestPage = () => {
                                 </span>
                               )}
                             </td>
-
-                            {UserLogin.role_id === 2 ||
-                            UserLogin.role_id === 4 ? (
-                              <></>
-                            ) : (
-                              <td className="align-middle">
-                                <div className="d-flex gap-2 justify-content-center">
-                                  {(UserLogin.role_id == 1 ||
-                                    UserLogin.role_id == 3) &&
-                                    item.status === "pending" && (
-                                      <>
-                                        <button
-                                          className="btn btn-primary btn-sm mb-0"
-                                          onClick={() => {
-                                            handleStatusChange(
-                                              item.id,
-                                              "accepted"
-                                            );
-                                          }}
-                                        >
-                                          Accept
-                                        </button>
-                                        <button
-                                          className="btn btn-danger btn-sm mb-0"
-                                          onClick={() => {
-                                            handleStatusChange(
-                                              item.id,
-                                              "rejected"
-                                            );
-                                          }}
-                                        >
-                                          Reject
-                                        </button>
-                                      </>
-                                    )}
-                                </div>
-                              </td>
-                            )}
+                            <td className="align-middle">
+                              <div className="d-flex gap-2 justify-content-center">
+                                {(UserLogin.role_id == 1 ||
+                                  UserLogin.role_id == 3) &&
+                                item.status === "pending" ? (
+                                  <>
+                                    <button
+                                      className="btn btn-primary btn-sm mb-0"
+                                      onClick={() => {
+                                        handleStatusChange(item.id, "accepted");
+                                      }}
+                                    >
+                                      Accept
+                                    </button>
+                                    <button
+                                      className="btn btn-danger btn-sm mb-0"
+                                      onClick={() => {
+                                        handleStatusChange(item.id, "rejected");
+                                      }}
+                                    >
+                                      Reject
+                                    </button>
+                                    <button
+                                      className="btn btn-primary btn-sm mb-0"
+                                      onClick={() => {
+                                        history.push(
+                                          `/attendance-requests/${item.id}/detail`
+                                        );
+                                      }}
+                                    >
+                                      Detail
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button
+                                    className="btn btn-primary btn-sm mb-0"
+                                    onClick={() => {
+                                      history.push(
+                                        `/attendance-requests/${item.id}/detail`
+                                      );
+                                    }}
+                                  >
+                                    Detail
+                                  </button>
+                                )}
+                              </div>
+                            </td>
                           </tr>
                         );
                       })
