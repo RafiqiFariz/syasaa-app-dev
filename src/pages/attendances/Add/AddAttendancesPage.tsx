@@ -529,7 +529,7 @@ export const AddAttendancesPage = () => {
                             : "https://via.placeholder.com/150"
                         }`}
                         alt="lecturer"
-                        className="position-absolute top-0 start-0 w-100 h-100 object-cover"
+                        className="position-absolute top-0 start-0 object-cover"
                       />
                     ) : (
                       <video
