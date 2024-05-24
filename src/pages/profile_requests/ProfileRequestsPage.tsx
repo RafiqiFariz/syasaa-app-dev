@@ -159,7 +159,7 @@ export const ProgileRequestsPage = () => {
             className="card"
             style={
               {
-                //   height: ProfileRequest?.data?.length > 0 ? "100%" : "85vh",
+                  height: ProfileRequest?.data?.length > 0 ? "100%" : "85vh",
               }
             }
           >
@@ -239,7 +239,7 @@ export const ProgileRequestsPage = () => {
                               ) : (
                                 <div className="avatar avatar-xl position-relative">
                                   <img
-                                    src={`http://localhost:8000/${getUserProfilePhoto(
+                                    src={`${import.meta.env.VITE_API_URL}/${getUserProfilePhoto(
                                       item.old_value
                                     )}`}
                                     alt="profile"
@@ -263,7 +263,7 @@ export const ProgileRequestsPage = () => {
                               ) : (
                                 <div className="avatar avatar-xl position-relative">
                                   <img
-                                    src={`http://localhost:8000/storage/${item.new_value}`}
+                                    src={`${import.meta.env.VITE_API_URL}/storage/${item.new_value}`}
                                     alt="profile"
                                     style={{
                                       width: "100px",

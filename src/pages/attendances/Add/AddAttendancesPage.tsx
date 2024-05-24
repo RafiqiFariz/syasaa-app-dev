@@ -46,9 +46,10 @@ export const AddAttendancesPage = () => {
   const [isPresent, setIsPresent] = useState(false);
   const [step, setStep] = useState(1);
   const [distance, setDistance] = useState(0);
+  const [flashlight, setFlashlight] = useState(true);
+
   const user = isLogin.data;
   const ALLOWED_DISTANCE = 20;
-  const [flashlight, setFlashlight] = useState(true);
   const list = [
     {
       name: "Student",

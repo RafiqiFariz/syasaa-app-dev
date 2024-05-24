@@ -39,14 +39,6 @@ export const EditMajorPage = () => {
         _method: "PUT",
       };
 
-      const confirmed = await Alert.confirm(
-        "Update Confirmation!",
-        "Are you sure you want to update this major?",
-        "Yes, update it!"
-      );
-
-      if (!confirmed) return;
-
       const response = await fetchAPI(`/api/v1/majors/${id}`, {
         method: "POST",
         body: JSON.stringify(payload),
