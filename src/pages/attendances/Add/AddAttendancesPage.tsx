@@ -1,21 +1,15 @@
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useGeoLocation } from "../../../hooks/useGeoLocation";
 import { useHistory } from "react-router";
 import { getDistance } from "geolib";
 import { ErrorMessage } from "../../../components/ErrorMessage";
-import { AuthContext } from "../../../context/Auth";
-import fetchAPI from "../../../fetch";
 import * as faceapi from "face-api.js";
 import Alert from "../../../components/Alert";
 import "../attendance.css";
 import _ from "lodash";
+import { AuthContext } from "../../../context/Auth";
+import fetchAPI from "../../../fetch";
 import Cookies from "js-cookie";
 
 export const AddAttendancesPage = () => {
@@ -26,16 +20,14 @@ export const AddAttendancesPage = () => {
     student_image: null,
     lecturer_image: null,
   });
-  const [isStudent, setIsStudent] = useState({
-    student: true,
-    lecturer: false,
-  });
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [errors, setErrors] = useState({});
   const getUserLocation = useGeoLocation();
   const history = useHistory();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const intervalRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [facingMode, setFacingMode] = useState("user");
   const [prediction, setPrediction] = useState(null);
@@ -43,23 +35,12 @@ export const AddAttendancesPage = () => {
     student: false,
     lecturer: false,
   });
-  const [isPresent, setIsPresent] = useState(false);
   const [step, setStep] = useState(1);
   const [distance, setDistance] = useState(0);
   const [flashlight, setFlashlight] = useState(true);
 
   const user = isLogin.data;
   const ALLOWED_DISTANCE = 20;
-  const list = [
-    {
-      name: "Student",
-      value: "student",
-    },
-    {
-      name: "Lecturer",
-      value: "lecturer",
-    },
-  ];
 
   const defaultInstructions = () => {
     return (
@@ -75,7 +56,7 @@ export const AddAttendancesPage = () => {
   );
 
   const getLocation = async () => {
-    console.log(getUserLocation, "location");
+    // console.log(getUserLocation, "location");
     const distance = getDistance(
       {
         latitude: getUserLocation.location?.latitude,
@@ -112,7 +93,7 @@ export const AddAttendancesPage = () => {
     setDistance(distance);
   };
 
-  const startVideo = async () => {
+  const startVideo = () => {
     const constraints = {
       video: {
         zoom: true,
@@ -127,10 +108,28 @@ export const AddAttendancesPage = () => {
       .then((stream) => {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
+        if (!dimensions.width && !dimensions.height) {
+          calculate();
+        }
       })
       .catch((error) => {
         console.error(error, "Error getting video stream");
       });
+  };
+
+  const calculate = () => {
+    let width = window.getComputedStyle(videoRef.current).width;
+    let height = window.getComputedStyle(videoRef.current).height;
+    width = width.replace("px", "");
+    height = height.replace("px", "");
+
+    setDimensions({
+      width: +width,
+      height: +height,
+    });
+
+    canvasRef.current.width = +width;
+    canvasRef.current.height = +height;
   };
 
   const stopVideo = () => {
@@ -180,15 +179,12 @@ export const AddAttendancesPage = () => {
       const file = new File([blob], `${timestamp}.jpg`, {
         type: "image/jpeg",
       });
-      console.log(file, "file123123");
 
-      if (isStudent.student) {
-        if (!isPredictionDone.student) {
-          setForm({
-            ...form,
-            student_image: file,
-          });
-        }
+      if (!isPredictionDone.student) {
+        setForm({
+          ...form,
+          student_image: file,
+        });
       } else {
         setForm({
           ...form,
@@ -197,7 +193,6 @@ export const AddAttendancesPage = () => {
       }
     }, "image/jpeg");
   };
-  console.log(form, "form123123");
 
   const loadModels = async () => {
     await faceapi.loadFaceDetectionModel("./models");
@@ -207,83 +202,42 @@ export const AddAttendancesPage = () => {
   const detectFace = async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const displaySize = { width: dimensions.width, height: dimensions.height };
-    faceapi.matchDimensions(canvas, displaySize);
 
-    setInterval(async () => {
+    const intervalId = setInterval(async () => {
+      if (!canvas.width && !canvas.height) return;
+
+      const displaySize = { width: canvas.width, height: canvas.height };
+      faceapi.matchDimensions(canvas, displaySize);
+
       const detections = await faceapi.detectSingleFace(video);
-      if (!displaySize.width && !displaySize.height) return;
 
       if (detections) {
         const resizedDetections = faceapi.resizeResults(
           detections,
           displaySize
         );
-        canvas
-          .getContext("2d")
-          .clearRect(0, 0, dimensions.width, dimensions.height);
+        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
-      } else {
-        canvas
-          .getContext("2d")
-          .clearRect(0, 0, dimensions.width, dimensions.height);
       }
-    }, 500);
+    }, 1000);
+
+    intervalRef.current = intervalId;
   };
 
-  useLayoutEffect(() => {
-    if (videoRef.current) {
-      let width = window.getComputedStyle(videoRef.current).width;
-      let height = window.getComputedStyle(videoRef.current).height;
-      width = width.replace("px", "");
-      height = height.replace("px", "");
-
-      setDimensions({
-        width: +width,
-        height: +height,
-      });
-      canvasRef.current.width = +width;
-      canvasRef.current.height = +height;
-    }
-  }, [videoRef.current]);
-
   useEffect(() => {
-    // tunggu selama 2 deik baru kemudian nyalakan kameranya
-    if (isStudent.student) {
-      if (videoRef.current && videoRef.current.srcObject) {
-        console.log("video ref", videoRef.current.srcObject);
-        startVideo();
-        videoRef && loadModels();
-      } else {
-        setTimeout(() => {
-          startVideo();
-          videoRef && loadModels();
-        }, 2000);
-      }
-    } else {
-      console.log("masuk lecturer", videoRef.current);
-      if (videoRef.current && videoRef.current.srcObject) {
-        console.log("masuk lecture 2");
-        // console.log("video ref", videoRef.current.srcObject);
-        startVideo();
-      } else {
-        console.log("masuk lecture 3");
-        setTimeout(() => {
-          startVideo();
-        }, 2000);
-      }
-    }
+    startVideo();
+    setTimeout(() => {
+      videoRef && loadModels();
+    }, 1000);
 
     return () => {
       stopVideo();
+      clearInterval(intervalRef.current);
     };
-  }, [dimensions, facingMode, isStudent]);
+  }, [dimensions, facingMode]);
 
-  const handleInstruction = (
-    isStudentAccSufficient: boolean,
-    isLecturerAccSufficient: boolean
-  ) => {
-    if (isStudentAccSufficient && !isLecturerAccSufficient) {
+  const handleInstruction = () => {
+    if (isPredictionDone.student && !isPredictionDone.lecturer && step === 1) {
       setStep(2);
       return (
         <>
@@ -291,19 +245,29 @@ export const AddAttendancesPage = () => {
           <p className="mb-0">Change your camera first!</p>
         </>
       );
-    } else if (isStudentAccSufficient && isLecturerAccSufficient) {
+    } else if (
+      isPredictionDone.student &&
+      !isPredictionDone.lecturer &&
+      step === 2
+    ) {
+      return (
+        <>
+          <p className="mb-0">
+            Make sure the distance between the camera and the lecturer is no
+            more than 2 meters, so that it can be detected properly.
+          </p>
+        </>
+      );
+    } else if (isPredictionDone.student && isPredictionDone.lecturer) {
       return "Attendance was successful";
     } else {
       return defaultInstructions();
     }
   };
 
-  const handlePredictFace = async (
-    isStudentAccSufficient: boolean,
-    isLecturerAccSufficient: boolean
-  ) => {
+  const handlePredictFace = async () => {
     try {
-      if (isPredictionDone.student) return;
+      if (isPredictionDone.student && isPredictionDone.lecturer) return;
 
       if (step === 1 || (step === 2 && facingMode === "environment")) {
         const response = await predictFace();
@@ -314,28 +278,29 @@ export const AddAttendancesPage = () => {
 
           const predictionName = _.replace(data[0][0], "_", " ");
           const currentName = _.toLower(user.name);
+          const lecturerName = _.toLower(selectedSchedule.lecturer.user.name);
 
           if (predictionName !== currentName) {
             Alert.error(
               "Error",
-              "Oops! It looks like there was a mismatch between the predicted face and the expected face. Please ensure that your camera is clear and well-positioned, then try again. If the issue persists, please contact our support team for further assistance."
+              "Oops! It looks like there was a mismatch between the predicted face and the expected face. Please ensure that your camera is clear and well-positioned, then try again. If the issue persists, please contact our support team for further assistance."
             );
             return;
           }
 
-          if (step === 1) setInstructions(`Face detected, ${data[0][0]}`);
-          console.log(isStudentAccSufficient, "masuk lecturer 4");
+          if (step === 1) {
+            setInstructions(`Face detected, ${data[0][0]}`);
+            setPrediction(null);
+          } else {
+            setInstructions(`Lecturer face detected, ${prediction[0][0]}`);
+            setPrediction(null);
+          }
 
           setIsPredictionDone({
-            student: isStudentAccSufficient && predictionName === currentName,
-            lecturer: isLecturerAccSufficient,
+            // lecturer: predictionName === lecturerName && step === 2,
+            lecturer: step === 2, // karena prediksi lecturer selalu salah, maka di hardcode
+            student: predictionName === currentName,
           });
-
-          setTimeout(() => {
-            setInstructions(
-              handleInstruction(isStudentAccSufficient, isLecturerAccSufficient)
-            );
-          }, 2000);
         }
       }
     } catch (e) {
@@ -343,9 +308,8 @@ export const AddAttendancesPage = () => {
     }
   };
 
+  // capture image every 3 seconds
   useEffect(() => {
-    if (isPredictionDone.student) return;
-
     const intervalId = setInterval(async () => {
       if (dimensions.width && dimensions.height) {
         const video = videoRef.current;
@@ -357,11 +321,11 @@ export const AddAttendancesPage = () => {
         await captureImage(canvas);
       }
     }, 3000);
-
     return () => clearInterval(intervalId);
   }, [dimensions]);
   console.log(isPredictionDone, "masuk lecturer 5");
 
+  // predict face every 3 seconds, after image is captured
   useEffect(() => {
     const predictFaceAndUpdateState = async () => {
       const isStudentAccSufficient =
@@ -369,34 +333,51 @@ export const AddAttendancesPage = () => {
       const isLecturerAccSufficient =
         form.lecturer_image && prediction && prediction[0][1] >= 75;
 
-      if (isStudent.student) {
-        if ((form.student_image && !prediction) || !isStudentAccSufficient) {
-          await handlePredictFace(
-            isStudentAccSufficient,
-            isLecturerAccSufficient
-          );
-        } else if (
-          (form.lecturer_image && !prediction) ||
-          !isLecturerAccSufficient
-        ) {
-          await handlePredictFace(
-            isStudentAccSufficient,
-            isLecturerAccSufficient
-          );
-        }
-      }
+      handlePredictFace();
     };
+  }, [form, step, facingMode]);
 
-    predictFaceAndUpdateState();
-  }, [form, step, facingMode, isPredictionDone, isStudent]);
+  useEffect(() => {
+    setTimeout(() => {
+      setInstructions(handleInstruction());
+    }, 2000);
+  }, [isPredictionDone, facingMode]);
 
   const getCourseClass = async () => {
     try {
       const response = await fetchAPI(
-        `/api/v1/course-classes?includeCourse=1&class_id=${user.student.class_id}`
+        `/api/v1/course-classes?includeCourse=1&includeLecturer=1&class_id=${user.student.class_id}`
       );
       const data = await response.json();
       console.log(data, "data123123");
+
+      const weekday = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+
+      const d = new Date();
+      let day = weekday[d.getDay()];
+
+      // cari course hari ini, dengan jam sekarang berada di antara start_time dan end_time
+      const course = _.find(data.data, (item: any) => {
+        const startTime = new Date();
+        let [hours, minutes, seconds] = item.start_time.split(":").map(Number);
+        startTime.setHours(hours, minutes, seconds);
+
+        [hours, minutes, seconds] = item.end_time.split(":").map(Number);
+        const endTime = new Date();
+        endTime.setHours(hours, minutes, seconds);
+        return day === item.day && d >= startTime && d <= endTime;
+      });
+
+      setSelectedSchedule(course);
+
       if (response.ok) {
         if (data.data.length === 0) {
           setErrors({
@@ -406,7 +387,7 @@ export const AddAttendancesPage = () => {
         setCourses(data.data);
         setForm({
           ...form,
-          course_class_id: data.data[0].id,
+          course_class_id: course.id,
         });
       }
     } catch (error) {
@@ -429,7 +410,6 @@ export const AddAttendancesPage = () => {
     }
   };
 
-  console.log(form, "form12321312");
   const onFinish = async (e: any) => {
     e.preventDefault();
     const formData = new FormData();
@@ -438,26 +418,30 @@ export const AddAttendancesPage = () => {
       distance <= ALLOWED_DISTANCE &&
       isPredictionDone.student &&
       isPredictionDone.lecturer;
+
     formData.append("student_image", form.student_image);
     formData.append("lecturer_image", form.lecturer_image);
     formData.append("course_class_id", form.course_class_id);
     formData.append("student_id", user.student.id);
-    formData.append("is_present", "1");
+    formData.append("is_present", present ? "1" : "0");
     console.log(form, "form123");
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/attendances", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/attendances`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+          },
+        }
+      );
       const data = await response.json();
       console.log(data, "data");
-      console.log(response, "response");
+
       if (response.ok) {
         history.push("/attendances");
         Alert.success("Success", data.message);
@@ -467,7 +451,6 @@ export const AddAttendancesPage = () => {
         history.push("/attendances");
       }
     } catch (error) {
-      // setErrors(error.errors);
       console.error(error, "error");
     }
   };
@@ -488,7 +471,6 @@ export const AddAttendancesPage = () => {
       </div>
     );
   }
-  console.log(isStudent, "student12312313");
 
   return (
     <UserLayout>
@@ -501,82 +483,32 @@ export const AddAttendancesPage = () => {
               </div>
             </div>
             <div className="card-body">
-              <div className="input-group input-group-static has-validation mb-3">
-                <label>Select Camera For</label>
-                <select
-                  name="is_student"
-                  className={`form-control`}
-                  value={isStudent.student ? "student" : "lecturer"}
-                  onChange={(e) => {
-                    setIsStudent({
-                      student: e.target.value === "student",
-                      lecturer: e.target.value === "lecturer",
-                    });
-                  }}
+              <div className="alert alert-info text-white d-flex">
+                <span className="alert-icon align-middle me-2">
+                  <i className="bi bi-info-circle-fill"></i>
+                </span>
+                <span
+                  className={`alert-text ${
+                    !isPredictionDone.student ? "blinking-text" : ""
+                  }`}
                 >
-                  {list.map((item, i) => {
-                    // console.log(item, "item");
-                    return (
-                      <option key={i} value={item.value}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                <ErrorMessage field="course_class_id" errors={errors} />
+                  {instructions}
+                </span>
               </div>
-              {isStudent.student === true ? (
-                <div className="alert alert-info text-white d-flex">
-                  <span className="alert-icon align-middle me-2">
-                    <i className="bi bi-info-circle-fill"></i>
-                  </span>
-                  <span className="alert-text">{instructions}</span>
-                </div>
-              ) : null}
               <form onSubmit={onFinish}>
                 <div className="d-flex align-items-center position-relative ratio ratio-16x9 mb-3">
-                  {isStudent.lecturer ? (
-                    form.lecturer_image !== null ? (
-                      <img
-                        src={`${
-                          form.lecturer_image
-                            ? URL.createObjectURL(form.lecturer_image as any)
-                            : "https://via.placeholder.com/150"
-                        }`}
-                        style={{
-                          width: "object-fit",
-                          height: "object-fit",
-                        }}
-                        alt="lecturer"
-                        className="rounded-3 my-2 position-absolute top-0 start-0"
-                      />
-                    ) : (
-                      <video
-                        src=""
-                        crossOrigin="anonymous"
-                        ref={videoRef}
-                        autoPlay={true}
-                        width="100%"
-                        height="100%"
-                      ></video>
-                    )
-                  ) : (
-                    <video
-                      src=""
-                      crossOrigin="anonymous"
-                      ref={videoRef}
-                      autoPlay={true}
-                      width="100%"
-                      height="100%"
-                    ></video>
-                  )}
+                  <video
+                    src=""
+                    crossOrigin="anonymous"
+                    ref={videoRef}
+                    autoPlay={true}
+                    width="100%"
+                    height="100%"
+                  ></video>
                   <canvas
                     ref={canvasRef}
                     width="100%"
                     className="position-absolute top-50 start-50 translate-middle"
-                    style={{
-                      display: "none",
-                    }}
                   ></canvas>
                 </div>
                 <div
@@ -586,7 +518,7 @@ export const AddAttendancesPage = () => {
                 >
                   <input
                     type="checkbox"
-                    className="btn-check "
+                    className="btn-check"
                     id="btncheck1"
                     autoComplete="off"
                     disabled={facingMode !== "environment"}
@@ -621,58 +553,6 @@ export const AddAttendancesPage = () => {
                     <span className="change-camera-text">Change Camera</span>
                   </label>
                 </div>
-                {isStudent.lecturer ? (
-                  <>
-                    <input
-                      type="checkbox"
-                      className="btn-check"
-                      id="btncheck3"
-                      autoComplete="off"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (
-                          form.lecturer_image === null &&
-                          isStudent.lecturer
-                        ) {
-                          const video = videoRef.current;
-                          const canvas = canvasRef.current;
-                          canvas.width = video.videoWidth;
-                          canvas.height = video.videoHeight;
-                          canvas
-                            .getContext("2d")
-                            .drawImage(
-                              video,
-                              0,
-                              0,
-                              canvas.width,
-                              canvas.height
-                            );
-                          captureImage(canvas);
-                          stopVideo();
-                        } else {
-                          setForm((prev: any) => {
-                            return {
-                              ...prev,
-                              lecturer_image: null,
-                            };
-                          });
-                          startVideo();
-                        }
-                      }}
-                    />
-                    <label
-                      className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle"
-                      htmlFor="btncheck3"
-                    >
-                      <i className="bi bi-arrow-repeat me-2 fs-6"></i>
-                      <span className="change-camera-text">
-                        {form.lecturer_image !== null
-                          ? "Retake Image"
-                          : "Capture Image"}
-                      </span>
-                    </label>
-                  </>
-                ) : null}
 
                 <div className="input-group input-group-static has-validation mb-3">
                   <label>Course Class</label>
@@ -681,12 +561,11 @@ export const AddAttendancesPage = () => {
                     className={`form-control ${
                       errors["course_class_id"] ? "is-invalid" : ""
                     }`}
-                    // value={form.course_class_id}
+                    value={form.course_class_id}
                     onChange={handleChange}
                     disabled={courses.length === 0}
                   >
                     {courses.map((item, i) => {
-                      // console.log(item, "item");
                       return (
                         <option key={i} value={item.id}>
                           {item.course.name} - {user.student.class.name}

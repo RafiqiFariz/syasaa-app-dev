@@ -75,6 +75,7 @@ import { EditAttancanceRequest } from "./pages/attendance_request/Edit/EditAttan
 import { ProgileRequestsPage } from "./pages/profile_requests/ProfileRequestsPage";
 import { EditUserProfileRequestPage } from "./pages/profile_requests/Edit/EditUserProfileRequestPage";
 import { DetailAttedanceRequestPage } from "./pages/attendance_request/Detail/DetailAttedanceRequestPage";
+import { DetailProfileRequestPage } from "./pages/profile_requests/Detail/DetailProfileRequestPage";
 
 setupIonicReact();
 
@@ -376,6 +377,17 @@ const App: React.FC = () => {
               render={() =>
                 isLogin.isLogin ? (
                   <EditProfileRequestPage />
+                ) : (
+                  <Redirect to="/login" />
+                )
+              }
+            />
+            <Route
+              exact
+              path="/profile/:id/detail"
+              render={() =>
+                isLogin.isLogin ? (
+                  <DetailProfileRequestPage />
                 ) : (
                   <Redirect to="/login" />
                 )

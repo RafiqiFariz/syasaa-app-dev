@@ -97,7 +97,7 @@ export const CourseClass = () => {
     }
   };
 
-  console.log(user, "user");
+  // console.log(user, "user");
 
   const getData = async (classId: number, majorId: number) => {
     setIsLoading(true);

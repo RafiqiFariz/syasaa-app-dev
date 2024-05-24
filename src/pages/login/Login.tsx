@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../context/Auth";
 import fetchAPI from "../../fetch";
+import Alert from "../../components/Alert";
 
 export const LoginPage = () => {
   const history = useHistory();
@@ -20,7 +21,6 @@ export const LoginPage = () => {
     remember: 0,
   });
 
-  // Handle form change
   const handleChange = (event: any) => {
     const { name, value } = event.target;
 
@@ -35,41 +35,31 @@ export const LoginPage = () => {
     });
   };
 
-  // Handle form submission
   const onFinish = async (event: any) => {
     event.preventDefault();
     try {
-      const response = await fetchAPI("/sanctum/csrf-cookie", {
+      const csrfCookie = await fetchAPI("/sanctum/csrf-cookie", {
         method: "GET",
-        credentials: "include",
       });
 
-      if (response.status === 204) {
-        const response = await fetchAPI("/login", {
-          method: "POST",
-          body: JSON.stringify(form),
+      if (csrfCookie.status !== 204) return;
+
+      const response = await fetchAPI("/login", {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.toast("Login Success", "success");
+        setIsLogin({
+          isLogin: true,
+          isPending: false,
         });
-
-        const message = await response.json();
-
-        if (response.ok) {
-          // Redirect to dashboard
-          history.push("/dashboard");
-          setIsLogin({
-            isLogin: true,
-            isPending: false,
-          });
-        } else {
-          console.log("Login failed");
-
-          setErrors({
-            ...errors,
-            email: message.errors.email ? message.errors.email[0] : "",
-            password: message.errors.password
-              ? message.errors.password[0]
-              : "",
-          });
-        }
+        history.push("/dashboard");
+      } else {
+        setErrors(data.errors);
       }
     } catch (error) {
       console.log(error, "Error");
@@ -92,7 +82,7 @@ export const LoginPage = () => {
             </div>
             <div className="card-body">
               <form onSubmit={onFinish} noValidate={true}>
-                <div className="input-group input-group-static mb-4">
+                <div className="input-group input-group-static mb-4 text-start">
                   <label>Email</label>
                   <input
                     name="email"
@@ -101,13 +91,12 @@ export const LoginPage = () => {
                     type="email"
                     className="form-control"
                     placeholder="syasa@example.com"
-                    aria-label="email"
                   />
+                  {errors.email && (
+                    <span className="text-danger text-sm">{errors.email}</span>
+                  )}
                 </div>
-                {errors.email && (
-                  <span className="text-danger text-s">{errors.email}</span>
-                )}
-                <div className="input-group input-group-static mb-4">
+                <div className="input-group input-group-static mb-4 text-start">
                   <label>Password</label>
                   <input
                     name="password"
@@ -117,12 +106,11 @@ export const LoginPage = () => {
                     className="form-control"
                     placeholder="********"
                     aria-label="Password"
-                    aria-describedby="basic-addon2"
                   />
+                  {errors.password && (
+                    <span className="text-danger text-sm">{errors.password}</span>
+                  )}
                 </div>
-                {errors.password && (
-                  <span className="text-danger text-s">{errors.password}</span>
-                )}
                 <div className="form-check form-switch d-flex align-items-center my-4">
                   <input
                     name="remember"

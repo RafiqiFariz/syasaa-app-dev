@@ -157,11 +157,9 @@ export const ProgileRequestsPage = () => {
         <div className="col-12">
           <div
             className="card"
-            style={
-              {
-                  height: ProfileRequest?.data?.length > 0 ? "100%" : "85vh",
-              }
-            }
+            style={{
+              height: ProfileRequest?.data?.length > 0 ? "100%" : "85vh",
+            }}
           >
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
@@ -239,9 +237,9 @@ export const ProgileRequestsPage = () => {
                               ) : (
                                 <div className="avatar avatar-xl position-relative">
                                   <img
-                                    src={`${import.meta.env.VITE_API_URL}/${getUserProfilePhoto(
-                                      item.old_value
-                                    )}`}
+                                    src={`${
+                                      import.meta.env.VITE_API_URL
+                                    }/${getUserProfilePhoto(item.old_value)}`}
                                     alt="profile"
                                     style={{
                                       width: "100px",
@@ -263,7 +261,9 @@ export const ProgileRequestsPage = () => {
                               ) : (
                                 <div className="avatar avatar-xl position-relative">
                                   <img
-                                    src={`${import.meta.env.VITE_API_URL}/storage/${item.new_value}`}
+                                    src={`${
+                                      import.meta.env.VITE_API_URL
+                                    }/storage/${item.new_value}`}
                                     alt="profile"
                                     style={{
                                       width: "100px",
@@ -326,7 +326,9 @@ export const ProgileRequestsPage = () => {
                                     <button
                                       className="btn btn-primary btn-sm mb-0"
                                       onClick={() => {
-                                        // history.push(`/profile/edit/${item.id}`);
+                                        history.push(
+                                          `/profile/${item.id}/detail`
+                                        );
                                       }}
                                     >
                                       Detail

@@ -161,8 +161,6 @@ export const AddUserPage = () => {
                       errors["name"] ? "is-invalid" : ""
                     }`}
                     placeholder="Username"
-                    aria-label="Username"
-                    aria-describedby="basic-addon0"
                   />
                   <ErrorMessage field="name" errors={errors}/>
                 </div>
@@ -176,7 +174,6 @@ export const AddUserPage = () => {
                       errors["email"] ? "is-invalid" : ""
                     }`}
                     placeholder="Email"
-                    aria-label="email"
                   />
                   <ErrorMessage field="email" errors={errors}/>
                 </div>

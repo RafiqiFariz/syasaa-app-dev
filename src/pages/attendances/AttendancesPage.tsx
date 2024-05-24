@@ -35,11 +35,16 @@ export const AttendancesPage = () => {
   });
   const [selectedFilter, setSelectedFilter] = useState<any>({
     value: "default",
-    label: "Default",
+    label: "Created At (ASC)",
   });
   const history = useHistory();
 
   const UserLogin = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const formatedDate = (date: string) => {
+    const dateObj = new Date(date);
+    return dateObj.toLocaleDateString();
+  };
 
   let columns = [
     {
@@ -47,7 +52,7 @@ export const AttendancesPage = () => {
       selector: "id",
       key: 1,
     },
-    {
+    UserLogin.role_id !== 4 && {
       name: "Name",
       selector: "name",
       key: 2,
@@ -183,11 +188,6 @@ export const AttendancesPage = () => {
     setIsLoading(true);
     try {
       let url = `/api/v1/attendances?page=${currentPage}`;
-      if (filter === "time") {
-        url += `&lastest=true`;
-      } else {
-        url += `&lastest=false`;
-      }
 
       if (user.data.role_id === 4) {
         url = `/api/v1/attendances?page=${currentPage}&student_id=${user.data.student.id}`;
@@ -201,6 +201,12 @@ export const AttendancesPage = () => {
         url += `&class_id=${classId}`;
       } else if (classId === 0 && majorId !== 0) {
         url += `&major_id=${majorId}`;
+      }
+
+      if (filter === "time") {
+        url += `&latest=true`;
+      } else {
+        url += `&latest=false`;
       }
 
       const response = await fetchAPI(url, {
@@ -350,23 +356,26 @@ export const AttendancesPage = () => {
                     )}
                   </>
                 )}
-                <ReactSelect
-                  className="col-6"
-                  options={[
-                    {
-                      value: "default",
-                      label: "Default",
-                    },
-                    {
-                      value: "time",
-                      label: "Time",
-                    },
-                  ]}
-                  value={selectedFilter}
-                  name="Filter By"
-                  onChange={handlefilter}
-                  isLoading={isLoading}
-                />
+                <div className="d-flex flex-column w-100">
+                  <label>Filter</label>
+                  <ReactSelect
+                    className="col-6"
+                    options={[
+                      {
+                        value: "default",
+                        label: "Created At (ASC)",
+                      },
+                      {
+                        value: "time",
+                        label: "Created At (DESC)",
+                      },
+                    ]}
+                    value={selectedFilter}
+                    name="Filter By"
+                    onChange={handlefilter}
+                    isLoading={isLoading}
+                  />
+                </div>
               </div>
               <div className="table-responsive">
                 <table className="table align-items-center mb-0">
@@ -434,9 +443,12 @@ export const AttendancesPage = () => {
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.id}
                             </td>
-                            <td className="text-sm font-weight-normal px-4 py-3">
-                              {item.student.user.name}
-                            </td>
+                            {UserLogin.role_id !== 4 && (
+                              <td className="text-sm font-weight-normal px-4 py-3">
+                                {item.student.user.name}
+                              </td>
+                            )}
+
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               <div className="avatar avatar-xl position-relative">
                                 {item.student_image !== null ? (
@@ -450,7 +462,9 @@ export const AttendancesPage = () => {
                                     }}
                                   />
                                 ) : (
-                                  <>-</>
+                                  <span className="text-center text-dark">
+                                    -
+                                  </span>
                                 )}
                               </div>
                             </td>
@@ -467,15 +481,25 @@ export const AttendancesPage = () => {
                                     }}
                                   />
                                 ) : (
-                                  <>-</>
+                                  <span className="text-center text-dark">
+                                    -
+                                  </span>
                                 )}
                               </div>
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                              {item.is_present !== 0 ? "Present" : "Absent"}
+                              {item.is_present !== 0 ? (
+                                <span className="badge badge-sm bg-gradient-success d-flex justify-content-center">
+                                  Present
+                                </span>
+                              ) : (
+                                <span className="badge badge-sm bg-gradient-danger d-flex justify-content-center">
+                                  Absent
+                                </span>
+                              )}
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                              {item.created_at}
+                              {formatedDate(item.created_at)}
                             </td>
                             {/* {UserLogin.role_id !== 1 ? (
                               <></>
