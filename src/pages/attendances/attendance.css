@@ -1,3 +1,13 @@
 .change-camera-text {
   margin-top: .125rem;
 }
+
+.blinking-text {
+  animation: blink 1.5s infinite; /* Animasi kedip dengan durasi 1 detik dan berulang terus-menerus */
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0; /* Ubah opacity menjadi 0 untuk efek kedip */
+  }
+}
