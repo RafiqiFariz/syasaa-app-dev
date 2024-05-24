@@ -87,7 +87,7 @@ export const AddAttendancesPage = () => {
     );
 
     // distance harus diubah ketika di production
-    if (distance >= ALLOWED_DISTANCE) {
+    if (distance >= 1000000000000000) {
       const result = await Alert.confirm(
         "Location Confirmation",
         "You are not in the class location, please change places or do attendance request!",
@@ -172,7 +172,7 @@ export const AddAttendancesPage = () => {
   };
 
   const captureImage = async (canvas: any) => {
-    if (isPredictionDone.student && isPredictionDone.lecturer) return;
+    if (isPredictionDone.student || isPredictionDone.lecturer) return;
 
     canvas.toBlob((blob) => {
       const timestamp = new Date().getTime();
@@ -260,10 +260,13 @@ export const AddAttendancesPage = () => {
         }, 2000);
       }
     } else {
+      console.log("masuk lecturer", videoRef.current);
       if (videoRef.current && videoRef.current.srcObject) {
+        console.log("masuk lecture 2");
         // console.log("video ref", videoRef.current.srcObject);
         startVideo();
       } else {
+        console.log("masuk lecture 3");
         setTimeout(() => {
           startVideo();
         }, 2000);
@@ -273,7 +276,7 @@ export const AddAttendancesPage = () => {
     return () => {
       stopVideo();
     };
-  }, [dimensions, facingMode, isStudent.student]);
+  }, [dimensions, facingMode, isStudent]);
 
   const handleInstruction = (
     isStudentAccSufficient: boolean,
@@ -320,6 +323,7 @@ export const AddAttendancesPage = () => {
           }
 
           if (step === 1) setInstructions(`Face detected, ${data[0][0]}`);
+          console.log(isStudentAccSufficient, "masuk lecturer 4");
 
           setIsPredictionDone({
             student: isStudentAccSufficient && predictionName === currentName,
@@ -339,9 +343,10 @@ export const AddAttendancesPage = () => {
   };
 
   useEffect(() => {
-    // console.log(isStudentAccSufficient, 'student acc is enough')
+    if (isPredictionDone.student) return;
+
     const intervalId = setInterval(async () => {
-      if (dimensions.width && dimensions.height && !isPredictionDone.student) {
+      if (dimensions.width && dimensions.height) {
         const video = videoRef.current;
         const canvas = canvasRef.current;
 
@@ -351,29 +356,38 @@ export const AddAttendancesPage = () => {
         await captureImage(canvas);
       }
     }, 3000);
-    // console.log(isPredictionDone, 'is prediction done');
+
     return () => clearInterval(intervalId);
-  });
+  }, [dimensions]);
+  console.log(isPredictionDone, "masuk lecturer 5");
 
   useEffect(() => {
-    const isStudentAccSufficient =
-      form.student_image && prediction && prediction[0][1] >= 75;
-    const isLecturerAccSufficient =
-      form.lecturer_image && prediction && prediction[0][1] >= 75;
+    const predictFaceAndUpdateState = async () => {
+      const isStudentAccSufficient =
+        form.student_image && prediction && prediction[0][1] >= 75;
+      const isLecturerAccSufficient =
+        form.lecturer_image && prediction && prediction[0][1] >= 75;
 
-    if (isStudent.student) {
-      if ((form.student_image && !prediction) || !isStudentAccSufficient) {
-        console.log("masuk student");
-        handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
-      } else if (
-        (form.lecturer_image && !prediction) ||
-        !isLecturerAccSufficient
-      ) {
-        console.log("masuk lecturer");
-        handlePredictFace(isStudentAccSufficient, isLecturerAccSufficient);
+      if (isStudent.student) {
+        if ((form.student_image && !prediction) || !isStudentAccSufficient) {
+          await handlePredictFace(
+            isStudentAccSufficient,
+            isLecturerAccSufficient
+          );
+        } else if (
+          (form.lecturer_image && !prediction) ||
+          !isLecturerAccSufficient
+        ) {
+          await handlePredictFace(
+            isStudentAccSufficient,
+            isLecturerAccSufficient
+          );
+        }
       }
-    }
-  }, [form, step, facingMode, isPredictionDone]);
+    };
+
+    predictFaceAndUpdateState();
+  }, [form, step, facingMode, isPredictionDone, isStudent]);
 
   const getCourseClass = async () => {
     try {
@@ -528,8 +542,12 @@ export const AddAttendancesPage = () => {
                             ? URL.createObjectURL(form.lecturer_image as any)
                             : "https://via.placeholder.com/150"
                         }`}
+                        style={{
+                          width: "object-fit",
+                          height: "object-fit",
+                        }}
                         alt="lecturer"
-                        className="position-absolute top-0 start-0 object-cover"
+                        className="rounded-3 my-2 position-absolute top-0 start-0"
                       />
                     ) : (
                       <video
@@ -571,7 +589,10 @@ export const AddAttendancesPage = () => {
                     id="btncheck1"
                     autoComplete="off"
                     disabled={facingMode !== "environment"}
-                    onClick={handleFlashlight}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleFlashlight();
+                    }}
                   />
                   <label
                     className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle"
@@ -586,7 +607,10 @@ export const AddAttendancesPage = () => {
                     className="btn-check"
                     id="btncheck2"
                     autoComplete="off"
-                    onClick={handleChangeCamera}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleChangeCamera();
+                    }}
                   />
                   <label
                     className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle"

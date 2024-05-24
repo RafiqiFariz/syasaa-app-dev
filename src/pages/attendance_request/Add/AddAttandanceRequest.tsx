@@ -152,19 +152,19 @@ export const AddAttandanceRequest = () => {
         formData.append("description", form.description);
         formData.append("student_image", form.student_image);
         console.log(formData.get("student_image"), "formdata");
+        const url = `${
+          import.meta.env.VITE_API_URL
+        }/api/v1/attendance-requests`;
 
-        const response = await fetch(
-          "http://localhost:8000/api/v1/attendance-requests",
-          {
-            method: "POST",
-            body: formData,
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-            },
-          }
-        );
+        const response = await fetch(url, {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+          },
+        });
 
         const data = await response.json();
 

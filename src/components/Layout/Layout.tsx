@@ -169,7 +169,7 @@ export const UserLayout = ({ children }: LayoutProps) => {
               <div className="ms-md-auto pe-md-3 d-flex align-items-center"></div>
               <ul
                 className={`navbar-nav d-flex ${
-                  window.innerWidth < 400
+                  window.innerWidth < 600
                     ? "flex-row-reverse justify-content-start"
                     : "justify-content-end"
                 } `}
