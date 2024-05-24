@@ -35,14 +35,6 @@ export const EditClassPage = () => {
   const onFinish = async (event: any) => {
     event.preventDefault();
     try {
-      const confirmed = await Alert.confirm(
-        "Update Confirmation!",
-        "Are you sure you want to update this major?",
-        "Yes, update it!"
-      );
-
-      if (!confirmed) return;
-
       const response = await fetchAPI(`/api/v1/major-classes/${id}`, {
         method: "POST",
         body: JSON.stringify({ ...form, _method: "PUT" }),

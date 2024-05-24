@@ -50,14 +50,6 @@ export const EditFacultiesPage = () => {
         _method: "PUT",
       };
 
-      const confirmed = await Alert.confirm(
-        "Update Confirmation!",
-        "Are you sure you want to update this faculty?",
-        "Yes, update it!"
-      );
-
-      if (!confirmed) return;
-
       const response = await fetchAPI(`/api/v1/faculties/${id}`, {
         method: "POST",
         body: JSON.stringify(payload),

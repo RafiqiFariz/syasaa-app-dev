@@ -8,8 +8,6 @@ import * as faceapi from "face-api.js";
 import { WithFaceLandmarks } from "face-api.js";
 import "./profile.css";
 import Alert from "../../components/Alert";
-import Cookies from "js-cookie";
-import fetchAPI from "../../fetch";
 
 export const ProfilePage = () => {
   const { isLogin, setIsLogin } = useContext(AuthContext);
@@ -135,9 +133,13 @@ export const ProfilePage = () => {
   const handleDeleteFacialData = async () => {
     const username = _.snakeCase(isLogin.data.name);
     const response = await fetch(
-      `${import.meta.env.VITE_API_ML_URL}/delete-facial-data/${username}`,
+      `${import.meta.env.VITE_API_ML_URL}/delete-facial-data`,
       {
         method: "POST",
+        body: JSON.stringify({"name": username}),
+        headers: {
+          "Content-Type": "application/json"
+        }
       }
     );
 
@@ -290,7 +292,7 @@ export const ProfilePage = () => {
   const checkFacialData = async () => {
     const username = _.snakeCase(isLogin.data.name);
     const response = await fetch(
-      `${import.meta.env.VITE_API_ML_URL}/check-facial-data/${username}`,
+      `${import.meta.env.VITE_API_ML_URL}/check-facial-data?name=${username}`,
       {
         method: "GET",
       }
@@ -336,9 +338,9 @@ export const ProfilePage = () => {
   }, [videoStarted]);
 
   useEffect(() => {
-    if (videoStarted) {
+    // if (videoStarted) {
       loadModels();
-    }
+    // }
 
     return () => {
       stopVideo();
