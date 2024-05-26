@@ -320,25 +320,21 @@ export const AttendancesPage = () => {
   return (
     <UserLayout>
       <div className="row gap-4">
-        <div className="col-12">
-          <div className="alert alert-info alert-dismissible text-white fade show">
+        {UserLogin.role_id === 4 && (
+          <div className="col-12">
+            <div className="alert alert-info alert-dismissible text-white fade show">
             <span className="alert-icon align-middle me-2">
               <i className="bi bi-info-circle-fill"></i>
             </span>
-            <span className="alert-text">
-              For security purposes, your attendance photo will be deleted after
-              24 hours.
+              <span className="alert-text">
+              For security purposes, your attendance photo will be deleted after 24 hours.
             </span>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
         <div className="col-12">
           <div
             className="card"

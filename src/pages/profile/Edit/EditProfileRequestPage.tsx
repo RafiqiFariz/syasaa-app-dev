@@ -102,82 +102,83 @@ export const EditProfileRequestPage = () => {
         <div className="col-12 col-lg-6 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+              <div
+                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">
                   Edit Profile Request
                 </h6>
               </div>
-              <div className="card-body">
-                <form onSubmit={onFinish}>
-                  <div className="input-group input-group-static mb-4 has-validation">
-                    <label>Changed Data</label>
-                    <select
-                      name="changeField"
-                      className="form-control"
-                      onChange={handleChange}
-                      value={form.changeField}
-                    >
-                      {options.map((item, i) => (
-                        <option key={i} value={item.value}>
-                          {item.label}
-                        </option>
-                      ))}
-                    </select>
-                    <ErrorMessage field="changed_data" errors={errors} />
-                  </div>
-                  {form.changeField === "image" ? (
-                    <div className="input-group input-group-static has-validation mb-3">
-                      <label className="mb-1">Change Image</label>
-                      <input
-                        className="form-control form-control-sm"
-                        id="formFileSm"
-                        type="file"
-                        name="image"
-                        onChange={handleChange}
-                      />
-                      <ErrorMessage field="image" errors={errors} />
-                    </div>
-                  ) : (
-                    <div className="input-group input-group-static mb-4 has-validation">
-                      <label className="mb-1">
-                        New {_.startCase(form.changeField)}
-                      </label>
-                      <input
-                        name="new_value"
-                        value={form.new_value || ""}
-                        onChange={handleChange}
-                        type="text"
-                        className={`form-control ${
-                          errors["new_value"] ? "is-invalid" : ""
-                        }`}
-                        placeholder={`New ${_.startCase(form.changeField)}`}
-                      />
-                      <ErrorMessage field="new_value" errors={errors} />
-                    </div>
-                  )}
-
-                  <div className="input-group input-group-static has-validation mt-3 mb-4 w-100">
-                    <label>Description</label>
-                    <textarea
-                      name="description"
-                      className="form-control"
-                      rows={5}
-                      placeholder="Description"
-                      spellCheck="false"
+            </div>
+            <div className="card-body">
+              <form onSubmit={onFinish}>
+                <div className="input-group input-group-static mb-4 has-validation">
+                  <label>Changed Data</label>
+                  <select
+                    name="changeField"
+                    className="form-control"
+                    onChange={handleChange}
+                    value={form.changeField}
+                  >
+                    {options.map((item, i) => (
+                      <option key={i} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ErrorMessage field="changed_data" errors={errors}/>
+                </div>
+                {form.changeField === "image" ? (
+                  <div className="input-group input-group-static has-validation mb-3">
+                    <label className="mb-1">Change Image</label>
+                    <input
+                      className="form-control form-control-sm"
+                      id="formFileSm"
+                      type="file"
+                      name="image"
                       onChange={handleChange}
                     />
+                    <ErrorMessage field="image" errors={errors}/>
                   </div>
-                  <div className="button-row d-flex mt-4">
-                    <button
-                      className="btn bg-gradient-dark ms-auto mb-0"
-                      type="submit"
-                      title="Send"
-                    >
-                      Submit
-                    </button>
+                ) : (
+                  <div className="input-group input-group-static mb-4 has-validation">
+                    <label className="mb-1">
+                      New {_.startCase(form.changeField)}
+                    </label>
+                    <input
+                      name="new_value"
+                      value={form.new_value || ""}
+                      onChange={handleChange}
+                      type="text"
+                      className={`form-control ${
+                        errors["new_value"] ? "is-invalid" : ""
+                      }`}
+                      placeholder={`New ${_.startCase(form.changeField)}`}
+                    />
+                    <ErrorMessage field="new_value" errors={errors}/>
                   </div>
-                </form>
-              </div>
+                )}
+
+                <div className="input-group input-group-static has-validation mt-3 mb-4 w-100">
+                  <label>Description</label>
+                  <textarea
+                    name="description"
+                    className="form-control"
+                    rows={5}
+                    placeholder="Description"
+                    spellCheck="false"
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="button-row d-flex mt-4">
+                  <button
+                    className="btn bg-gradient-dark ms-auto mb-0"
+                    type="submit"
+                    title="Send"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

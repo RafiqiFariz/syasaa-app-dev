@@ -187,7 +187,7 @@ export const ProfilePage = () => {
 
     let face_val = +ry.toFixed(2);
 
-    console.log(lastDirection, "last direction");
+    // console.log(lastDirection, "last direction");
 
     if (face_val < -0.06 && !lastDirection.left) {
       lastDirection = {
@@ -222,7 +222,7 @@ export const ProfilePage = () => {
     const canvas = canvasRef.current;
     const displaySize = { width: dimensions.width, height: dimensions.height };
     faceapi.matchDimensions(canvas, displaySize);
-    console.log(displaySize, "displaySize");
+    // console.log(displaySize, "displaySize");
 
     let lastDirection = { left: false, right: false, forward: false };
 
@@ -495,6 +495,18 @@ export const ProfilePage = () => {
                 </button>
               </div>
               <div className="modal-body">
+                <div className="alert alert-info alert-dismissible text-white fade show">
+                  <span className="alert-icon align-middle me-2">
+                    <i className="bi bi-info-circle-fill"></i>
+                  </span>
+                  <span className="alert-text">
+                    Make sure the background is plain and expressive during the process.
+                  </span>
+                  <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+
                 {!isDetectingDone ? (
                   <p className="text-center">{instructions}</p>
                 ) : (

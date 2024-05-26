@@ -142,7 +142,7 @@ export const AddClassPage = () => {
                   <ErrorMessage field="lng" errors={errors} />
                 </div>
                 <BasicLeafletMap form={form} setform={setForm} />
-                <div className="input-group input-group-static mb-4">
+                <div className="input-group input-group-static my-4">
                   <label htmlFor="majors" className="ms-0">
                     Major
                   </label>
