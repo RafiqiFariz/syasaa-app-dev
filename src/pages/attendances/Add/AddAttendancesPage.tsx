@@ -141,11 +141,11 @@ export const AddAttendancesPage = () => {
 
     setDimensions({
       width: +width,
-      height: +height,
+      height: +height + 34,
     });
 
     canvasRef.current.width = +width;
-    canvasRef.current.height = +height;
+    canvasRef.current.height = +height + 34;
   };
 
   const stopVideo = () => {
@@ -429,7 +429,7 @@ export const AddAttendancesPage = () => {
         setCourses(data.data);
         setForm({
           ...form,
-          course_class_id: course.id,
+          course_class_id: course?.id,
         });
       }
     } catch (error) {
@@ -563,7 +563,7 @@ export const AddAttendancesPage = () => {
                 </span>
               </div>
               <form onSubmit={onFinish}>
-                <div className="d-flex align-items-center position-relative ratio ratio-16x9 mb-3">
+                <div className="d-flex align-items-center position-relative mb-3">
                   {camera.lecturer ? (
                     form.lecturer_image !== null ? (
                       <img
@@ -598,6 +598,7 @@ export const AddAttendancesPage = () => {
                   <canvas
                     ref={canvasRef}
                     width="100%"
+                    height="100%"
                     className="position-absolute top-50 start-50 translate-middle"
                     style={camera.lecturer ? { display: "none" } : null}
                   ></canvas>

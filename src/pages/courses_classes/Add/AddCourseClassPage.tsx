@@ -187,140 +187,141 @@ export const AddCourseClassPage = () => {
         <div className="col-12 col-lg-8 m-auto">
           <div className="card my-4">
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
+              <div
+                className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">
                   Add Schedule
                 </h6>
               </div>
-              <div className="card-body">
-                <form onSubmit={onFinish}>
-                  <div className="input-group input-group-static has-validation mb-3">
-                    <label>Course</label>
-                    <select
-                      name="course_id"
-                      className={`form-control ${
-                        errors["course_id"] ? "is-invalid" : ""
-                      }`}
-                      // id={name_form}
-                      value={form.course_id}
-                      onChange={handleChange}
-                      //   disabled={courses.length === 0}
-                    >
-                      {courses.map((item, i) => {
-                        return (
-                          <option key={i} value={item.value}>
-                            {item.label}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <ErrorMessage field="course_id" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-static has-validation mb-3">
-                    <label>Class</label>
-                    <select
-                      name="class_id"
-                      className={`form-control ${
-                        errors["class_id"] ? "is-invalid" : ""
-                      }`}
-                      // id={name_form}
-                      value={form.class_id}
-                      onChange={handleChange}
-                      //   disabled={courses.length === 0}
-                    >
-                      {classes.map((item, i) => {
-                        return (
-                          <option key={i} value={item.value}>
-                            {item.label}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <ErrorMessage field="class_id" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-static has-validation mb-3">
-                    <label>Lecturer</label>
-                    <select
-                      name="lecturer_id"
-                      className={`form-control ${
-                        errors["lecturer_id"] ? "is-invalid" : ""
-                      }`}
-                      // id={name_form}
-                      value={form.lecturer_id}
-                      onChange={handleChange}
-                      //   disabled={courses.length === 0}
-                    >
-                      {lecturers.map((item, i) => {
-                        return (
-                          <option key={i} value={item.value}>
-                            {item.label}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <ErrorMessage field="lecturer_id" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-static has-validation mb-3">
-                    <label>Days</label>
-                    <select
-                      name="day"
-                      className={`form-control ${
-                        errors["day"] ? "is-invalid" : ""
-                      }`}
-                      // id={name_form}
-                      value={form.day}
-                      onChange={handleChange}
-                      //   disabled={courses.length === 0}
-                    >
-                      {daysOptions.map((item, i) => {
-                        return (
-                          <option key={i} value={item.value}>
-                            {item.label}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <ErrorMessage field="day" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-static mb-4 has-validation">
-                    <label>Start Time</label>
-                    <input
-                      name="start_time"
-                      value={form.start_time}
-                      onChange={handleChange}
-                      type="text"
-                      className={`form-control ${
-                        errors["start_time"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="ex. 08:00"
-                    />
-                    <ErrorMessage field="start_time" errors={errors} />
-                  </div>
-                  <div className="input-group input-group-static mb-4 has-validation">
-                    <label>End Time</label>
-                    <input
-                      name="end_time"
-                      value={form.end_time}
-                      onChange={handleChange}
-                      type="text"
-                      className={`form-control ${
-                        errors["end_time"] ? "is-invalid" : ""
-                      }`}
-                      placeholder="ex. 08:00"
-                    />
-                    <ErrorMessage field="end_time" errors={errors} />
-                  </div>
-                  <div className="button-row d-flex mt-4">
-                    <button
-                      className="btn bg-gradient-dark ms-auto mb-0"
-                      type="submit"
-                      title="Send"
-                    >
-                      Submit
-                    </button>
-                  </div>
-                </form>
-              </div>
+            </div>
+            <div className="card-body">
+              <form onSubmit={onFinish}>
+                <div className="input-group input-group-static has-validation mb-3">
+                  <label>Course</label>
+                  <select
+                    name="course_id"
+                    className={`form-control ${
+                      errors["course_id"] ? "is-invalid" : ""
+                    }`}
+                    // id={name_form}
+                    value={form.course_id}
+                    onChange={handleChange}
+                    //   disabled={courses.length === 0}
+                  >
+                    {courses.map((item, i) => {
+                      return (
+                        <option key={i} value={item.value}>
+                          {item.label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <ErrorMessage field="course_id" errors={errors}/>
+                </div>
+                <div className="input-group input-group-static has-validation mb-3">
+                  <label>Class</label>
+                  <select
+                    name="class_id"
+                    className={`form-control ${
+                      errors["class_id"] ? "is-invalid" : ""
+                    }`}
+                    // id={name_form}
+                    value={form.class_id}
+                    onChange={handleChange}
+                    //   disabled={courses.length === 0}
+                  >
+                    {classes.map((item, i) => {
+                      return (
+                        <option key={i} value={item.value}>
+                          {item.label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <ErrorMessage field="class_id" errors={errors}/>
+                </div>
+                <div className="input-group input-group-static has-validation mb-3">
+                  <label>Lecturer</label>
+                  <select
+                    name="lecturer_id"
+                    className={`form-control ${
+                      errors["lecturer_id"] ? "is-invalid" : ""
+                    }`}
+                    // id={name_form}
+                    value={form.lecturer_id}
+                    onChange={handleChange}
+                    //   disabled={courses.length === 0}
+                  >
+                    {lecturers.map((item, i) => {
+                      return (
+                        <option key={i} value={item.value}>
+                          {item.label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <ErrorMessage field="lecturer_id" errors={errors}/>
+                </div>
+                <div className="input-group input-group-static has-validation mb-3">
+                  <label>Days</label>
+                  <select
+                    name="day"
+                    className={`form-control ${
+                      errors["day"] ? "is-invalid" : ""
+                    }`}
+                    // id={name_form}
+                    value={form.day}
+                    onChange={handleChange}
+                    //   disabled={courses.length === 0}
+                  >
+                    {daysOptions.map((item, i) => {
+                      return (
+                        <option key={i} value={item.value}>
+                          {item.label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <ErrorMessage field="day" errors={errors}/>
+                </div>
+                <div className="input-group input-group-static mb-4 has-validation">
+                  <label>Start Time</label>
+                  <input
+                    name="start_time"
+                    value={form.start_time}
+                    onChange={handleChange}
+                    type="text"
+                    className={`form-control ${
+                      errors["start_time"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="ex. 08:00"
+                  />
+                  <ErrorMessage field="start_time" errors={errors}/>
+                </div>
+                <div className="input-group input-group-static mb-4 has-validation">
+                  <label>End Time</label>
+                  <input
+                    name="end_time"
+                    value={form.end_time}
+                    onChange={handleChange}
+                    type="text"
+                    className={`form-control ${
+                      errors["end_time"] ? "is-invalid" : ""
+                    }`}
+                    placeholder="ex. 08:00"
+                  />
+                  <ErrorMessage field="end_time" errors={errors}/>
+                </div>
+                <div className="button-row d-flex mt-4">
+                  <button
+                    className="btn bg-gradient-dark ms-auto mb-0"
+                    type="submit"
+                    title="Send"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
