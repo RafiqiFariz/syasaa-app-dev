@@ -107,7 +107,7 @@ export const EditUserProfileRequestPage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/update-profile-requests/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/v1/update-profile-requests/${id}`,
         {
           method: "POST",
           body: formData,

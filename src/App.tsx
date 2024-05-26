@@ -68,13 +68,13 @@ import { EditProfileRequestPage } from "./pages/profile/Edit/EditProfileRequestP
 import { AddAttendancesPage } from "./pages/attendances/Add/AddAttendancesPage";
 import { useGeoLocation } from "./hooks/useGeoLocation";
 import { EditProfilePage } from "./pages/profile/Edit/EditProfilePage";
-import { AddAttandanceRequest } from "./pages/attendance_request/Add/AddAttandanceRequest";
+import { AddAttendanceRequest } from "./pages/attendance_request/Add/AddAttendanceRequest";
 import { AddCourseClassPage } from "./pages/courses_classes/Add/AddCourseClassPage";
 import { EditCourseClassPage } from "./pages/courses_classes/Edit/EditCourseClassPage";
 import { EditAttancanceRequest } from "./pages/attendance_request/Edit/EditAttandanceRequest";
 import { ProgileRequestsPage } from "./pages/profile_requests/ProfileRequestsPage";
 import { EditUserProfileRequestPage } from "./pages/profile_requests/Edit/EditUserProfileRequestPage";
-import { DetailAttedanceRequestPage } from "./pages/attendance_request/Detail/DetailAttedanceRequestPage";
+import { DetailAttendanceRequestPage } from "./pages/attendance_request/Detail/DetailAttendanceRequestPage";
 
 setupIonicReact();
 
@@ -404,7 +404,7 @@ const App: React.FC = () => {
               path="/attendance-requests/add"
               render={() =>
                 isLogin.isLogin ? (
-                  <AddAttandanceRequest />
+                  <AddAttendanceRequest />
                 ) : (
                   <Redirect to="/login" />
                 )
@@ -426,7 +426,7 @@ const App: React.FC = () => {
               path="/attendance-requests/:id/detail"
               render={() =>
                 isLogin.isLogin ? (
-                  <DetailAttedanceRequestPage />
+                  <DetailAttendanceRequestPage />
                 ) : (
                   <Redirect to="/login" />
                 )

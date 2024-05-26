@@ -25,6 +25,10 @@ export const AddAttendancesPage = () => {
     student_image: null,
     lecturer_image: null,
   });
+  const [camera, setCamera] = useState({
+    student: true,
+    lecturer: false,
+  });
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [errors, setErrors] = useState({});
   const getUserLocation = useGeoLocation();
@@ -46,6 +50,17 @@ export const AddAttendancesPage = () => {
 
   const user = isLogin.data;
   const ALLOWED_DISTANCE = 20;
+
+  const list = [
+    {
+      name: "Student",
+      value: "student",
+    },
+    {
+      name: "Lecturer",
+      value: "lecturer",
+    },
+  ];
 
   const defaultInstructions = () => {
     return (
@@ -167,6 +182,8 @@ export const AddAttendancesPage = () => {
   };
 
   const predictFace = async () => {
+    if (!form.student_image) return;
+
     const API_ML_URL = import.meta.env.VITE_API_ML_URL;
     const formData = new FormData();
     formData.append("image", form.student_image);
@@ -197,6 +214,32 @@ export const AddAttendancesPage = () => {
         });
       }
     }, "image/jpeg");
+  };
+
+  const handleCaptureImageLecturer = async (e) => {
+    e.preventDefault();
+    if (
+      form.lecturer_image === null &&
+      camera.lecturer
+    ) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d")
+        .drawImage(video, 0, 0, canvas.width, canvas.height);
+      await captureImage(canvas);
+      setIsPredictionDone({...isPredictionDone, lecturer: true});
+      stopVideo();
+    } else {
+      setForm((prev: any) => {
+        return {
+          ...prev,
+          lecturer_image: null,
+        };
+      });
+      startVideo();
+    }
   };
 
   const loadModels = async () => {
@@ -249,13 +292,14 @@ export const AddAttendancesPage = () => {
       return (
         <>
           <p className="mb-0">Now, take a picture of your lecturer!</p>
-          <p className="mb-0">Change your camera first!</p>
+          <p className="mb-0">Select camera for lecturer and then face the camera towards the environment!</p>
         </>
       );
     } else if (isPredictionDone.student && !isPredictionDone.lecturer && step === 2) {
       return (
         <>
-          <p className="mb-0">Make sure the distance between the camera and the lecturer is no more than 2 meters, so that it can be detected properly.</p>
+          <p className="mb-0">Make sure the distance between the camera and the lecturer is no more than 2 meters, so
+            that it can be detected properly.</p>
         </>
       );
     } else if (isPredictionDone.student && isPredictionDone.lecturer) {
@@ -269,39 +313,37 @@ export const AddAttendancesPage = () => {
     try {
       if (isPredictionDone.student && isPredictionDone.lecturer) return;
 
-      if (step === 1 || (step === 2 && facingMode === "environment")) {
-        const response = await predictFace();
-        const data = await response.json();
+      const response = await predictFace();
+      const data = await response?.json();
 
-        if (_.isArray(data) && !_.isEmpty(data)) {
-          setPrediction(data);
+      if (_.isArray(data) && !_.isEmpty(data)) {
+        setPrediction(data);
 
-          const predictionName = _.replace(data[0][0], "_", " ");
-          const currentName = _.toLower(user.name);
-          const lecturerName = _.toLower(selectedSchedule.lecturer.user.name);
+        const predictionName = _.replace(data[0][0], "_", " ");
+        const currentName = _.toLower(user.name);
+        const lecturerName = _.toLower(selectedSchedule?.lecturer?.user?.name);
 
-          if (predictionName !== currentName) {
-            Alert.error(
-              "Error",
-              "Oops! It looks like there was a mismatch between the predicted face and the expected face. Please ensure that your camera is clear and well-positioned, then try again. If the issue persists, please contact our support team for further assistance."
-            );
-            return;
-          }
-
-          if (step === 1) {
-            setInstructions(`Face detected, ${data[0][0]}`);
-            setPrediction(null);
-          } else {
-            setInstructions(`Lecturer face detected, ${prediction[0][0]}`);
-            setPrediction(null);
-          }
-
-          setIsPredictionDone({
-            // lecturer: predictionName === lecturerName && step === 2,
-            lecturer: step === 2, // karena prediksi lecturer selalu salah, maka di hardcode
-            student: predictionName === currentName,
-          });
+        if (predictionName !== currentName) {
+          Alert.error(
+            "Error",
+            "Oops! It looks like there was a mismatch between the predicted face and the expected face. Please ensure that your camera is clear and well-positioned, then try again. If the issue persists, please contact our support team for further assistance."
+          );
+          return;
         }
+
+        if (step === 1) {
+          setInstructions(`Face detected, ${data[0][0]}`);
+          setPrediction(null);
+        } else {
+          setInstructions(`Lecturer face detected, ${prediction[0][0]}`);
+          setPrediction(null);
+        }
+
+        setIsPredictionDone({
+          // lecturer: predictionName === lecturerName && step === 2,
+          lecturer: step === 2, // karena prediksi lecturer selalu salah, maka di hardcode
+          student: predictionName === currentName,
+        });
       }
     } catch (e) {
       console.error(e, "error");
@@ -311,7 +353,7 @@ export const AddAttendancesPage = () => {
   // capture image every 3 seconds
   useEffect(() => {
     const intervalId = setInterval(async () => {
-      if (dimensions.width && dimensions.height) {
+      if (dimensions.width && dimensions.height && step === 1) {
         const video = videoRef.current;
         const canvas = canvasRef.current;
 
@@ -331,7 +373,9 @@ export const AddAttendancesPage = () => {
     const isLecturerAccSufficient =
       form.lecturer_image && prediction && prediction[0][1] >= 75;
 
-    handlePredictFace();
+    if (camera.student && step == 1) {
+      handlePredictFace();
+    }
   }, [form, step, facingMode]);
 
   useEffect(() => {
@@ -340,7 +384,7 @@ export const AddAttendancesPage = () => {
         handleInstruction()
       );
     }, 2000);
-  }, [isPredictionDone, facingMode])
+  }, [isPredictionDone, facingMode, camera.lecturer])
 
   const getCourseClass = async () => {
     try {
@@ -350,7 +394,7 @@ export const AddAttendancesPage = () => {
       const data = await response.json();
       console.log(data, "data123123");
 
-      const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
       const d = new Date();
       let day = weekday[d.getDay()];
@@ -471,6 +515,29 @@ export const AddAttendancesPage = () => {
               </div>
             </div>
             <div className="card-body">
+              <div className="input-group input-group-static has-validation mb-3">
+                <label>Select Camera For</label>
+                <select
+                  name="camera"
+                  className={`form-control`}
+                  value={camera.student ? "student" : "lecturer"}
+                  onChange={(e) => {
+                    setCamera({
+                      student: e.target.value === "student",
+                      lecturer: e.target.value === "lecturer",
+                    });
+                  }}
+                  disabled={(!isPredictionDone.student && step === 1) || camera.lecturer}
+                >
+                  {list.map((item, i) => {
+                    return (
+                      <option key={i} value={item.value}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
               <div className="alert alert-info text-white d-flex">
                   <span className="alert-icon align-middle me-2">
                     <i className="bi bi-info-circle-fill"></i>
@@ -481,18 +548,42 @@ export const AddAttendancesPage = () => {
               </div>
               <form onSubmit={onFinish}>
                 <div className="d-flex align-items-center position-relative ratio ratio-16x9 mb-3">
-                  <video
-                    src=""
-                    crossOrigin="anonymous"
-                    ref={videoRef}
-                    autoPlay={true}
-                    width="100%"
-                    height="100%"
-                  ></video>
+                  {camera.lecturer ? (
+                    form.lecturer_image !== null ? (
+                      <img
+                        src={`${
+                          form.lecturer_image
+                            ? URL.createObjectURL(form.lecturer_image as any)
+                            : "https://via.placeholder.com/150"
+                        }`}
+                        alt="lecturer"
+                        className="position-absolute top-0 start-0 object-cover"
+                      />
+                    ) : (
+                      <video
+                        src=""
+                        crossOrigin="anonymous"
+                        ref={videoRef}
+                        autoPlay={true}
+                        width="100%"
+                        height="100%"
+                      ></video>
+                    )
+                  ) : (
+                    <video
+                      src=""
+                      crossOrigin="anonymous"
+                      ref={videoRef}
+                      autoPlay={true}
+                      width="100%"
+                      height="100%"
+                    ></video>
+                  )}
                   <canvas
                     ref={canvasRef}
                     width="100%"
                     className="position-absolute top-50 start-50 translate-middle"
+                    style={camera.lecturer ? { display: "none" } : null}
                   ></canvas>
                 </div>
                 <div
@@ -531,6 +622,29 @@ export const AddAttendancesPage = () => {
                     <span className="change-camera-text">Change Camera</span>
                   </label>
                 </div>
+
+                {camera.lecturer ? (
+                  <>
+                    <input
+                      type="checkbox"
+                      className="btn-check"
+                      id="btncheck3"
+                      autoComplete="off"
+                      onClick={handleCaptureImageLecturer}
+                    />
+                    <label
+                      className="btn btn-outline-info ms-0 d-flex justify-content-center align-content-center align-middle"
+                      htmlFor="btncheck3"
+                    >
+                      <i className="bi bi-arrow-repeat me-2 fs-6"></i>
+                      <span className="change-camera-text">
+                        {form.lecturer_image !== null
+                          ? "Retake Image"
+                          : "Capture Image"}
+                      </span>
+                    </label>
+                  </>
+                ) : null}
 
                 <div className="input-group input-group-static has-validation mb-3">
                   <label>Course Class</label>

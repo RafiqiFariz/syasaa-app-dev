@@ -5,7 +5,6 @@ import { DefaultPaginatedResponse } from "../../types";
 import Pagination from "react-js-pagination";
 import { useHistory } from "react-router";
 import Alert from "../../components/Alert";
-import Cookies from "js-cookie";
 
 export const AttendanceRequestPage = () => {
   const [attendancesReq, setAttendanceReq] = useState<
@@ -21,7 +20,7 @@ export const AttendanceRequestPage = () => {
       selector: "id",
       key: 1,
     },
-    {
+    UserLogin.role_id !== 4 && {
       name: "Student Name",
       selector: "student",
       key: 2,
@@ -37,14 +36,14 @@ export const AttendanceRequestPage = () => {
       key: 4,
     },
     {
-      name: "Evidance",
-      selector: "evidance",
+      name: "Evidence",
+      selector: "evidence",
       key: 5,
     },
     {
       name: "Status",
       selector: "status",
-      key: 5,
+      key: 6,
     },
     {
       name: "Action",
@@ -64,8 +63,6 @@ export const AttendanceRequestPage = () => {
       const data = await response.json();
       console.log(data, "data123");
       if (response.ok) {
-        // console.log(data, "data123");
-
         setAttendanceReq({
           data: data.data.filter((item: any) => {
             if (UserLogin.role_id === 4) {
@@ -132,8 +129,8 @@ export const AttendanceRequestPage = () => {
 
   useEffect(() => {
     getData();
-  }, []);
-  // console.log();
+  }, [currentPage]);
+
   return (
     <UserLayout>
       <div className="row">
@@ -211,15 +208,17 @@ export const AttendanceRequestPage = () => {
                       </tr>
                     ) : (
                       attendancesReq.data?.map((item: any, index) => {
-                        console.log(item, "item");
+                        // console.log(item, "item");
                         return (
                           <tr key={index}>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.id}
                             </td>
-                            <td className="text-sm font-weight-normal px-4 py-3">
-                              {item.student.user.name}
-                            </td>
+                            {UserLogin.role_id !== 4 && (
+                              <td className="text-sm font-weight-normal px-4 py-3">
+                                {item.student.user.name}
+                              </td>
+                            )}
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               <div className="avatar avatar-xl position-relative">
                                 <img

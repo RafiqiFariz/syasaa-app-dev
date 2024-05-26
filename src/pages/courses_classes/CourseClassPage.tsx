@@ -33,14 +33,19 @@ export const CourseClass = () => {
       key: 4,
     },
     {
+      name: "Day",
+      selector: "day",
+      key: 5,
+    },
+    {
       name: "Start Time",
       selector: "start_time",
-      key: 5,
+      key: 6,
     },
     {
       name: "End Time",
       selector: "end_time",
-      key: 6,
+      key: 7,
     },
     UserLogin.role_id === 1 && {
       name: "Action",
@@ -290,7 +295,7 @@ export const CourseClass = () => {
     if (!confirmed) return;
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/course-classes/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/v1/course-classes/${id}`,
         {
           method: "POST",
           body: bodyData,
@@ -430,6 +435,9 @@ export const CourseClass = () => {
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3">
                               {item.lecturer.user.name}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3">
+                              {item.day}
                             </td>
                             <td className="text-sm font-weight-normal px-4 py-3 text-center">
                               {item.start_time}

@@ -21,7 +21,7 @@ export const EditCourseClassPage = () => {
     course_id: "",
     class_id: "",
     lecturer_id: "",
-    day: "monday",
+    day: "",
     start_time: "",
     end_time: "",
   });
@@ -172,9 +172,10 @@ export const EditCourseClassPage = () => {
     formData.append("start_time", form.start_time);
     formData.append("end_time", form.end_time);
     formData.append("_method", "PUT");
+
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/course-classes/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/v1/course-classes/${id}`,
         {
           method: "POST",
           body: formData,
@@ -206,7 +207,7 @@ export const EditCourseClassPage = () => {
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">
-                  Add Schedule
+                  Edit Schedule
                 </h6>
               </div>
               <div className="card-body">
@@ -275,13 +276,12 @@ export const EditCourseClassPage = () => {
                         );
                       })}
                     </select>
-                    {/* <ErrorMessage field="lecturer_id" errors={errors} /> */}
+                    <ErrorMessage field="lecturer_id" errors={errors} />
                   </div>
                   <div className="input-group input-group-static has-validation mb-3">
                     <label>Days</label>
                     <select
-                      name="days"
-                      //   className="form-control"
+                      name="day"
                       className={`form-control ${
                         errors["day"] ? "is-invalid" : ""
                       }`}
@@ -297,7 +297,7 @@ export const EditCourseClassPage = () => {
                         );
                       })}
                     </select>
-                    {/* <ErrorMessage field="day" errors={errors} /> */}
+                    <ErrorMessage field="day" errors={errors} />
                   </div>
                   <div className="input-group input-group-static mb-4 has-validation">
                     <label>Start Time</label>
@@ -306,7 +306,6 @@ export const EditCourseClassPage = () => {
                       value={form.start_time}
                       onChange={handleChange}
                       type="text"
-                      // className="form-control"
                       className={`form-control ${
                         errors["start_time"] ? "is-invalid" : ""
                       }`}
@@ -323,7 +322,6 @@ export const EditCourseClassPage = () => {
                       value={form.end_time}
                       onChange={handleChange}
                       type="text"
-                      //   className="form-control"
                       className={`form-control ${
                         errors["end_time"] ? "is-invalid" : ""
                       }`}

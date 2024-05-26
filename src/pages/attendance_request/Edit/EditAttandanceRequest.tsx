@@ -148,7 +148,7 @@ export const EditAttancanceRequest = () => {
       formData.append("student_image", form.student_image);
       formData.append("_method", "PUT");
       const response = await fetch(
-        `http://localhost:8000/api/v1/attendance-requests/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/v1/attendance-requests/${id}`,
         {
           method: "POST",
           body: formData,

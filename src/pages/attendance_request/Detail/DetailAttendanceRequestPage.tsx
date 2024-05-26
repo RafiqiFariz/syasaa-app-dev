@@ -1,21 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
-import { AuthContext } from "../../../context/Auth";
 import { useParams } from "react-router";
 import fetchAPI from "../../../fetch";
 import { set } from "lodash";
 
-export const DetailAttedanceRequestPage = () => {
-  // Example attendance request data
-  //   const attendanceRequest = {
-  //     name: "John Doe",
-  //     course_class: "Introduction to Computer Science",
-  //     picture: "https://via.placeholder.com/150",
-  //     evidence: "present",
-  //     status: "Pending",
-  //     description: "Unable to attend the class due to medical reasons.",
-  //   };
-
+export const DetailAttendanceRequestPage = () => {
   const [attendanceRequest, setAttendanceRequest] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
@@ -76,25 +65,19 @@ export const DetailAttedanceRequestPage = () => {
             </div>
             <div className="card-body">
               <div className="mb-3">
-                <label className="form-label">Name</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={attendanceRequest.name}
-                  readOnly
-                />
+                <label className="form-label ms-0">Name</label>
+                <div className="text-dark">
+                  {attendanceRequest.name}
+                </div>
               </div>
               <div className="mb-3">
-                <label className="form-label">Course Class</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={attendanceRequest.course}
-                  readOnly
-                />
+                <label className="form-label ms-0">Course Class</label>
+                <div className="text-dark">
+                  {attendanceRequest.course}
+                </div>
               </div>
               <div className="mb-3">
-                <label className="form-label">Picture</label>
+                <label className="form-label ms-0">Picture</label>
                 <div>
                   <img
                     src={attendanceRequest.picture}
@@ -105,33 +88,22 @@ export const DetailAttedanceRequestPage = () => {
                 </div>
               </div>
               <div className="mb-3">
-                <label className="form-label">Evidence</label>
-                <div>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={attendanceRequest.evidence}
-                    readOnly
-                  />
+                <label className="form-label ms-0">Evidence</label>
+                <div className="text-dark">
+                  {attendanceRequest.evidence}
                 </div>
               </div>
               <div className="mb-3">
-                <label className="form-label">Status</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={attendanceRequest.status}
-                  readOnly
-                />
+                <label className="form-label ms-0">Status</label>
+                <div className="text-dark">
+                  {attendanceRequest.status}
+                </div>
               </div>
               <div className="mb-3">
-                <label className="form-label">Description</label>
-                <textarea
-                  className="form-control"
-                  rows={3}
-                  value={attendanceRequest.description}
-                  readOnly
-                />
+                <label className="form-label ms-0">Description</label>
+                <div className="text-dark">
+                  {attendanceRequest.description ?? "-"}
+                </div>
               </div>
             </div>
           </div>

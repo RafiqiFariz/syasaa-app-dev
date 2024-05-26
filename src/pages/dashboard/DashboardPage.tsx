@@ -48,8 +48,8 @@ export const DashboardPage = () => {
   const [permissions, setPermissions] = useState<any>({});
   const [majors, setMajors] = useState<any>({});
   const [classes, setClasses] = useState<any>({});
-  const [Attendance, setAttendance] = useState<any>({});
-  const [Schedules, setSchedules] = useState<any>({});
+  const [attendance, setAttendance] = useState<any>({});
+  const [schedules, setSchedules] = useState<any>({});
 
   const [courses, setCourses] = useState<any>({});
   const { isLogin, setIsLogin } = useContext(AuthContext);
@@ -124,7 +124,7 @@ export const DashboardPage = () => {
     }
   };
 
-  const getattendanceRequest = async () => {
+  const getAttendanceRequest = async () => {
     try {
       const response = await fetchAPI("/api/v1/attendance-requests", {
         method: "GET",
@@ -151,6 +151,7 @@ export const DashboardPage = () => {
           userFilter = data.data.filter(
             (item) => item.student.id === isLogin.data.student.id
           );
+          console.log(data.data, 'test')
           setAttendanceRequest(userFilter);
         }
         setIsLoading(false);
@@ -327,7 +328,7 @@ export const DashboardPage = () => {
     } else {
       setIsLoading(false);
       getProfileRequest();
-      getattendanceRequest();
+      getAttendanceRequest();
       getUsers();
       getFacultyData();
       getRolesData();
@@ -384,7 +385,7 @@ export const DashboardPage = () => {
         },
         {
           title: "Attendances ",
-          data: Attendance,
+          data: attendance,
           status: "Active",
           icon: "bi bi-person-fill-check",
           gradient: "danger",
@@ -401,7 +402,7 @@ export const DashboardPage = () => {
       cardSmall: [
         {
           title: "Schedules",
-          data: Schedules,
+          data: schedules,
           status: "Active",
           icon: "bi bi-calendar-fill",
           gradient: "warning",
@@ -409,13 +410,13 @@ export const DashboardPage = () => {
           desc: "Total Schedules",
         },
         {
-          title: "attendances",
-          data: Attendance,
+          title: "Attendances",
+          data: attendance,
           status: "Active",
           icon: "bi bi-person-fill-check",
           gradient: "info",
           color_text: "text-info",
-          desc: "Total attendances",
+          desc: "Total Attendances",
         },
         {
           title: "Attendance Requests",
@@ -424,7 +425,7 @@ export const DashboardPage = () => {
           icon: "bi bi-person-fill-check",
           gradient: "success",
           color_text: "text-success",
-          desc: "Total attendance Requests",
+          desc: "Total Attendance Requests",
         },
         {
           title: "Profile Request",
@@ -672,7 +673,7 @@ export const DashboardPage = () => {
         },
         {
           title: "Attendances",
-          data: Attendance,
+          data: attendance,
           status: "active",
           icon: "bi bi-person-fill-check",
           gradient: "warning",
@@ -681,7 +682,7 @@ export const DashboardPage = () => {
         },
         {
           title: "Schedules",
-          data: Schedules,
+          data: schedules,
           status: "active",
           icon: "bi bi-calendar-fill",
           gradient: "info",
@@ -893,7 +894,7 @@ export const DashboardPage = () => {
         },
         {
           title: "Attendances",
-          data: Attendance,
+          data: attendance,
           status: "Total",
           icon: "bi bi-person-fill-check",
           gradient: "warning",
@@ -902,7 +903,7 @@ export const DashboardPage = () => {
         },
         {
           title: "Schedules",
-          data: Schedules,
+          data: schedules,
           status: "Total",
           icon: "bi bi-calendar-fill",
           gradient: "info",
@@ -1036,7 +1037,7 @@ export const DashboardPage = () => {
     },
   ];
 
-  // console.log(LecturerDashboard, "Dashboard");
+  console.log(StudentDashboard, "Dashboard");
 
   return (
     <UserLayout>

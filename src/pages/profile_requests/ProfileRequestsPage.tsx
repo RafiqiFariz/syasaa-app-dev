@@ -83,7 +83,6 @@ export const ProgileRequestsPage = () => {
             links: data.links,
           });
         }
-        // setProfileRequest(data);
         setIsLoading(false);
       }
     } catch (error) {
@@ -94,7 +93,7 @@ export const ProgileRequestsPage = () => {
 
   useEffect(() => {
     getProfileRequestData();
-  }, []);
+  }, [currentPage]);
 
   const handleChangePage = (newPage: number) => {
     setCurrentPage(newPage);
@@ -115,8 +114,9 @@ export const ProgileRequestsPage = () => {
         "Yes, Reject it!"
       );
     }
-    console.log(confirm, "confirm");
+
     if (!confirm) return;
+
     else {
       try {
         const payload = {

@@ -34,7 +34,7 @@ export const UserPage = () => {
 
   const getUserData = async () => {
     try {
-      const response = await fetchAPI("/api/v1/users?includeRole=1", {
+      const response = await fetchAPI(`/api/v1/users?includeRole=1&page=${currentPage}`, {
         method: "GET",
       });
 

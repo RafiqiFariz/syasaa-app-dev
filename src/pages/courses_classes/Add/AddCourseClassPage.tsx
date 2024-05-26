@@ -137,20 +137,20 @@ export const AddCourseClassPage = () => {
 
   const onFinish = async (e) => {
     e.preventDefault();
-    const Formdata = new FormData();
-    Formdata.append("course_id", form.course_id);
-    Formdata.append("class_id", form.class_id);
-    Formdata.append("lecturer_id", form.lecturer_id);
-    Formdata.append("day", form.day);
-    Formdata.append("start_time", form.start_time);
-    Formdata.append("end_time", form.end_time);
+    const formData = new FormData();
+    formData.append("course_id", form.course_id);
+    formData.append("class_id", form.class_id);
+    formData.append("lecturer_id", form.lecturer_id);
+    formData.append("day", form.day);
+    formData.append("start_time", form.start_time);
+    formData.append("end_time", form.end_time);
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/v1/course-classes",
+        `${import.meta.env.VITE_API_URL}/api/v1/course-classes`,
         {
           method: "POST",
-          body: Formdata,
+          body: formData,
           credentials: "include",
           headers: {
             Accept: "application/json",
@@ -198,7 +198,6 @@ export const AddCourseClassPage = () => {
                     <label>Course</label>
                     <select
                       name="course_id"
-                      //   className="form-control"
                       className={`form-control ${
                         errors["course_id"] ? "is-invalid" : ""
                       }`}
@@ -221,7 +220,6 @@ export const AddCourseClassPage = () => {
                     <label>Class</label>
                     <select
                       name="class_id"
-                      //   className="form-control"
                       className={`form-control ${
                         errors["class_id"] ? "is-invalid" : ""
                       }`}
@@ -244,7 +242,6 @@ export const AddCourseClassPage = () => {
                     <label>Lecturer</label>
                     <select
                       name="lecturer_id"
-                      //   className="form-control"
                       className={`form-control ${
                         errors["lecturer_id"] ? "is-invalid" : ""
                       }`}
@@ -267,7 +264,6 @@ export const AddCourseClassPage = () => {
                     <label>Days</label>
                     <select
                       name="days"
-                      //   className="form-control"
                       className={`form-control ${
                         errors["day"] ? "is-invalid" : ""
                       }`}
@@ -293,13 +289,10 @@ export const AddCourseClassPage = () => {
                       value={form.start_time}
                       onChange={handleChange}
                       type="text"
-                      //   className="form-control"
                       className={`form-control ${
                         errors["start_time"] ? "is-invalid" : ""
                       }`}
                       placeholder="ex. 08:00"
-                      aria-label="ex. 08:00"
-                      aria-describedby="ex. 08:00"
                     />
                     <ErrorMessage field="start_time" errors={errors} />
                   </div>
@@ -310,13 +303,10 @@ export const AddCourseClassPage = () => {
                       value={form.end_time}
                       onChange={handleChange}
                       type="text"
-                      //   className="form-control"
                       className={`form-control ${
                         errors["end_time"] ? "is-invalid" : ""
                       }`}
                       placeholder="ex. 08:00"
-                      aria-label="ex. 08:00"
-                      aria-describedby="ex. 08:00"
                     />
                     <ErrorMessage field="end_time" errors={errors} />
                   </div>
