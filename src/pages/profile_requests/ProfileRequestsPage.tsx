@@ -40,9 +40,14 @@ export const ProgileRequestsPage = () => {
       key: 6,
     },
     {
+      name: "Created At",
+      selector: "created_at",
+      key: 7,
+    },
+    {
       name: "Action",
       selector: "action",
-      key: 7,
+      key: 8,
     },
   ];
 
@@ -116,7 +121,6 @@ export const ProgileRequestsPage = () => {
     }
 
     if (!confirm) return;
-
     else {
       try {
         const payload = {
@@ -149,6 +153,27 @@ export const ProgileRequestsPage = () => {
     }
 
     return item;
+  };
+
+  const formatedDate = (date: string) => {
+    const dateObj = new Date(date);
+
+    const optionsDate: Intl.DateTimeFormatOptions = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    };
+
+    const optionsTime: Intl.DateTimeFormatOptions = {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    };
+
+    const datePart = dateObj.toLocaleDateString("en-GB", optionsDate); // 'en-GB' for dd/mm/yyyy format
+    const timePart = dateObj.toLocaleTimeString("en-GB", optionsTime);
+
+    return `${datePart} ${timePart}`;
   };
 
   return (
@@ -291,6 +316,9 @@ export const ProgileRequestsPage = () => {
                                   Rejected
                                 </span>
                               )}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {formatedDate(item.created_at)}
                             </td>
                             <td className="w-full">
                               <div className="d-flex gap-2 flex-wrap w-full justify-content-center">
