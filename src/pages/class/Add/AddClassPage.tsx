@@ -5,6 +5,7 @@ import fetchAPI from "../../../fetch";
 import { useHistory } from "react-router";
 import Alert from "../../../components/Alert";
 import { useGeoLocation } from "../../../hooks/useGeoLocation";
+import { BasicLeafletMap } from "../../../components/leaflet";
 
 interface OptionsData {
   id: number;
@@ -140,6 +141,7 @@ export const AddClassPage = () => {
                   />
                   <ErrorMessage field="lng" errors={errors} />
                 </div>
+                <BasicLeafletMap form={form} setform={setForm} />
                 <div className="input-group input-group-static mb-4">
                   <label htmlFor="majors" className="ms-0">
                     Major

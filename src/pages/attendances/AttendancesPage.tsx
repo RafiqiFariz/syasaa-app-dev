@@ -33,9 +33,18 @@ export const AttendancesPage = () => {
     value: 0,
     label: "All Major",
   });
+  const [selectedFilter, setSelectedFilter] = useState<any>({
+    value: "default",
+    label: "Created At (ASC)",
+  });
   const history = useHistory();
 
   const UserLogin = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const formatedDate = (date: string) => {
+    const dateObj = new Date(date);
+    return dateObj.toLocaleDateString();
+  };
 
   let columns = [
     {
@@ -43,7 +52,7 @@ export const AttendancesPage = () => {
       selector: "id",
       key: 1,
     },
-    {
+    UserLogin.role_id !== 4 && {
       name: "Name",
       selector: "name",
       key: 2,
@@ -62,6 +71,11 @@ export const AttendancesPage = () => {
       name: "Attendance",
       selector: "is_present",
       key: 3,
+    },
+    {
+      name: "Created At",
+      selector: "created_at",
+      key: 4,
     },
     // UserLogin.role_id === 1 && {
     //   name: "Action",
@@ -170,7 +184,7 @@ export const AttendancesPage = () => {
     }
   };
 
-  const getData = async (classId: number, majorId: number) => {
+  const getData = async (classId: number, majorId: number, filter: string) => {
     setIsLoading(true);
     try {
       let url = `/api/v1/attendances?page=${currentPage}`;
@@ -187,6 +201,12 @@ export const AttendancesPage = () => {
         url += `&class_id=${classId}`;
       } else if (classId === 0 && majorId !== 0) {
         url += `&major_id=${majorId}`;
+      }
+
+      if (filter === "time") {
+        url += `&latest=true`;
+      } else {
+        url += `&latest=false`;
       }
 
       const response = await fetchAPI(url, {
@@ -228,9 +248,9 @@ export const AttendancesPage = () => {
     if (user.data) {
       getMajor();
       getClasses();
-      getData(selectedClass.value, selectedMajor.value);
+      getData(selectedClass.value, selectedMajor.value, selectedFilter.value);
     }
-  }, [currentPage, selectedClass, selectedMajor, user]);
+  }, [currentPage, selectedClass, selectedMajor, user, selectedFilter]);
 
   const handleChangePage = (newPage: number) => {
     setCurrentPage(newPage);
@@ -272,6 +292,13 @@ export const AttendancesPage = () => {
       }
     }
     return image;
+  };
+
+  const handlefilter = (e) => {
+    setSelectedFilter({
+      value: e.value,
+      label: e.label,
+    });
   };
 
   return (
@@ -343,6 +370,26 @@ export const AttendancesPage = () => {
                     )}
                   </>
                 )}
+                <div className="d-flex flex-column w-100">
+                  <label>Filter</label>
+                  <ReactSelect
+                    className="col-6"
+                    options={[
+                      {
+                        value: "default",
+                        label: "Created At (ASC)",
+                      },
+                      {
+                        value: "time",
+                        label: "Created At (DESC)",
+                      },
+                    ]}
+                    value={selectedFilter}
+                    name="Filter By"
+                    onChange={handlefilter}
+                    isLoading={isLoading}
+                  />
+                </div>
               </div>
               <div className="table-responsive">
                 <table className="table align-items-center mb-0">
@@ -371,87 +418,104 @@ export const AttendancesPage = () => {
                   </tr>
                   </thead>
                   <tbody>
-                  {isLoading ? (
-                    <tr>
-                      {Array(columns.length)
-                        .fill(0)
-                        .map((_, i) => {
-                          if (!columns[i]) {
+                    {isLoading ? (
+                      <tr>
+                        {Array(columns.length)
+                          .fill(0)
+                          .map((_, i) => {
+                            if (!columns[i]) {
+                              return (
+                                <td
+                                  key={i}
+                                  style={{
+                                    display: "none",
+                                  }}
+                                ></td>
+                              );
+                            }
                             return (
                               <td
                                 key={i}
-                                style={{
-                                  display: "none",
-                                }}
-                              ></td>
+                                className="text-center placeholder-glow"
+                              >
+                                <span className="placeholder col-10"></span>
+                              </td>
                             );
-                          }
-                          return (
-                            <td
-                              key={i}
-                              className="text-center placeholder-glow"
-                            >
-                              <span className="placeholder col-10"></span>
+                          })}
+                      </tr>
+                    ) : attendances.data?.length === 0 ? (
+                      <tr>
+                        <td colSpan={columns.length} className="text-center">
+                          No data available
+                        </td>
+                      </tr>
+                    ) : (
+                      attendances.data?.map((item: any, index) => {
+                        // console.log(item, "item");
+                        return (
+                          <tr key={index}>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {item.id}
                             </td>
-                          );
-                        })}
-                    </tr>
-                  ) : attendances.data?.length === 0 ? (
-                    <tr>
-                      <td colSpan={columns.length} className="text-center">
-                        No data available
-                      </td>
-                    </tr>
-                  ) : (
-                    attendances.data?.map((item: any, index) => {
-                      // console.log(item, "item");
-                      return (
-                        <tr key={index}>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            {item.id}
-                          </td>
-                          <td className="text-sm font-weight-normal px-4 py-3">
-                            {item.student.user.name}
-                          </td>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            <div className="avatar avatar-xl position-relative">
-                              {item.student_image ? (
-                                <img
-                                  src={formatImage(item.student_image)}
-                                  alt="profile_image"
-                                  className="border-radius-lg shadow-sm"
-                                  style={{
-                                    width: "object-fit",
-                                    height: "object-fit",
-                                  }}
-                                />
-                              ) : (
-                                <>-</>
-                              )}
-                            </div>
-                          </td>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            <div className="avatar avatar-xl position-relative">
-                              {item.lecturer_image ? (
-                                <img
-                                  src={formatImage(item.lecturer_image)}
-                                  alt="profile_image"
-                                  className="border-radius-lg shadow-sm"
-                                  style={{
-                                    width: "object-fit",
-                                    height: "object-fit",
-                                  }}
-                                />
-                              ) : (
-                                <>-</>
-                              )}
-                            </div>
-                          </td>
-                          <td className="text-sm font-weight-normal px-4 py-3 text-center">
-                            {item.is_present !== 0 ? "Present" : "Absent"}
-                          </td>
+                            {UserLogin.role_id !== 4 && (
+                              <td className="text-sm font-weight-normal px-4 py-3">
+                                {item.student.user.name}
+                              </td>
+                            )}
 
-                          {/* {UserLogin.role_id !== 1 ? (
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              <div className="avatar avatar-xl position-relative">
+                                {item.student_image !== null ? (
+                                  <img
+                                    src={formatImage(item.student_image)}
+                                    alt="profile_image"
+                                    className="border-radius-lg shadow-sm"
+                                    style={{
+                                      width: "object-fit",
+                                      height: "object-fit",
+                                    }}
+                                  />
+                                ) : (
+                                  <span className="text-center text-dark">
+                                    -
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              <div className="avatar avatar-xl position-relative">
+                                {item.lecturer_image !== null ? (
+                                  <img
+                                    src={formatImage(item.lecturer_image)}
+                                    alt="profile_image"
+                                    className="border-radius-lg shadow-sm"
+                                    style={{
+                                      width: "object-fit",
+                                      height: "object-fit",
+                                    }}
+                                  />
+                                ) : (
+                                  <span className="text-center text-dark">
+                                    -
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {item.is_present !== 0 ? (
+                                <span className="badge badge-sm bg-gradient-success d-flex justify-content-center">
+                                  Present
+                                </span>
+                              ) : (
+                                <span className="badge badge-sm bg-gradient-danger d-flex justify-content-center">
+                                  Absent
+                                </span>
+                              )}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {formatedDate(item.created_at)}
+                            </td>
+                            {/* {UserLogin.role_id !== 1 ? (
                               <></>
                             ) : (
                               <td className="align-middle">
@@ -473,10 +537,10 @@ export const AttendancesPage = () => {
                                 </div>
                               </td>
                             )} */}
-                        </tr>
-                      );
-                    })
-                  )}
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>

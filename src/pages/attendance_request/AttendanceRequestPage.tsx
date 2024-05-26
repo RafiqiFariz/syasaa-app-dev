@@ -5,6 +5,7 @@ import { DefaultPaginatedResponse } from "../../types";
 import Pagination from "react-js-pagination";
 import { useHistory } from "react-router";
 import Alert from "../../components/Alert";
+import ReactSelect from "react-select";
 
 export const AttendanceRequestPage = () => {
   const [attendancesReq, setAttendanceReq] = useState<
@@ -46,16 +47,39 @@ export const AttendanceRequestPage = () => {
       key: 6,
     },
     {
+      name: "Created At",
+      selector: "created_at",
+      key: 7,
+    },
+    {
       name: "Action",
       selector: "action",
     },
   ];
-  const getData = async () => {
+
+  const [selectedFilter, setSelectedFilter] = useState<any>({
+    value: "default",
+    label: "Created At (ASC)",
+  });
+
+  const formatedDate = (date: string) => {
+    const dateObj = new Date(date);
+    return dateObj.toLocaleDateString();
+  };
+
+  const getData = async (filter: string) => {
     try {
       let url = `/api/v1/attendance-requests?page=${currentPage}`;
       if (UserLogin.role_id === 4) {
         url = `/api/v1/attendance-requests?page=${currentPage}&student_id=${UserLogin.student.id}`;
       }
+
+      if (filter === "time") {
+        url += `&latest=true`;
+      } else {
+        url += `&latest=false`;
+      }
+
       const response = await fetchAPI(url, {
         method: "GET",
       });
@@ -120,7 +144,7 @@ export const AttendanceRequestPage = () => {
       const data = await response.json();
       console.log(data, "data1234");
       if (response.ok) {
-        getData();
+        getData(selectedFilter.value);
       }
     } catch (error) {
       console.log(error, "error");
@@ -128,8 +152,15 @@ export const AttendanceRequestPage = () => {
   };
 
   useEffect(() => {
-    getData();
-  }, [currentPage]);
+    getData(selectedFilter.value);
+  }, [currentPage, selectedFilter]);
+
+  const handlefilter = (e) => {
+    setSelectedFilter({
+      value: e.value,
+      label: e.label,
+    });
+  };
 
   return (
     <UserLayout>
@@ -159,7 +190,28 @@ export const AttendanceRequestPage = () => {
               </div>
             </div>
             <div className="card-body px-0 pb-2">
-              <div className="d-flex mx-4 justify-content-start gap-2 col-6"></div>
+              <div className="d-flex mx-4 justify-content-start gap-2 col-6">
+                <div className="d-flex flex-column w-100">
+                  <label>Filter</label>
+                  <ReactSelect
+                    className="col-6"
+                    options={[
+                      {
+                        value: "default",
+                        label: "Created At (ASC)",
+                      },
+                      {
+                        value: "time",
+                        label: "Created At (DESC)",
+                      },
+                    ]}
+                    value={selectedFilter}
+                    name="Filter By"
+                    onChange={handlefilter}
+                    isLoading={isLoading}
+                  />
+                </div>
+              </div>
               <div className="table-responsive">
                 <table className="table align-items-center mb-0">
                   <thead>
@@ -261,6 +313,9 @@ export const AttendanceRequestPage = () => {
                                   Rejected
                                 </span>
                               )}
+                            </td>
+                            <td className="text-sm font-weight-normal px-4 py-3 text-center">
+                              {formatedDate(item.created_at)}
                             </td>
                             <td className="align-middle">
                               <div className="d-flex gap-2 justify-content-center">
