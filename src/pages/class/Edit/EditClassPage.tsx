@@ -4,6 +4,8 @@ import { useHistory, useParams } from "react-router";
 import { ErrorMessage } from "../../../components/ErrorMessage";
 import fetchAPI from "../../../fetch";
 import Alert from "../../../components/Alert";
+import { useGeoLocation } from "../../../hooks/useGeoLocation";
+import { BasicLeafletMap } from "../../../components/leaflet";
 
 interface OptionsData {
   id: number;
@@ -19,6 +21,7 @@ export const EditClassPage = () => {
   });
   const [errors, setErrors] = useState({});
   const [majors, setMajors] = useState<Array<OptionsData>>([]);
+  const getUserLocation = useGeoLocation();
 
   const { id } = useParams<{ id: string }>();
 
@@ -101,6 +104,20 @@ export const EditClassPage = () => {
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3 d-flex justify-content-between">
                 <h6 className="text-white text-capitalize ps-3">Edit Class</h6>
+                <button
+                  className="btn btn-info btn-md mx-4 mb-0"
+                  onClick={() => {
+                    if (getUserLocation) {
+                      setForm({
+                        ...form,
+                        lat: getUserLocation.location.latitude.toString(),
+                        lng: getUserLocation.location.longitude.toString(),
+                      });
+                    }
+                  }}
+                >
+                  Set Current Location
+                </button>
               </div>
             </div>
             <div className="card-body">
@@ -147,6 +164,7 @@ export const EditClassPage = () => {
                   />
                   <ErrorMessage field="lng" errors={errors} />
                 </div>
+                <BasicLeafletMap form={form} setform={setForm} />
                 <div className="input-group input-group-static mb-4">
                   <label htmlFor="majors" className="ms-0">
                     Major

@@ -13,6 +13,7 @@ import "material-dashboard/assets/js/core/popper.min.js";
 import "material-dashboard/assets/js/core/bootstrap.min.js";
 import "material-dashboard/assets/js/plugins/smooth-scrollbar.min.js";
 import "material-dashboard/assets/js/material-dashboard.min.js";
+import "./index.css";
 
 const container = document.getElementById("root");
 const root = createRoot(container!);

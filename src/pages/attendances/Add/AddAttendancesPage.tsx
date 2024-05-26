@@ -387,7 +387,7 @@ export const AddAttendancesPage = () => {
         setCourses(data.data);
         setForm({
           ...form,
-          course_class_id: course.id,
+          course_class_id: course?.id,
         });
       }
     } catch (error) {
