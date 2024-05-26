@@ -324,9 +324,9 @@ export const ProgileRequestsPage = () => {
                               <div className="d-flex gap-2 flex-wrap w-full justify-content-center">
                                 {userLogin.role_id === 1 ? (
                                   item.status === "pending" && (
-                                    <div className="d-flex gap-2 flex-wrap w-full">
+                                    <div className="d-flex gap-2 flex-row w-full">
                                       <button
-                                        className="btn btn-primary btn-sm mb-0"
+                                        className="btn btn-success btn-sm mb-0"
                                         onClick={() => {
                                           handleStatusChange(
                                             item.id,
@@ -346,6 +346,16 @@ export const ProgileRequestsPage = () => {
                                         }}
                                       >
                                         Reject
+                                      </button>
+                                      <button
+                                        className="btn btn-primary btn-sm mb-0"
+                                        onClick={() => {
+                                          history.push(
+                                            `/profile/${item.id}/detail`
+                                          );
+                                        }}
+                                      >
+                                        Detail
                                       </button>
                                     </div>
                                   )
