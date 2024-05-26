@@ -263,7 +263,7 @@ export const AddCourseClassPage = () => {
                   <div className="input-group input-group-static has-validation mb-3">
                     <label>Days</label>
                     <select
-                      name="days"
+                      name="day"
                       className={`form-control ${
                         errors["day"] ? "is-invalid" : ""
                       }`}
