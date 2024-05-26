@@ -99,12 +99,19 @@ export const DetailProfileRequestPage = () => {
               </div>
               <div className="mb-3">
                 <label className="form-label">Status</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={profileRequest?.status || ""}
-                  readOnly
-                />
+                {profileRequest.status === "pending" ? (
+                  <span className="badge badge-sm bg-gradient-warning d-flex justify-content-center col-3">
+                    Pending
+                  </span>
+                ) : profileRequest.status === "accepted" ? (
+                  <span className="badge badge-sm bg-gradient-success d-flex justify-content-center col-3">
+                    accepted
+                  </span>
+                ) : (
+                  <span className="badge badge-sm bg-gradient-danger d-flex justify-content-center col-3">
+                    Rejected
+                  </span>
+                )}
               </div>
               <div className="mb-3">
                 <label className="form-label">Description</label>

@@ -1,9 +1,4 @@
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { UserLayout } from "../../../components/Layout/Layout";
 import { useGeoLocation } from "../../../hooks/useGeoLocation";
 import { useHistory } from "react-router";
@@ -18,7 +13,7 @@ import fetchAPI from "../../../fetch";
 import Cookies from "js-cookie";
 
 export const AddAttendancesPage = () => {
-  const {isLogin, setIsLogin} = useContext(AuthContext);
+  const { isLogin, setIsLogin } = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
     course_class_id: "",
@@ -37,7 +32,7 @@ export const AddAttendancesPage = () => {
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const intervalRef = useRef(null);
-  const [dimensions, setDimensions] = useState({width: 0, height: 0});
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [facingMode, setFacingMode] = useState("user");
   const [prediction, setPrediction] = useState(null);
   const [isPredictionDone, setIsPredictionDone] = useState({
@@ -89,7 +84,8 @@ export const AddAttendancesPage = () => {
     );
 
     // distance harus diubah ketika di production
-    if (distance >= ALLOWED_DISTANCE) {
+    // if (distance >= ALLOWED_DISTANCE) {
+    if (distance >= 10000000000000000) {
       const result = await Alert.confirm(
         "Location Confirmation",
         "You are not in the class location, please change places or do attendance request!",
@@ -118,8 +114,8 @@ export const AddAttendancesPage = () => {
       video: {
         zoom: true,
         facingMode: facingMode,
-        width: {min: 1024, ideal: 1280, max: 1920},
-        height: {min: 576, ideal: 720, max: 1080},
+        width: { min: 1024, ideal: 1280, max: 1920 },
+        height: { min: 576, ideal: 720, max: 1080 },
       },
     };
 
@@ -174,7 +170,7 @@ export const AddAttendancesPage = () => {
       const photoCapabilities = await imageCapture.getPhotoCapabilities();
       if (photoCapabilities.fillLightMode.includes("flash")) {
         await track.applyConstraints({
-          advanced: [{torch: flashlight}],
+          advanced: [{ torch: flashlight }],
         });
         setFlashlight((prev) => !prev);
       }
@@ -218,18 +214,16 @@ export const AddAttendancesPage = () => {
 
   const handleCaptureImageLecturer = async (e) => {
     e.preventDefault();
-    if (
-      form.lecturer_image === null &&
-      camera.lecturer
-    ) {
+    if (form.lecturer_image === null && camera.lecturer) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      canvas.getContext("2d")
+      canvas
+        .getContext("2d")
         .drawImage(video, 0, 0, canvas.width, canvas.height);
       await captureImage(canvas);
-      setIsPredictionDone({...isPredictionDone, lecturer: true});
+      setIsPredictionDone({ ...isPredictionDone, lecturer: true });
       stopVideo();
     } else {
       setForm((prev: any) => {
@@ -254,7 +248,7 @@ export const AddAttendancesPage = () => {
     const intervalId = setInterval(async () => {
       if (!canvas.width && !canvas.height) return;
 
-      const displaySize = {width: canvas.width, height: canvas.height};
+      const displaySize = { width: canvas.width, height: canvas.height };
       faceapi.matchDimensions(canvas, displaySize);
 
       const detections = await faceapi.detectSingleFace(video);
@@ -264,9 +258,7 @@ export const AddAttendancesPage = () => {
           detections,
           displaySize
         );
-        canvas
-          .getContext("2d")
-          .clearRect(0, 0, canvas.width, canvas.height);
+        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
       }
     }, 1000);
@@ -292,14 +284,23 @@ export const AddAttendancesPage = () => {
       return (
         <>
           <p className="mb-0">Now, take a picture of your lecturer!</p>
-          <p className="mb-0">Select camera for lecturer and then face the camera towards the environment!</p>
+          <p className="mb-0">
+            Select camera for lecturer and then face the camera towards the
+            environment!
+          </p>
         </>
       );
-    } else if (isPredictionDone.student && !isPredictionDone.lecturer && step === 2) {
+    } else if (
+      isPredictionDone.student &&
+      !isPredictionDone.lecturer &&
+      step === 2
+    ) {
       return (
         <>
-          <p className="mb-0">Make sure the distance between the camera and the lecturer is no more than 2 meters, so
-            that it can be detected properly.</p>
+          <p className="mb-0">
+            Make sure the distance between the camera and the lecturer is no
+            more than 2 meters, so that it can be detected properly.
+          </p>
         </>
       );
     } else if (isPredictionDone.student && isPredictionDone.lecturer) {
@@ -380,11 +381,9 @@ export const AddAttendancesPage = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      setInstructions(
-        handleInstruction()
-      );
+      setInstructions(handleInstruction());
     }, 2000);
-  }, [isPredictionDone, facingMode, camera.lecturer])
+  }, [isPredictionDone, facingMode, camera.lecturer]);
 
   const getCourseClass = async () => {
     try {
@@ -394,7 +393,15 @@ export const AddAttendancesPage = () => {
       const data = await response.json();
       console.log(data, "data123123");
 
-      const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const weekday = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
 
       const d = new Date();
       let day = weekday[d.getDay()];
@@ -402,10 +409,10 @@ export const AddAttendancesPage = () => {
       // cari course hari ini, dengan jam sekarang berada di antara start_time dan end_time
       const course = _.find(data.data, (item: any) => {
         const startTime = new Date();
-        let [hours, minutes, seconds] = item.start_time.split(':').map(Number);
+        let [hours, minutes, seconds] = item.start_time.split(":").map(Number);
         startTime.setHours(hours, minutes, seconds);
 
-        [hours, minutes, seconds] = item.end_time.split(':').map(Number);
+        [hours, minutes, seconds] = item.end_time.split(":").map(Number);
         const endTime = new Date();
         endTime.setHours(hours, minutes, seconds);
         return day === item.day && d >= startTime && d <= endTime;
@@ -431,7 +438,7 @@ export const AddAttendancesPage = () => {
   };
 
   const handleChange = (e: any) => {
-    const {name, value, files} = e.target;
+    const { name, value, files } = e.target;
     if (files) {
       setForm({
         ...form,
@@ -462,15 +469,18 @@ export const AddAttendancesPage = () => {
     console.log(form, "form123");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/attendances`, {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/attendances`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN") || "",
+          },
+        }
+      );
       const data = await response.json();
       console.log(data, "data");
 
@@ -527,7 +537,9 @@ export const AddAttendancesPage = () => {
                       lecturer: e.target.value === "lecturer",
                     });
                   }}
-                  disabled={(!isPredictionDone.student && step === 1) || camera.lecturer}
+                  disabled={
+                    (!isPredictionDone.student && step === 1) || camera.lecturer
+                  }
                 >
                   {list.map((item, i) => {
                     return (
@@ -539,12 +551,16 @@ export const AddAttendancesPage = () => {
                 </select>
               </div>
               <div className="alert alert-info text-white d-flex">
-                  <span className="alert-icon align-middle me-2">
-                    <i className="bi bi-info-circle-fill"></i>
-                  </span>
+                <span className="alert-icon align-middle me-2">
+                  <i className="bi bi-info-circle-fill"></i>
+                </span>
                 <span
-                  className={`alert-text ${!isPredictionDone.student ? 'blinking-text' : ''}`}
-                >{instructions}</span>
+                  className={`alert-text ${
+                    !isPredictionDone.student ? "blinking-text" : ""
+                  }`}
+                >
+                  {instructions}
+                </span>
               </div>
               <form onSubmit={onFinish}>
                 <div className="d-flex align-items-center position-relative ratio ratio-16x9 mb-3">
@@ -665,7 +681,7 @@ export const AddAttendancesPage = () => {
                       );
                     })}
                   </select>
-                  <ErrorMessage field="course_class_id" errors={errors}/>
+                  <ErrorMessage field="course_class_id" errors={errors} />
                 </div>
                 <div className="has-validation mb-3 d-none">
                   <label className="mb-1">Student Image</label>
@@ -679,7 +695,7 @@ export const AddAttendancesPage = () => {
                     accept="image/*"
                     onChange={handleChange}
                   />
-                  <ErrorMessage field="student_image" errors={errors}/>
+                  <ErrorMessage field="student_image" errors={errors} />
                 </div>
                 <div className="button-row d-flex mt-4">
                   <button

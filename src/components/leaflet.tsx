@@ -63,8 +63,8 @@ export const BasicLeafletMap = ({ form, setform }) => {
             onDeleted={() => {
               setform({
                 ...form,
-                lat: "-6.2000000",
-                lng: "106.8166660",
+                lat: "0.1",
+                lng: "0.1",
               }); // Reset to default location if needed
             }}
             draw={{

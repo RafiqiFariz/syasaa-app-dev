@@ -59,12 +59,28 @@ export const AttendanceRequestPage = () => {
 
   const [selectedFilter, setSelectedFilter] = useState<any>({
     value: "default",
-    label: "Created At (ASC)",
+    label: "Created At (DESC)",
   });
 
   const formatedDate = (date: string) => {
     const dateObj = new Date(date);
-    return dateObj.toLocaleDateString();
+
+    const optionsDate: Intl.DateTimeFormatOptions = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    };
+
+    const optionsTime: Intl.DateTimeFormatOptions = {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    };
+
+    const datePart = dateObj.toLocaleDateString("en-GB", optionsDate); // 'en-GB' for dd/mm/yyyy format
+    const timePart = dateObj.toLocaleTimeString("en-GB", optionsTime);
+
+    return `${datePart} ${timePart}`;
   };
 
   const getData = async (filter: string) => {
@@ -74,7 +90,7 @@ export const AttendanceRequestPage = () => {
         url = `/api/v1/attendance-requests?page=${currentPage}&student_id=${UserLogin.student.id}`;
       }
 
-      if (filter === "time") {
+      if (filter === "default") {
         url += `&latest=true`;
       } else {
         url += `&latest=false`;
@@ -190,18 +206,18 @@ export const AttendanceRequestPage = () => {
               </div>
             </div>
             <div className="card-body px-0 pb-2">
-              <div className="d-flex mx-4 justify-content-start gap-2 col-6">
+              <div className="d-flex mx-4 justify-content-start gap-2 col-6 mb-3">
                 <div className="d-flex flex-column w-100">
                   <label>Filter</label>
                   <ReactSelect
                     className="col-6"
                     options={[
                       {
-                        value: "default",
+                        value: "time",
                         label: "Created At (ASC)",
                       },
                       {
-                        value: "time",
+                        value: "default",
                         label: "Created At (DESC)",
                       },
                     ]}
@@ -324,7 +340,7 @@ export const AttendanceRequestPage = () => {
                                 item.status === "pending" ? (
                                   <>
                                     <button
-                                      className="btn btn-primary btn-sm mb-0"
+                                      className="btn btn-success btn-sm mb-0"
                                       onClick={() => {
                                         handleStatusChange(item.id, "accepted");
                                       }}

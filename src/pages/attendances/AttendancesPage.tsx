@@ -35,7 +35,7 @@ export const AttendancesPage = () => {
   });
   const [selectedFilter, setSelectedFilter] = useState<any>({
     value: "default",
-    label: "Created At (ASC)",
+    label: "Created At (DESC)",
   });
   const history = useHistory();
 
@@ -43,7 +43,23 @@ export const AttendancesPage = () => {
 
   const formatedDate = (date: string) => {
     const dateObj = new Date(date);
-    return dateObj.toLocaleDateString();
+
+    const optionsDate: Intl.DateTimeFormatOptions = {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    };
+
+    const optionsTime: Intl.DateTimeFormatOptions = {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    };
+
+    const datePart = dateObj.toLocaleDateString("en-GB", optionsDate); // 'en-GB' for dd/mm/yyyy format
+    const timePart = dateObj.toLocaleTimeString("en-GB", optionsTime);
+
+    return `${datePart} ${timePart}`;
   };
 
   let columns = [
@@ -203,7 +219,7 @@ export const AttendancesPage = () => {
         url += `&major_id=${majorId}`;
       }
 
-      if (filter === "time") {
+      if (filter === "default") {
         url += `&latest=true`;
       } else {
         url += `&latest=false`;
@@ -310,9 +326,15 @@ export const AttendancesPage = () => {
               <i className="bi bi-info-circle-fill"></i>
             </span>
             <span className="alert-text">
-              For security purposes, your attendance photo will be deleted after 24 hours.
+              For security purposes, your attendance photo will be deleted after
+              24 hours.
             </span>
-            <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -325,8 +347,7 @@ export const AttendancesPage = () => {
             }}
           >
             <div className="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-              <div
-                className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
+              <div className="bg-gradient-primary shadow-primary border-radius-lg py-3 d-flex justify-content-between align-items-center">
                 <h6 className="text-white text-capitalize ps-3 mb-0">
                   Attendances
                 </h6>
@@ -343,7 +364,7 @@ export const AttendancesPage = () => {
               </div>
             </div>
             <div className="card-body px-0 pb-2">
-              <div className="d-flex mx-4 justify-content-start gap-2 col-6">
+              <div className="d-flex mx-4 justify-content-start gap-2 col-6 mb-3">
                 {UserLogin.role_id !== 1 && (
                   <>
                     {UserLogin.role_id === 2 && (
@@ -376,11 +397,11 @@ export const AttendancesPage = () => {
                     className="col-6"
                     options={[
                       {
-                        value: "default",
+                        value: "time",
                         label: "Created At (ASC)",
                       },
                       {
-                        value: "time",
+                        value: "default",
                         label: "Created At (DESC)",
                       },
                     ]}
@@ -394,28 +415,28 @@ export const AttendancesPage = () => {
               <div className="table-responsive">
                 <table className="table align-items-center mb-0">
                   <thead>
-                  <tr>
-                    {columns.map((item, index) => {
-                      if (!item) {
+                    <tr>
+                      {columns.map((item, index) => {
+                        if (!item) {
+                          return (
+                            <div
+                              key={index}
+                              style={{
+                                display: "none",
+                              }}
+                            ></div>
+                          );
+                        }
                         return (
-                          <div
+                          <th
                             key={index}
-                            style={{
-                              display: "none",
-                            }}
-                          ></div>
+                            className="text-uppercase text-secondary text-xxs font-weight-bolder text-center"
+                          >
+                            {item.name}
+                          </th>
                         );
-                      }
-                      return (
-                        <th
-                          key={index}
-                          className="text-uppercase text-secondary text-xxs font-weight-bolder text-center"
-                        >
-                          {item.name}
-                        </th>
-                      );
-                    })}
-                  </tr>
+                      })}
+                    </tr>
                   </thead>
                   <tbody>
                     {isLoading ? (
