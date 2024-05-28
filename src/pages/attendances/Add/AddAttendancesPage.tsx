@@ -465,7 +465,7 @@ export const AddAttendancesPage = () => {
     formData.append("lecturer_image", form.lecturer_image);
     formData.append("course_class_id", form.course_class_id);
     formData.append("student_id", user.student.id);
-    formData.append("is_present", present ? "1" : "0");
+    formData.append("is_present", "1");
     console.log(form, "form123");
 
     try {
@@ -563,7 +563,7 @@ export const AddAttendancesPage = () => {
                 </span>
               </div>
               <form onSubmit={onFinish}>
-                <div className="d-flex align-items-center position-relative mb-3">
+                <div className="d-flex align-items-center position-relative ratio ratio-16x9 mb-3">
                   {camera.lecturer ? (
                     form.lecturer_image !== null ? (
                       <img
@@ -598,7 +598,6 @@ export const AddAttendancesPage = () => {
                   <canvas
                     ref={canvasRef}
                     width="100%"
-                    height="100%"
                     className="position-absolute top-50 start-50 translate-middle"
                     style={camera.lecturer ? { display: "none" } : null}
                   ></canvas>

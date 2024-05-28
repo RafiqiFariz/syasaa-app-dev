@@ -395,7 +395,7 @@ export const ProfilePage = () => {
                 <img
                   src={getUserProfilePhoto()}
                   alt="profile_image"
-                  className="shadow w-100 rounded-circle"
+                  className="shadow w-100 h-100 rounded-circle"
                 />
               </div>
             </div>
